@@ -42,7 +42,7 @@ struct return_type_specializer
         // unqualified types, ie values only
         return FunctionPointerValue(
             argument_array[ArgSeq]
-                .get<typename std::remove_reference_t<ArgTypes>::type>()...);
+                .get<typename std::remove_reference_t<ArgTypes>>()...);
     }
 };
 
@@ -66,7 +66,7 @@ struct return_type_specializer<void>
         // unqualified types, ie values only
         FunctionPointerValue(
             argument_array[ArgSeq]
-                .get<typename std::remove_reference_t<ArgTypes>::type>()...);
+                .get<typename std::remove_reference_t<ArgTypes>>()...);
 
         // return empty any, ie 'void'
         return any();
