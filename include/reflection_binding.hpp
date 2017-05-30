@@ -36,7 +36,7 @@ struct return_type_specializer
     static any
     dispatch(any* argument_array,
              t_list::type_list<ArgTypes...>,
-             std::integer_sequence<std::size_t, ArgSeq...>)
+             std::index_sequence<ArgSeq...>)
     {
         // necessary to remove reference from types as any only stores
         // unqualified types, ie values only
@@ -60,7 +60,7 @@ struct return_type_specializer<void>
     static any
     dispatch(any* argument_array,
              t_list::type_list<ArgTypes...>,
-             std::integer_sequence<std::size_t, ArgSeq...>)
+             std::index_sequence<ArgSeq...>)
     {
         // necessary to remove reference from types as any only stores
         // unqualified types, ie values only
@@ -84,7 +84,8 @@ any
 generic_free_function_bind_point(any* argument_array)
 {
     typedef free_function_return_type_t<FunctionPointerType> return_type;
-    // deduce parameter types from function pointer type.
+    typedef free_function_parameter_types_t<FunctionPointerType>
+        parameter_types;
     // make integer sequence from type list
 }
 }
