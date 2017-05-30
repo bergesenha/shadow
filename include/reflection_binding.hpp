@@ -5,6 +5,7 @@
 
 #include "any.hpp"
 #include "meta/type_list.hpp"
+#include "meta/free_function_deduction.hpp"
 
 
 namespace shadow
@@ -82,6 +83,8 @@ template <class FunctionPointerType, FunctionPointerType FunctionPointerValue>
 any
 generic_free_function_bind_point(any* argument_array)
 {
-    // TODO: implementation
+    typedef free_function_return_type_t<FunctionPointerType> return_type;
+    // deduce parameter types from function pointer type.
+    // make integer sequence from type list
 }
 }
