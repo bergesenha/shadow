@@ -1,6 +1,11 @@
 #pragma once
 
+#include <utility>
+#include <type_traits>
+
 #include "any.hpp"
+#include "meta/type_list.hpp"
+
 
 namespace shadow
 {
@@ -20,12 +25,51 @@ namespace free_function_detail
 template <class ReturnType>
 struct return_type_specializer
 {
+    // dispatch: unpacks argument type list and sequence to correctly index into
+    // argument array and call get with the right types to retrieve raw values
+    // from the anys
+    template <class FunctionPointerType,
+              FunctionPointerType FunctionPointerValue,
+              class... ArgTypes,
+              std::size_t... ArgSeq>
+    static any
+    dispatch(any* argument_array,
+             t_list::type_list<ArgTypes...>,
+             std::integer_sequence<std::size_t, ArgSeq...>)
+    {
+        // necessary to remove reference from types as any only stores
+        // unqualified types, ie values only
+        return FunctionPointerValue(
+            argument_array[ArgSeq]
+                .get<typename std::remove_reference_t<ArgTypes>::type>()...);
+    }
 };
 
 
 template <>
 struct return_type_specializer<void>
 {
+    // dispatch: unpacks argument type list and sequence to correctly index into
+    // argument array and call get with the right types to retrieve raw values
+    // from the anys
+    template <class FunctionPointerType,
+              FunctionPointerType FunctionPointerValue,
+              class... ArgTypes,
+              std::size_t... ArgSeq>
+    static any
+    dispatch(any* argument_array,
+             t_list::type_list<ArgTypes...>,
+             std::integer_sequence<std::size_t, ArgSeq...>)
+    {
+        // necessary to remove reference from types as any only stores
+        // unqualified types, ie values only
+        FunctionPointerValue(
+            argument_array[ArgSeq]
+                .get<typename std::remove_reference_t<ArgTypes>::type>()...);
+
+        // return empty any, ie 'void'
+        return any();
+    }
 };
 }
 
