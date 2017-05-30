@@ -20,6 +20,7 @@ set_target_properties(main PROPERTIES
 if(SHADOW_BUILD_TESTS)
     set(SHADOW_TEST_SRC
         tests/test_main.cpp
+        tests/test_any.cpp
         )
 
     add_executable(unit_tests ${SHADOW_TEST_SRC})
