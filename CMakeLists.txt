@@ -13,6 +13,6 @@ target_include_directories(main
 set_target_properties(main PROPERTIES
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS OFF
-    CXX_STANDARD 11
+    CXX_STANDARD 14
     )
 
