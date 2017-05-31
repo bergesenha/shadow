@@ -6,11 +6,13 @@
 #include "any.hpp"
 #include "meta/type_list.hpp"
 #include "meta/free_function_deduction.hpp"
+#include "meta/member_function_deduction.hpp"
 
 
 namespace shadow
 {
 typedef any (*free_function_binding_signature)(any*);
+typedef any (*member_function_binding_signature)(any&, any*);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +74,6 @@ struct return_type_specializer<void>
         return any();
     }
 };
-}
 
 
 // the value of the function pointer is stored at runtime in the template
@@ -90,8 +91,81 @@ generic_free_function_bind_point(any* argument_array)
     typedef t_list::integer_sequence_from_type_list_t<parameter_types>
         parameter_sequence;
 
-    return free_function_detail::return_type_specializer<return_type>::
+    return return_type_specializer<return_type>::
         template dispatch<FunctionPointerType, FunctionPointerValue>(
             argument_array, parameter_types(), parameter_sequence());
+}
+}
+
+
+namespace member_function_detail
+{
+
+template <class ReturnType>
+struct return_type_specializer
+{
+    template <class MemFunPointerType,
+              MemFunPointerType MemFunPointerValue,
+              class ObjectType,
+              class... ParamTypes,
+              std::size_t... ParamSequence>
+    static any
+    dispatch(any& object,
+             any* argument_array,
+             t_list::type_list<ParamTypes...>,
+             std::index_sequence<ParamSequence...>)
+    {
+        return (object.get<ObjectType>().*MemFunPointerValue)(
+            argument_array[ParamSequence]
+                .get<std::remove_reference_t<ParamTypes>>()...);
+    }
+};
+
+
+template <>
+struct return_type_specializer<void>
+{
+    template <class MemFunPointerType,
+              MemFunPointerType MemFunPointerValue,
+              class ObjectType,
+              class... ParamTypes,
+              std::size_t... ParamSequence>
+    static any
+    dispatch(any& object,
+             any* argument_array,
+             t_list::type_list<ParamTypes...>,
+             std::index_sequence<ParamSequence...>)
+    {
+        (object.get<ObjectType>().*MemFunPointerValue)(
+            argument_array[ParamSequence]
+                .get<std::remove_reference_t<ParamTypes>>()...);
+
+        return any();
+    }
+};
+
+
+template <class MemFunPointerType, MemFunPointerType MemFunPointerValue>
+any
+generic_member_function_bind_point(any& object, any* argument_array)
+{
+    // deduce return type
+    typedef member_function_return_type_t<MemFunPointerType> return_type;
+
+    // deduce parameter types
+    typedef member_function_parameter_types_t<MemFunPointerType>
+        parameter_types;
+
+    // make integer sequence from parameter type list
+    typedef t_list::integer_sequence_from_type_list_t<parameter_types>
+        parameter_sequence;
+
+    // deduce object type
+    typedef member_function_object_type_t<MemFunPointerType> object_type;
+
+    return return_type_specializer<return_type>::
+        template dispatch<MemFunPointerType, MemFunPointerValue, object_type>(
+            object, argument_array, parameter_types(), parameter_sequence());
+}
 }
 }
