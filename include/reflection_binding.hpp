@@ -174,4 +174,36 @@ generic_member_function_bind_point(any& object, any* argument_array)
             object, argument_array, parameter_types(), parameter_sequence());
 }
 }
+
+
+namespace member_variable_detail
+{
+
+template <class MemVarPointerType,
+          MemVarPointerType MemVarPointerValue,
+          class ObjectType,
+          class MemVarType>
+any
+get_dispatch(const any& object)
+{
+    return (object.get<ObjectType>().*MemVarPointerValue);
+}
+
+template <class MemVarPointerType,
+          MemVarPointerType MemVarPointerValue,
+          class ObjectType,
+          class MemVarType>
+void
+set_dispatch(any& object, const any& value)
+{
+    (object.get<ObjectType>().*MemVarPointerValue) = value.get<MemVarType>();
+}
+
+
+template <class MemVarPointerType, MemVarPointerType MemVarPointerValue>
+any
+generic_member_variable_get_bind_point(const any& object)
+{
+}
+}
 }
