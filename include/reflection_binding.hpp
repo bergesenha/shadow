@@ -6,6 +6,7 @@
 #include "any.hpp"
 #include "meta/type_list.hpp"
 #include "meta/free_function_deduction.hpp"
+#include "meta/member_function_deduction.hpp"
 
 
 namespace shadow
@@ -93,6 +94,24 @@ generic_free_function_bind_point(any* argument_array)
     return return_type_specializer<return_type>::
         template dispatch<FunctionPointerType, FunctionPointerValue>(
             argument_array, parameter_types(), parameter_sequence());
+}
+}
+
+
+namespace member_function_detail
+{
+
+
+template <class MemFunPointerType, MemFunPointerType MemFunPointerValue>
+any
+generic_member_function_bind_point(any& object, any* argument_array)
+{
+    // deduce return type
+    typedef member_function_return_type_t<MemFunPointerType> return_type;
+
+    // deduce parameter types
+    // make integer sequence from parameter type list
+    // deduce object type
 }
 }
 }
