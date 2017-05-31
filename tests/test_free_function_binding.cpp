@@ -64,6 +64,14 @@ test_function8(const int* in)
 }
 
 
+// pointer out parameter
+void
+test_function9(int* out)
+{
+    *out = 44;
+}
+
+
 TEST_CASE("test free function binding point",
           "[generic_free_function_bind_point]")
 {
@@ -98,6 +106,10 @@ TEST_CASE("test free function binding point",
     auto bind_point8 =
         &shadow::generic_free_function_bind_point<decltype(&test_function8),
                                                   &test_function8>;
+
+    auto bind_point9 =
+        &shadow::generic_free_function_bind_point<decltype(&test_function9),
+                                                  &test_function9>;
 
     bool has_same_signature =
         std::is_same<decltype(bind_point1), decltype(bind_point2)>::value;
@@ -170,5 +182,13 @@ TEST_CASE("test free function binding point",
         REQUIRE(origin == 100);
         REQUIRE(any_of_p.get<int*>() == p_or);
         REQUIRE(ret_val.get<int>() == 200);
+
+        SECTION("call 9 with the same argument")
+        {
+            bind_point9(&any_of_p);
+
+            REQUIRE(origin == 44);
+            REQUIRE(*any_of_p.get<int*>() == 44);
+        }
     }
 }
