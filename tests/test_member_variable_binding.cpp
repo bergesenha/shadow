@@ -59,4 +59,23 @@ TEST_CASE("test binding of member variables", "[member_variable_detail::]")
             REQUIRE(get_bind_point2(t1).get<double>() == 150.4);
         }
     }
+
+    SECTION("make a const any of test_class_mv1")
+    {
+        const shadow::any t1 = test_class_mv1();
+
+        SECTION("get var1")
+        {
+            auto res = get_bind_point1(t1);
+
+            REQUIRE(res.get<int>() == 10);
+        }
+
+        SECTION("get var2")
+        {
+            auto res = get_bind_point2(t1);
+
+            REQUIRE(res.get<double>() == 20.5);
+        }
+    }
 }
