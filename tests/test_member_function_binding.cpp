@@ -19,6 +19,12 @@ public:
         return local_;
     }
 
+    int
+    test_member3() const
+    {
+        return local_;
+    }
+
 private:
     int local_ = 111;
 };
@@ -37,6 +43,11 @@ TEST_CASE("test binding of member functions",
             decltype(&test_class1::test_member2),
             &test_class1::test_member2>;
 
+    auto bind_point3 =
+        &shadow::member_function_detail::generic_member_function_bind_point<
+            decltype(&test_class1::test_member3),
+            &test_class1::test_member3>;
+
     SECTION("create a test_class1 and an int")
     {
         shadow::any t1 = test_class1();
@@ -53,6 +64,13 @@ TEST_CASE("test binding of member functions",
         SECTION("call 2")
         {
             auto ret_val = bind_point2(t1, nullptr);
+
+            REQUIRE(ret_val.get<int>() == 111);
+        }
+
+        SECTION("call 3")
+        {
+            auto ret_val = bind_point3(t1, nullptr);
 
             REQUIRE(ret_val.get<int>() == 111);
         }
