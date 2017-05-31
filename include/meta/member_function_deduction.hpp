@@ -32,4 +32,18 @@ struct member_function_parameter_types<ReturnType (ObjectType::*)(
 template <class MemFunPointerType>
 using member_function_parameter_types_t =
     typename member_function_parameter_types<MemFunPointerType>::type;
+
+
+template <class MemFunPointerType>
+struct member_function_object_type;
+
+template <class ReturnType, class ObjectType, class... ParamTypes>
+struct member_function_object_type<ReturnType (ObjectType::*)(ParamTypes...)>
+{
+    typedef ObjectType type;
+};
+
+template <class MemFunPointerType>
+using member_function_object_type_t =
+    typename member_function_object_type<MemFunPointerType>::type;
 }

@@ -114,7 +114,11 @@ generic_member_function_bind_point(any& object, any* argument_array)
         parameter_types;
 
     // make integer sequence from parameter type list
+    typedef t_list::integer_sequence_from_type_list_t<parameter_types>
+        parameter_sequence;
+
     // deduce object type
+    typedef member_function_object_type_t<MemFunPointerType> object_type;
 }
 }
 }
