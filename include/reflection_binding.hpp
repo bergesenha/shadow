@@ -110,6 +110,9 @@ generic_member_function_bind_point(any& object, any* argument_array)
     typedef member_function_return_type_t<MemFunPointerType> return_type;
 
     // deduce parameter types
+    typedef member_function_parameter_types_t<MemFunPointerType>
+        parameter_types;
+
     // make integer sequence from parameter type list
     // deduce object type
 }
