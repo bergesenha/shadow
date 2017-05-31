@@ -2,6 +2,7 @@
 
 
 #include <reflection_binding.hpp>
+#include <vector>
 
 
 class test_class1
@@ -31,6 +32,12 @@ public:
         local_ = i;
     }
 
+    int
+    test_member5(int i, char c)
+    {
+        return i + c;
+    }
+
     int local_ = 111;
 };
 
@@ -57,6 +64,11 @@ TEST_CASE("test binding of member functions",
         &shadow::member_function_detail::generic_member_function_bind_point<
             decltype(&test_class1::test_member4),
             &test_class1::test_member4>;
+
+    auto bind_point5 =
+        &shadow::member_function_detail::generic_member_function_bind_point<
+            decltype(&test_class1::test_member5),
+            &test_class1::test_member5>;
 
     SECTION("create a test_class1 and an int")
     {
@@ -92,6 +104,17 @@ TEST_CASE("test binding of member functions",
             bind_point4(t1, &anint);
 
             REQUIRE(t1.get<test_class1>().local_ == 44);
+        }
+
+        SECTION("create argument array and call 5")
+        {
+            std::vector<shadow::any> arg_arr;
+            arg_arr.emplace_back(10);
+            arg_arr.emplace_back(char(3));
+
+            auto ret_val = bind_point5(t1, arg_arr.data());
+
+            REQUIRE(ret_val.get<int>() == 13);
         }
     }
 }
