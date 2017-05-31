@@ -48,6 +48,13 @@ test_function6(const int& i)
     return 3 * i;
 }
 
+// reference out parameter
+void
+test_function7(int& i)
+{
+    i = 50;
+}
+
 
 TEST_CASE("test free function binding point",
           "[generic_free_function_bind_point]")
@@ -75,6 +82,10 @@ TEST_CASE("test free function binding point",
     auto bind_point6 =
         &shadow::generic_free_function_bind_point<decltype(&test_function6),
                                                   &test_function6>;
+
+    auto bind_point7 =
+        &shadow::generic_free_function_bind_point<decltype(&test_function7),
+                                                  &test_function7>;
 
     bool has_same_signature =
         std::is_same<decltype(bind_point1), decltype(bind_point2)>::value;
@@ -127,7 +138,12 @@ TEST_CASE("test free function binding point",
         auto ret_val = bind_point4(nullptr);
     }
 
-    SECTION("call 5")
+    SECTION("call 7")
     {
+        shadow::any anint = 10;
+
+        bind_point7(&anint);
+
+        REQUIRE(anint.get<int>() == 50);
     }
 }
