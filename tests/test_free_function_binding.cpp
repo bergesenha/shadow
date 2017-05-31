@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <reflection_binding.hpp>
 #include <any.hpp>
+#include <cmath>
 
 
 // return type and parameter type
@@ -72,6 +73,20 @@ test_function9(int* out)
 }
 
 
+// overloads
+int
+overloaded_function(int i)
+{
+    return i;
+}
+
+int
+overloaded_function(double d)
+{
+    return std::floor(d);
+}
+
+
 TEST_CASE("test free function binding point",
           "[generic_free_function_bind_point]")
 {
@@ -110,6 +125,14 @@ TEST_CASE("test free function binding point",
     auto bind_point9 =
         &shadow::generic_free_function_bind_point<decltype(&test_function9),
                                                   &test_function9>;
+
+    auto overload1 = &shadow::generic_free_function_bind_point<
+        decltype(static_cast<int (*)(int)>(overloaded_function)),
+        &overloaded_function>;
+
+    auto overload2 = &shadow::generic_free_function_bind_point<
+        decltype(static_cast<int (*)(double)>(overloaded_function)),
+        &overloaded_function>;
 
     bool has_same_signature =
         std::is_same<decltype(bind_point1), decltype(bind_point2)>::value;
@@ -190,5 +213,17 @@ TEST_CASE("test free function binding point",
             REQUIRE(origin == 44);
             REQUIRE(*any_of_p.get<int*>() == 44);
         }
+    }
+
+    SECTION("call overloaded functions through bindings")
+    {
+        shadow::any has_int = 10;
+        shadow::any has_double = 20.1;
+
+        auto ret_val1 = overload1(&has_int);
+        auto ret_val2 = overload2(&has_double);
+
+        REQUIRE(ret_val1.get<int>() == 10);
+        REQUIRE(ret_val2.get<int>() == 20);
     }
 }
