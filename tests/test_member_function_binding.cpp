@@ -38,6 +38,18 @@ public:
         return i + c;
     }
 
+    int
+    test_member6(int i)
+    {
+        return i;
+    }
+
+    int
+    test_member6(double d)
+    {
+        return d;
+    }
+
     int local_ = 111;
 };
 
@@ -69,6 +81,18 @@ TEST_CASE("test binding of member functions",
         &shadow::member_function_detail::generic_member_function_bind_point<
             decltype(&test_class1::test_member5),
             &test_class1::test_member5>;
+
+    auto bind_point6_ol1 =
+        &shadow::member_function_detail::generic_member_function_bind_point<
+            decltype(static_cast<int (test_class1::*)(int)>(
+                &test_class1::test_member6)),
+            &test_class1::test_member6>;
+
+    auto bind_point6_ol2 =
+        &shadow::member_function_detail::generic_member_function_bind_point<
+            decltype(static_cast<int (test_class1::*)(double)>(
+                &test_class1::test_member6)),
+            &test_class1::test_member6>;
 
     SECTION("create a test_class1 and an int")
     {
@@ -115,6 +139,18 @@ TEST_CASE("test binding of member functions",
             auto ret_val = bind_point5(t1, arg_arr.data());
 
             REQUIRE(ret_val.get<int>() == 13);
+        }
+
+        SECTION("create int and double and call overloads of 6")
+        {
+            shadow::any anint = 10;
+            shadow::any adouble = 11.1;
+
+            auto ret_val1 = bind_point6_ol1(t1, &anint);
+            auto ret_val2 = bind_point6_ol2(t1, &adouble);
+
+            REQUIRE(ret_val1.get<int>() == 10);
+            REQUIRE(ret_val2.get<int>() == 11);
         }
     }
 }
