@@ -21,6 +21,7 @@ if(SHADOW_BUILD_TESTS)
     set(SHADOW_TEST_SRC
         tests/test_main.cpp
         tests/test_any.cpp
+        tests/test_free_function_binding.cpp
         )
 
     add_executable(unit_tests ${SHADOW_TEST_SRC})
