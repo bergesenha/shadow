@@ -11,6 +11,7 @@
 namespace shadow
 {
 typedef any (*free_function_binding_signature)(any*);
+typedef any (*member_function_binding_signature)(any&, any*);
 
 
 ////////////////////////////////////////////////////////////////////////////////
