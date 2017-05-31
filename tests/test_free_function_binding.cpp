@@ -88,51 +88,62 @@ overloaded_function(double d)
 
 
 TEST_CASE("test free function binding point",
-          "[generic_free_function_bind_point]")
+          "[free_function_detail::generic_free_function_bind_point]")
 {
     auto bind_point1 =
-        &shadow::generic_free_function_bind_point<decltype(&test_function1),
-                                                  &test_function1>;
+        &shadow::free_function_detail::generic_free_function_bind_point<
+            decltype(&test_function1),
+            &test_function1>;
 
     auto bind_point2 =
-        &shadow::generic_free_function_bind_point<decltype(&test_function2),
-                                                  &test_function2>;
+        &shadow::free_function_detail::generic_free_function_bind_point<
+            decltype(&test_function2),
+            &test_function2>;
 
     auto bind_point3 =
-        &shadow::generic_free_function_bind_point<decltype(&test_function3),
-                                                  &test_function3>;
+        &shadow::free_function_detail::generic_free_function_bind_point<
+            decltype(&test_function3),
+            &test_function3>;
 
     auto bind_point4 =
-        &shadow::generic_free_function_bind_point<decltype(&test_function4),
-                                                  &test_function4>;
+        &shadow::free_function_detail::generic_free_function_bind_point<
+            decltype(&test_function4),
+            &test_function4>;
 
     auto bind_point5 =
-        &shadow::generic_free_function_bind_point<decltype(&test_function5),
-                                                  &test_function5>;
+        &shadow::free_function_detail::generic_free_function_bind_point<
+            decltype(&test_function5),
+            &test_function5>;
 
     auto bind_point6 =
-        &shadow::generic_free_function_bind_point<decltype(&test_function6),
-                                                  &test_function6>;
+        &shadow::free_function_detail::generic_free_function_bind_point<
+            decltype(&test_function6),
+            &test_function6>;
 
     auto bind_point7 =
-        &shadow::generic_free_function_bind_point<decltype(&test_function7),
-                                                  &test_function7>;
+        &shadow::free_function_detail::generic_free_function_bind_point<
+            decltype(&test_function7),
+            &test_function7>;
 
     auto bind_point8 =
-        &shadow::generic_free_function_bind_point<decltype(&test_function8),
-                                                  &test_function8>;
+        &shadow::free_function_detail::generic_free_function_bind_point<
+            decltype(&test_function8),
+            &test_function8>;
 
     auto bind_point9 =
-        &shadow::generic_free_function_bind_point<decltype(&test_function9),
-                                                  &test_function9>;
+        &shadow::free_function_detail::generic_free_function_bind_point<
+            decltype(&test_function9),
+            &test_function9>;
 
-    auto overload1 = &shadow::generic_free_function_bind_point<
-        decltype(static_cast<int (*)(int)>(overloaded_function)),
-        &overloaded_function>;
+    auto overload1 =
+        &shadow::free_function_detail::generic_free_function_bind_point<
+            decltype(static_cast<int (*)(int)>(overloaded_function)),
+            &overloaded_function>;
 
-    auto overload2 = &shadow::generic_free_function_bind_point<
-        decltype(static_cast<int (*)(double)>(overloaded_function)),
-        &overloaded_function>;
+    auto overload2 =
+        &shadow::free_function_detail::generic_free_function_bind_point<
+            decltype(static_cast<int (*)(double)>(overloaded_function)),
+            &overloaded_function>;
 
     bool has_same_signature =
         std::is_same<decltype(bind_point1), decltype(bind_point2)>::value;

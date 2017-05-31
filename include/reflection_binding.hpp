@@ -72,7 +72,6 @@ struct return_type_specializer<void>
         return any();
     }
 };
-}
 
 
 // the value of the function pointer is stored at runtime in the template
@@ -90,8 +89,9 @@ generic_free_function_bind_point(any* argument_array)
     typedef t_list::integer_sequence_from_type_list_t<parameter_types>
         parameter_sequence;
 
-    return free_function_detail::return_type_specializer<return_type>::
+    return return_type_specializer<return_type>::
         template dispatch<FunctionPointerType, FunctionPointerValue>(
             argument_array, parameter_types(), parameter_sequence());
+}
 }
 }
