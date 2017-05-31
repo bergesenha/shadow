@@ -12,6 +12,15 @@ public:
     {
         return i * 2;
     }
+
+    int
+    test_member2()
+    {
+        return local_;
+    }
+
+private:
+    int local_ = 111;
 };
 
 
@@ -23,6 +32,10 @@ TEST_CASE("test binding of member functions",
             decltype(&test_class1::test_member1),
             &test_class1::test_member1>;
 
+    auto bind_point2 =
+        &shadow::member_function_detail::generic_member_function_bind_point<
+            decltype(&test_class1::test_member2),
+            &test_class1::test_member2>;
 
     SECTION("create a test_class1 and an int")
     {
@@ -35,6 +48,13 @@ TEST_CASE("test binding of member functions",
             auto ret_val = bind_point1(t1, &anint);
 
             REQUIRE(ret_val.get<int>() == 40);
+        }
+
+        SECTION("call 2")
+        {
+            auto ret_val = bind_point2(t1, nullptr);
+
+            REQUIRE(ret_val.get<int>() == 111);
         }
     }
 }
