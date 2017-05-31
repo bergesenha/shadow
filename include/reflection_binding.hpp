@@ -7,6 +7,7 @@
 #include "meta/type_list.hpp"
 #include "meta/free_function_deduction.hpp"
 #include "meta/member_function_deduction.hpp"
+#include "meta/member_variable_deduction.hpp"
 
 
 namespace shadow
@@ -204,6 +205,27 @@ template <class MemVarPointerType, MemVarPointerType MemVarPointerValue>
 any
 generic_member_variable_get_bind_point(const any& object)
 {
+    typedef member_variable_object_type_t<MemVarPointerType> object_type;
+    typedef member_variable_type_t<MemVarPointerType> member_variable_type;
+
+    return get_dispatch<MemVarPointerType,
+                        MemVarPointerValue,
+                        object_type,
+                        member_variable_type>(object);
+}
+
+
+template <class MemVarPointerType, MemVarPointerType MemVarPointerValue>
+void
+generic_member_variable_set_bind_point(any& object, const any& value)
+{
+    typedef member_variable_object_type_t<MemVarPointerType> object_type;
+    typedef member_variable_type_t<MemVarPointerType> member_variable_type;
+
+    return set_dispatch<MemVarPointerType,
+                        MemVarPointerValue,
+                        object_type,
+                        member_variable_type>(object, value);
 }
 }
 }
