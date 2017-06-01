@@ -8,3 +8,4 @@ build_release/
 compile_commands.json
 *.spv
 tags
+Session.vim
