@@ -7,16 +7,18 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(SHADOW_BUILD_TESTS "Build unit tests" ON)
 
-add_executable(main src/main.cpp)
-target_include_directories(main
-    PRIVATE include/
-    )
-set_target_properties(main PROPERTIES
-    CXX_STANDARD_REQUIRED ON
-    CXX_EXTENSIONS OFF
-    CXX_STANDARD 14
+
+add_library(shadow INTERFACE)
+target_compile_features(shadow 
+    INTERFACE cxx_std_14)
+target_include_directories(shadow
+    INTERFACE include/
     )
 
+add_executable(main src/main.cpp)
+target_link_libraries(main shadow)
+
+# unit tests
 if(SHADOW_BUILD_TESTS)
     set(SHADOW_TEST_SRC
         tests/test_main.cpp
@@ -27,13 +29,8 @@ if(SHADOW_BUILD_TESTS)
         )
 
     add_executable(unit_tests ${SHADOW_TEST_SRC})
+    target_link_libraries(unit_tests shadow)
     target_include_directories(unit_tests
         PRIVATE external/Catch/include/
-        PRIVATE include/
-        )
-    set_target_properties(unit_tests PROPERTIES
-        CXX_STANDARD_REQUIRED ON
-        CXX_EXTENSIONS OFF
-        CXX_STANDARD 14
         )
 endif(SHADOW_BUILD_TESTS)
