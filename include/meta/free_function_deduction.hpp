@@ -1,6 +1,6 @@
 #pragma once
 
-#include "meta/type_list.hpp"
+#include <type_list.hpp>
 
 namespace shadow
 {
@@ -29,7 +29,7 @@ struct free_function_parameter_types;
 template <class ReturnType, class... ParamTypes>
 struct free_function_parameter_types<ReturnType (*)(ParamTypes...)>
 {
-    typedef t_list::type_list<ParamTypes...> type;
+    typedef metamusil::t_list::type_list<ParamTypes...> type;
 };
 
 template <class FunctionPointerType>

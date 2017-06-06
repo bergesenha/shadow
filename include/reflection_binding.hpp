@@ -4,7 +4,7 @@
 #include <type_traits>
 
 #include "any.hpp"
-#include "meta/type_list.hpp"
+#include <type_list.hpp>
 #include "meta/free_function_deduction.hpp"
 #include "meta/member_function_deduction.hpp"
 #include "meta/member_variable_deduction.hpp"
@@ -44,7 +44,7 @@ struct return_type_specializer
               std::size_t... ArgSeq>
     static any
     dispatch(any* argument_array,
-             t_list::type_list<ArgTypes...>,
+             metamusil::t_list::type_list<ArgTypes...>,
              std::index_sequence<ArgSeq...>)
     {
         // necessary to remove reference from types as any only stores
@@ -68,7 +68,7 @@ struct return_type_specializer<void>
               std::size_t... ArgSeq>
     static any
     dispatch(any* argument_array,
-             t_list::type_list<ArgTypes...>,
+             metamusil::t_list::type_list<ArgTypes...>,
              std::index_sequence<ArgSeq...>)
     {
         // necessary to remove reference from types as any only stores
@@ -95,7 +95,7 @@ generic_free_function_bind_point(any* argument_array)
     typedef free_function_parameter_types_t<FunctionPointerType>
         parameter_types;
     // make integer sequence from type list
-    typedef t_list::integer_sequence_from_type_list_t<parameter_types>
+    typedef metamusil::t_list::index_sequence_for_t<parameter_types>
         parameter_sequence;
 
     return return_type_specializer<return_type>::
@@ -119,7 +119,7 @@ struct return_type_specializer
     static any
     dispatch(any& object,
              any* argument_array,
-             t_list::type_list<ParamTypes...>,
+             metamusil::t_list::type_list<ParamTypes...>,
              std::index_sequence<ParamSequence...>)
     {
         return (object.get<ObjectType>().*MemFunPointerValue)(
@@ -140,7 +140,7 @@ struct return_type_specializer<void>
     static any
     dispatch(any& object,
              any* argument_array,
-             t_list::type_list<ParamTypes...>,
+             metamusil::t_list::type_list<ParamTypes...>,
              std::index_sequence<ParamSequence...>)
     {
         (object.get<ObjectType>().*MemFunPointerValue)(
@@ -164,7 +164,7 @@ generic_member_function_bind_point(any& object, any* argument_array)
         parameter_types;
 
     // make integer sequence from parameter type list
-    typedef t_list::integer_sequence_from_type_list_t<parameter_types>
+    typedef metamusil::t_list::index_sequence_for_t<parameter_types>
         parameter_sequence;
 
     // deduce object type

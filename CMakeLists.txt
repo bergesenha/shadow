@@ -10,6 +10,7 @@ option(SHADOW_BUILD_TESTS "Build unit tests" ON)
 add_subdirectory(external/metamusil)
 
 add_library(shadow INTERFACE)
+target_link_libraries(shadow INTERFACE metamusil)
 target_compile_features(shadow 
     INTERFACE cxx_std_14)
 target_include_directories(shadow
