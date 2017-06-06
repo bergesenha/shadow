@@ -1,6 +1,6 @@
 #pragma once
 
-#include "meta/type_list.hpp"
+#include <type_list.hpp>
 
 
 namespace shadow
@@ -33,14 +33,14 @@ template <class ReturnType, class ObjectType, class... ParamTypes>
 struct member_function_parameter_types<ReturnType (ObjectType::*)(
     ParamTypes...)>
 {
-    typedef t_list::type_list<ParamTypes...> type;
+    typedef metamusil::t_list::type_list<ParamTypes...> type;
 };
 
 template <class ReturnType, class ObjectType, class... ParamTypes>
 struct member_function_parameter_types<ReturnType (ObjectType::*)(ParamTypes...)
                                            const>
 {
-    typedef t_list::type_list<ParamTypes...> type;
+    typedef metamusil::t_list::type_list<ParamTypes...> type;
 };
 
 template <class MemFunPointerType>
