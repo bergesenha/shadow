@@ -7,6 +7,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(SHADOW_BUILD_TESTS "Build unit tests" ON)
 
+add_subdirectory(external/metamusil)
 
 add_library(shadow INTERFACE)
 target_compile_features(shadow 
