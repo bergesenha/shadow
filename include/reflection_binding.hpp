@@ -5,9 +5,8 @@
 
 #include "any.hpp"
 #include <type_list.hpp>
-#include "meta/free_function_deduction.hpp"
-#include "meta/member_function_deduction.hpp"
-#include "meta/member_variable_deduction.hpp"
+#include <function_deduction.hpp>
+#include <member_variable_deduction.hpp>
 
 
 namespace shadow
@@ -91,8 +90,8 @@ template <class FunctionPointerType, FunctionPointerType FunctionPointerValue>
 any
 generic_free_function_bind_point(any* argument_array)
 {
-    typedef free_function_return_type_t<FunctionPointerType> return_type;
-    typedef free_function_parameter_types_t<FunctionPointerType>
+    typedef metamusil::deduce_return_type_t<FunctionPointerType> return_type;
+    typedef metamusil::deduce_parameter_types_t<FunctionPointerType>
         parameter_types;
     // make integer sequence from type list
     typedef metamusil::t_list::index_sequence_for_t<parameter_types>
@@ -157,10 +156,10 @@ any
 generic_member_function_bind_point(any& object, any* argument_array)
 {
     // deduce return type
-    typedef member_function_return_type_t<MemFunPointerType> return_type;
+    typedef metamusil::deduce_return_type_t<MemFunPointerType> return_type;
 
     // deduce parameter types
-    typedef member_function_parameter_types_t<MemFunPointerType>
+    typedef metamusil::deduce_parameter_types_t<MemFunPointerType>
         parameter_types;
 
     // make integer sequence from parameter type list
@@ -168,7 +167,7 @@ generic_member_function_bind_point(any& object, any* argument_array)
         parameter_sequence;
 
     // deduce object type
-    typedef member_function_object_type_t<MemFunPointerType> object_type;
+    typedef metamusil::deduce_object_type_t<MemFunPointerType> object_type;
 
     return return_type_specializer<return_type>::
         template dispatch<MemFunPointerType, MemFunPointerValue, object_type>(
@@ -205,8 +204,10 @@ template <class MemVarPointerType, MemVarPointerType MemVarPointerValue>
 any
 generic_member_variable_get_bind_point(const any& object)
 {
-    typedef member_variable_object_type_t<MemVarPointerType> object_type;
-    typedef member_variable_type_t<MemVarPointerType> member_variable_type;
+    typedef metamusil::deduce_member_variable_object_type_t<MemVarPointerType>
+        object_type;
+    typedef metamusil::deduce_member_variable_type_t<MemVarPointerType>
+        member_variable_type;
 
     return get_dispatch<MemVarPointerType,
                         MemVarPointerValue,
@@ -219,8 +220,10 @@ template <class MemVarPointerType, MemVarPointerType MemVarPointerValue>
 void
 generic_member_variable_set_bind_point(any& object, const any& value)
 {
-    typedef member_variable_object_type_t<MemVarPointerType> object_type;
-    typedef member_variable_type_t<MemVarPointerType> member_variable_type;
+    typedef metamusil::deduce_member_variable_object_type_t<MemVarPointerType>
+        object_type;
+    typedef metamusil::deduce_member_variable_type_t<MemVarPointerType>
+        member_variable_type;
 
     return set_dispatch<MemVarPointerType,
                         MemVarPointerValue,
