@@ -19,6 +19,8 @@ typedef any (*member_function_binding_signature)(any&, any*);
 typedef any (*member_variable_get_binding_signature)(const any&);
 // member variable setter
 typedef void (*member_variable_set_binding_signature)(any&, const any&);
+// constructor signature
+typedef any (*generic_constructor_signature)(any*);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -229,6 +231,29 @@ generic_member_variable_set_bind_point(any& object, const any& value)
                         MemVarPointerValue,
                         object_type,
                         member_variable_type>(object, value);
+}
+}
+
+
+namespace constructor_detail
+{
+
+template <class T, class... ParamTypes, std::size_t... Seq>
+any
+constructor_dispatch(any* argument_array, std::index_sequence<Seq...>)
+{
+    any out = T{argument_array[Seq].get<ParamTypes>()...};
+    return out;
+}
+
+template <class T, class... ParamTypes>
+any
+generic_constructor_bind_point(any* argument_array)
+{
+    typedef std::index_sequence_for<ParamTypes...> param_sequence;
+
+    return constructor_dispatch<T, ParamTypes...>(argument_array,
+                                                  param_sequence());
 }
 }
 }
