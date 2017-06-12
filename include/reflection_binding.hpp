@@ -20,7 +20,7 @@ typedef any (*member_variable_get_binding_signature)(const any&);
 // member variable setter
 typedef void (*member_variable_set_binding_signature)(any&, const any&);
 // constructor signature
-typedef any (*generic_constructor_signature)(any*);
+typedef any (*constructor_binding_signature)(any*);
 
 
 ////////////////////////////////////////////////////////////////////////////////
