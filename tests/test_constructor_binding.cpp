@@ -31,11 +31,9 @@ TEST_CASE("test constructor binding", "[generic_constructor_bind_point]")
         &shadow::constructor_detail::
             generic_constructor_bind_point<test_construct1, int, float>;
 
-    /*
     auto test_construct2_constructor =
         &shadow::constructor_detail::
             generic_constructor_bind_point<test_construct2, char, double>;
-            */
 
     SECTION("construct int with int")
     {

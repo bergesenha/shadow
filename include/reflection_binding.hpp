@@ -7,6 +7,7 @@
 #include <type_list.hpp>
 #include <function_deduction.hpp>
 #include <member_variable_deduction.hpp>
+#include <void_t.hpp>
 
 
 namespace shadow
@@ -238,13 +239,38 @@ generic_member_variable_set_bind_point(any& object, const any& value)
 namespace constructor_detail
 {
 
-template <class T, class... ParamTypes, std::size_t... Seq>
-any
-constructor_dispatch(any* argument_array, std::index_sequence<Seq...>)
+// purpose of braced_init_selector is to attempt to use constructor T(...) if
+// available, otherwise fall back to braced init list initialization
+template <class, class T, class... ParamTypes>
+struct braced_init_selector_impl
 {
-    any out = T(argument_array[Seq].get<ParamTypes>()...);
-    return out;
-}
+    template <std::size_t... Seq>
+    static any
+    constructor_dispatch(any* argument_array, std::index_sequence<Seq...>)
+    {
+        any out = T{argument_array[Seq].get<ParamTypes>()...};
+        return out;
+    }
+};
+
+template <class T, class... ParamTypes>
+struct braced_init_selector_impl<
+    metamusil::void_t<decltype(T(std::declval<ParamTypes>()...))>,
+    T,
+    ParamTypes...>
+{
+    template <std::size_t... Seq>
+    static any
+    constructor_dispatch(any* argument_array, std::index_sequence<Seq...>)
+    {
+        any out = T(argument_array[Seq].get<ParamTypes>()...);
+        return out;
+    }
+};
+
+template <class T, class... ParamTypes>
+using braced_init_selector = braced_init_selector_impl<void, T, ParamTypes...>;
+
 
 template <class T, class... ParamTypes>
 any
@@ -252,8 +278,8 @@ generic_constructor_bind_point(any* argument_array)
 {
     typedef std::index_sequence_for<ParamTypes...> param_sequence;
 
-    return constructor_dispatch<T, ParamTypes...>(argument_array,
-                                                  param_sequence());
+    return braced_init_selector<T, ParamTypes...>::constructor_dispatch(
+        argument_array, param_sequence());
 }
 }
 }
