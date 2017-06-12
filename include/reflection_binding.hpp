@@ -242,7 +242,7 @@ template <class T, class... ParamTypes, std::size_t... Seq>
 any
 constructor_dispatch(any* argument_array, std::index_sequence<Seq...>)
 {
-    any out = T{argument_array[Seq].get<ParamTypes>()...};
+    any out = T(argument_array[Seq].get<ParamTypes>()...);
     return out;
 }
 
