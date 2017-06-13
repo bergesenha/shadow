@@ -22,6 +22,8 @@ typedef any (*member_variable_get_binding_signature)(const any&);
 typedef void (*member_variable_set_binding_signature)(any&, const any&);
 // constructor signature
 typedef any (*constructor_binding_signature)(any*);
+// conversion signature
+typedef any (*conversion_binding_signature)(const any&);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -280,6 +282,19 @@ generic_constructor_bind_point(any* argument_array)
 
     return braced_init_selector<T, ParamTypes...>::constructor_dispatch(
         argument_array, param_sequence());
+}
+}
+
+
+namespace conversion_detail
+{
+template <class TargetType, class SourceType>
+any
+generic_conversion_bind_point(const any& src)
+{
+    TargetType temp = src.get<SourceType>();
+    any out = temp;
+    return out;
 }
 }
 }
