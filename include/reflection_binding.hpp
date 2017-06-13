@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <type_traits>
+#include <string>
 
 #include "any.hpp"
 #include <type_list.hpp>
@@ -22,6 +23,8 @@ typedef any (*member_variable_get_binding_signature)(const any&);
 typedef void (*member_variable_set_binding_signature)(any&, const any&);
 // constructor signature
 typedef any (*constructor_binding_signature)(any*);
+// conversion signature
+typedef any (*conversion_binding_signature)(const any&);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -280,6 +283,42 @@ generic_constructor_bind_point(any* argument_array)
 
     return braced_init_selector<T, ParamTypes...>::constructor_dispatch(
         argument_array, param_sequence());
+}
+}
+
+
+namespace conversion_detail
+{
+template <class TargetType,
+          class SourceType,
+          bool SourceIsArithmetic = std::is_arithmetic<SourceType>::value>
+struct conversion_specializer
+{
+    static any
+    dispatch(const any& src)
+    {
+        TargetType temp = src.get<SourceType>();
+        any out = temp;
+        return out;
+    }
+};
+
+template <class SourceType>
+struct conversion_specializer<std::string, SourceType, true>
+{
+    static any
+    dispatch(const any& src)
+    {
+        any out = std::to_string(src.get<SourceType>());
+        return out;
+    }
+};
+
+template <class TargetType, class SourceType>
+any
+generic_conversion_bind_point(const any& src)
+{
+    return conversion_specializer<TargetType, SourceType>::dispatch(src);
 }
 }
 }
