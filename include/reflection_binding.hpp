@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <type_traits>
+#include <string>
 
 #include "any.hpp"
 #include <type_list.hpp>
@@ -288,13 +289,36 @@ generic_constructor_bind_point(any* argument_array)
 
 namespace conversion_detail
 {
+template <class TargetType,
+          class SourceType,
+          bool SourceIsArithmetic = std::is_arithmetic<SourceType>::value>
+struct conversion_specializer
+{
+    static any
+    dispatch(const any& src)
+    {
+        TargetType temp = src.get<SourceType>();
+        any out = temp;
+        return out;
+    }
+};
+
+template <class SourceType>
+struct conversion_specializer<std::string, SourceType, true>
+{
+    static any
+    dispatch(const any& src)
+    {
+        any out = std::to_string(src.get<SourceType>());
+        return out;
+    }
+};
+
 template <class TargetType, class SourceType>
 any
 generic_conversion_bind_point(const any& src)
 {
-    TargetType temp = src.get<SourceType>();
-    any out = temp;
-    return out;
+    return conversion_specializer<TargetType, SourceType>::dispatch(src);
 }
 }
 }
