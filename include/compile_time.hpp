@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_list.hpp>
+#include <integer_sequence.hpp>
 
 namespace shadow
 {
@@ -34,4 +35,12 @@ using generate_vector_of_strings =
     constexpr char compile_time_type_info<__LINE__>::name[];
 
 
-#define REGISTER_TYPE_END() constexpr std::size_t type_line_end = __LINE__;
+#define REGISTER_TYPE_END()                                                    \
+    constexpr std::size_t type_line_end = __LINE__;                            \
+                                                                               \
+    typedef metamusil::int_seq::integer_sequence_from_range_t<                 \
+        std::size_t,                                                           \
+        type_line_begin + 1,                                                   \
+        type_line_end>                                                         \
+        type_line_range;                                                       \
+    \
