@@ -65,6 +65,13 @@ TEST_CASE("test conversion bindings between anys of different types",
         auto res = string_to_int(astring);
 
         REQUIRE(res.get<int>() == 234);
+
+        SECTION("convert back to string")
+        {
+            auto res_string = int_to_string(res);
+
+            REQUIRE(res_string.get<std::string>() == std::to_string(234));
+        }
     }
 
     SECTION("convert a string to float")
