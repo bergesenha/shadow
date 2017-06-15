@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <string>
 
 #include <compile_time.hpp>
 
@@ -20,18 +22,42 @@ void p(T)
 }
 
 
+class director
+{
+public:
+    template <class NameHolder, class TypeInfoHolder>
+    director(NameHolder, TypeInfoHolder)
+        : names_(std::begin(NameHolder::value), std::end(NameHolder::value)),
+          type_infos_(std::begin(TypeInfoHolder::value),
+                      std::end(TypeInfoHolder::value))
+    {
+    }
+
+    std::vector<std::string>::const_iterator
+    names_begin() const
+    {
+        return names_.cbegin();
+    }
+
+    std::vector<std::string>::const_iterator
+    names_end() const
+    {
+        return names_.cend();
+    }
+
+private:
+    std::vector<std::string> names_;
+    std::vector<shadow::type_info> type_infos_;
+};
+
+static const director thedir((myspace::type_name_array_holder()),
+                             myspace::type_info_array_holder());
+
 int
 main()
 {
-    p(myspace::instantiated_compile_time_infos());
-
-    for(auto str : myspace::type_name_array_holder::value)
+    for(auto i = thedir.names_begin(); i != thedir.names_end(); ++i)
     {
-        std::cout << str << '\n';
-    }
-
-    for(auto& cti : myspace::type_info_array_holder::value)
-    {
-        std::cout << cti.name << " : " << cti.size << '\n';
+        std::cout << *i << '\n';
     }
 }
