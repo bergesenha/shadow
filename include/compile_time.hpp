@@ -5,6 +5,7 @@
 #include <sfinae.hpp>
 
 #include "reflection_info.hpp"
+#include "director.hpp"
 
 
 namespace shadow
@@ -94,3 +95,7 @@ using generate_valid_compile_time_type_infos_t =
         instantiated_compile_time_infos>                                       \
         type_info_array_holder;
 
+
+#define SHADOW_INIT()                                                          \
+    static const shadow::director reflection_director{                         \
+        type_name_array_holder(), type_info_array_holder()};
