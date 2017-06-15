@@ -4,8 +4,6 @@
 
 namespace shadow
 {
-template <std::size_t LineNum>
-struct compile_time_type_info;
 
 template <class CompileTimeTypeInfo>
 struct extract_name
@@ -19,12 +17,13 @@ using generate_vector_of_strings =
                                        extract_name>;
 }
 
-#define REGISTER_TYPE_BEGIN() constexpr std::size_t type_line_begin = __LINE__;
+#define REGISTER_TYPE_BEGIN()                                                  \
+    constexpr std::size_t type_line_begin = __LINE__;                          \
+    template <std::size_t LineNum>                                             \
+    struct compile_time_type_info;
 
 
 #define REGISTER_TYPE(type_name)                                               \
-    namespace shadow                                                           \
-    {                                                                          \
     template <>                                                                \
     struct compile_time_type_info<__LINE__>                                    \
     {                                                                          \
@@ -32,8 +31,7 @@ using generate_vector_of_strings =
         static constexpr char name[] = #type_name;                             \
     };                                                                         \
                                                                                \
-    constexpr char compile_time_type_info<__LINE__>::name[];                   \
-    }
+    constexpr char compile_time_type_info<__LINE__>::name[];
 
 
 #define REGISTER_TYPE_END() constexpr std::size_t type_line_end = __LINE__;
