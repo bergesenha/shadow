@@ -19,6 +19,8 @@ using generate_vector_of_strings =
                                        extract_name>;
 }
 
+#define REGISTER_TYPE_BEGIN() constexpr std::size_t type_line_begin = __LINE__;
+
 
 #define REGISTER_TYPE(type_name)                                               \
     namespace shadow                                                           \
@@ -31,5 +33,7 @@ using generate_vector_of_strings =
     };                                                                         \
                                                                                \
     constexpr char compile_time_type_info<__LINE__>::name[];                   \
-    }                                                                          \
-    \
+    }
+
+
+#define REGISTER_TYPE_END() constexpr std::size_t type_line_end = __LINE__;
