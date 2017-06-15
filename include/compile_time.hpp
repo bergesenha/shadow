@@ -4,6 +4,8 @@
 #include <integer_sequence.hpp>
 #include <sfinae.hpp>
 
+#include "reflection_info.hpp"
+
 
 namespace shadow
 {
@@ -14,12 +16,22 @@ struct extract_name
     static constexpr const char* value = CompileTimeTypeInfo::name;
 };
 
-
 template <class TypeListOfCompileTimeTypeInfo>
 using generate_array_of_strings =
     metamusil::t_list::value_transform<TypeListOfCompileTimeTypeInfo,
                                        extract_name>;
 
+template <class CompileTimeTypeInfo>
+struct extract_type_info
+{
+    static constexpr type_info value = {CompileTimeTypeInfo::name,
+                                        CompileTimeTypeInfo::size};
+};
+
+template <class TypeListOfCompileTimeTypeInfo>
+using generate_array_of_type_info =
+    metamusil::t_list::value_transform<TypeListOfCompileTimeTypeInfo,
+                                       extract_type_info>;
 
 template <template <std::size_t> class CTI, class IntSeqRange>
 struct generate_valid_compile_time_type_infos
@@ -55,6 +67,7 @@ using generate_valid_compile_time_type_infos_t =
     {                                                                          \
         typedef type_name type;                                                \
         static constexpr char name[] = #type_name;                             \
+        static const std::size_t size = sizeof(type_name);                     \
     };                                                                         \
                                                                                \
     constexpr char compile_time_type_info<__LINE__>::name[];
@@ -75,5 +88,9 @@ using generate_valid_compile_time_type_infos_t =
         instantiated_compile_time_infos;                                       \
                                                                                \
     typedef shadow::generate_array_of_strings<instantiated_compile_time_infos> \
-        type_name_array_holder;
+        type_name_array_holder;                                                \
+                                                                               \
+    typedef shadow::generate_array_of_type_info<                               \
+        instantiated_compile_time_infos>                                       \
+        type_info_array_holder;
 

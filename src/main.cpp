@@ -29,4 +29,9 @@ main()
     {
         std::cout << str << '\n';
     }
+
+    for(auto& cti : myspace::type_info_array_holder::value)
+    {
+        std::cout << cti.name << " : " << cti.size << '\n';
+    }
 }
