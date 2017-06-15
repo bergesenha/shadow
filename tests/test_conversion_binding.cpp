@@ -20,14 +20,17 @@ TEST_CASE("test conversion bindings between anys of different types",
     auto int_to_string =
         &shadow::conversion_detail::generic_conversion_bind_point<std::string,
                                                                   int>;
-
     auto string_to_int =
         &shadow::conversion_detail::generic_conversion_bind_point<int,
                                                                   std::string>;
+    auto string_to_float =
+        &shadow::conversion_detail::generic_conversion_bind_point<float,
+                                                                  std::string>;
+
 
     shadow::any anint = 10;
     shadow::any afloat = 2.5f;
-    shadow::any astring = std::string("234");
+    shadow::any astring = std::string("234.3");
 
     SECTION("convert any of float to int")
     {
@@ -62,5 +65,12 @@ TEST_CASE("test conversion bindings between anys of different types",
         auto res = string_to_int(astring);
 
         REQUIRE(res.get<int>() == 234);
+    }
+
+    SECTION("convert a string to float")
+    {
+        auto res = string_to_float(astring);
+
+        REQUIRE(res.get<float>() == Approx(234.3));
     }
 }

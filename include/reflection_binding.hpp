@@ -325,6 +325,16 @@ struct conversion_specializer<int, std::string>
     }
 };
 
+template <>
+struct conversion_specializer<float, std::string>
+{
+    static any
+    dispatch(const any& src)
+    {
+        any out = std::stof(src.get<std::string>());
+        return out;
+    }
+};
 
 template <class TargetType, class SourceType>
 any
