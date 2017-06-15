@@ -16,7 +16,7 @@ struct extract_name
 
 
 template <class TypeListOfCompileTimeTypeInfo>
-using generate_vector_of_strings =
+using generate_array_of_strings =
     metamusil::t_list::value_transform<TypeListOfCompileTimeTypeInfo,
                                        extract_name>;
 
@@ -72,5 +72,8 @@ using generate_valid_compile_time_type_infos_t =
     typedef shadow::generate_valid_compile_time_type_infos_t<                  \
         compile_time_type_info,                                                \
         type_line_range>                                                       \
-        instantiated_compile_time_infos;
+        instantiated_compile_time_infos;                                       \
+                                                                               \
+    typedef shadow::generate_array_of_strings<instantiated_compile_time_infos> \
+        type_name_array_holder;
 

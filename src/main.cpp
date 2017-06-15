@@ -24,4 +24,9 @@ int
 main()
 {
     p(myspace::instantiated_compile_time_infos());
+
+    for(auto str : myspace::type_name_array_holder::value)
+    {
+        std::cout << str << '\n';
+    }
 }
