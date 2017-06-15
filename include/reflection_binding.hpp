@@ -314,6 +314,28 @@ struct conversion_specializer<std::string, SourceType, true>
     }
 };
 
+template <>
+struct conversion_specializer<int, std::string>
+{
+    static any
+    dispatch(const any& src)
+    {
+        any out = std::stoi(src.get<std::string>());
+        return out;
+    }
+};
+
+template <>
+struct conversion_specializer<float, std::string>
+{
+    static any
+    dispatch(const any& src)
+    {
+        any out = std::stof(src.get<std::string>());
+        return out;
+    }
+};
+
 template <class TargetType, class SourceType>
 any
 generic_conversion_bind_point(const any& src)
