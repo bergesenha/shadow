@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 2.8)
 project(shadow CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(SHADOW_BUILD_TESTS "Build unit tests" ON)
 
