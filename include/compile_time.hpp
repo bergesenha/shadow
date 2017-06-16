@@ -132,6 +132,9 @@ using extract_type = typename CTI::type;
         static const std::size_t num_parameters =                              \
             metamusil::t_list::length_v<parameter_type_list>;                  \
                                                                                \
+        typedef metamusil::t_list::order_t<parameter_type_list, type_universe> \
+            parameter_index_sequence;                                          \
+                                                                               \
         static constexpr shadow::constructor_binding_signature bind_point =    \
             &shadow::constructor_detail::                                      \
                 generic_constructor_bind_point<type_name, __VA_ARGS__>;        \
