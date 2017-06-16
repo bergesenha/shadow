@@ -35,4 +35,5 @@ int
 main()
 {
     p(myspace::type_universe());
+    std::cout << myspace::compile_time_constructor_info<20>::type_index << '\n';
 }

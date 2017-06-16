@@ -114,14 +114,24 @@ using extract_type = typename CTI::type;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor registration
 #define REGISTER_CONSTRUCTOR_BEGIN()                                           \
-    constexpr std::size_t constructor_line_begin = __LINE__;
+    constexpr std::size_t constructor_line_begin = __LINE__;                   \
+                                                                               \
+    template <std::size_t>                                                     \
+    struct compile_time_constructor_info;
 
 
-#define REGISTER_CONSTRUCTOR(type_name, ...)
+#define REGISTER_CONSTRUCTOR(type_name, ...)                                   \
+    template <>                                                                \
+    struct compile_time_constructor_info<__LINE__>                             \
+    {                                                                          \
+        static const std::size_t type_index =                                  \
+            metamusil::t_list::index_of_type_v<type_universe, type_name>;      \
+    };
 
 
 #define REGISTER_CONSTRUCTOR_END()                                             \
     constexpr std::size_t constructor_line_end = __LINE__;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize Shadow reflection library
