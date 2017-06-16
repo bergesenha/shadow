@@ -165,7 +165,13 @@ using generate_array_of_constructor_info =
 
 
 #define REGISTER_CONSTRUCTOR_END()                                             \
-    constexpr std::size_t constructor_line_end = __LINE__;
+    constexpr std::size_t constructor_line_end = __LINE__;                     \
+                                                                               \
+    typedef metamusil::int_seq::integer_sequence_from_range_t<                 \
+        std::size_t,                                                           \
+        constructor_line_begin + 1,                                            \
+        constructor_line_end>                                                  \
+        constructor_line_range;
 
 
 ////////////////////////////////////////////////////////////////////////////////

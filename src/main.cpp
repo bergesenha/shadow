@@ -74,4 +74,6 @@ main()
         std::cout << ci.type_index << " " << ci.num_parameters << " "
                   << ci.parameter_type_indices[0] << '\n';
     }
+
+    p(myspace::constructor_line_range());
 }
