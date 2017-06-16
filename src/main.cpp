@@ -36,4 +36,13 @@ main()
 {
     p(myspace::type_universe());
     std::cout << myspace::compile_time_constructor_info<20>::type_index << '\n';
+
+    auto double_constructor =
+        myspace::compile_time_constructor_info<20>::bind_point;
+
+    shadow::any adouble = 25.3;
+
+    auto constructed_double = double_constructor(&adouble);
+
+    std::cout << constructed_double.get<double>() << '\n';
 }

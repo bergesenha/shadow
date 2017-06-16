@@ -126,6 +126,10 @@ using extract_type = typename CTI::type;
     {                                                                          \
         static const std::size_t type_index =                                  \
             metamusil::t_list::index_of_type_v<type_universe, type_name>;      \
+                                                                               \
+        static constexpr shadow::constructor_binding_signature bind_point =    \
+            &shadow::constructor_detail::                                      \
+                generic_constructor_bind_point<type_name, __VA_ARGS__>;        \
     };
 
 
