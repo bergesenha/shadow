@@ -314,6 +314,7 @@ struct conversion_specializer<std::string, SourceType, true>
     }
 };
 
+// string parsing specializations
 template <>
 struct conversion_specializer<int, std::string>
 {
@@ -326,12 +327,78 @@ struct conversion_specializer<int, std::string>
 };
 
 template <>
+struct conversion_specializer<long, std::string>
+{
+    static any
+    dispatch(const any& src)
+    {
+        any out = std::stol(src.get<std::string>());
+        return out;
+    }
+};
+
+template <>
+struct conversion_specializer<long long, std::string>
+{
+    static any
+    dispatch(const any& src)
+    {
+        any out = std::stoll(src.get<std::string>());
+        return out;
+    }
+};
+
+template <>
+struct conversion_specializer<unsigned long, std::string>
+{
+    static any
+    dispatch(const any& src)
+    {
+        any out = std::stoul(src.get<std::string>());
+        return out;
+    }
+};
+
+template <>
+struct conversion_specializer<unsigned long long, std::string>
+{
+    static any
+    dispatch(const any& src)
+    {
+        any out = std::stoull(src.get<std::string>());
+        return out;
+    }
+};
+
+template <>
 struct conversion_specializer<float, std::string>
 {
     static any
     dispatch(const any& src)
     {
         any out = std::stof(src.get<std::string>());
+        return out;
+    }
+};
+
+template <>
+struct conversion_specializer<double, std::string>
+{
+    static any
+    dispatch(const any& src)
+    {
+        any out = std::stod(src.get<std::string>());
+        return out;
+    }
+};
+
+template <>
+struct conversion_specializer<long double, std::string>
+{
+    static any
+    dispatch(const any& src)
+    {
+        any out = std::stold(src.get<std::string>());
         return out;
     }
 };

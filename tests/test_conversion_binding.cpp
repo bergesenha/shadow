@@ -23,8 +23,26 @@ TEST_CASE("test conversion bindings between anys of different types",
     auto string_to_int =
         &shadow::conversion_detail::generic_conversion_bind_point<int,
                                                                   std::string>;
+    auto string_to_long =
+        &shadow::conversion_detail::generic_conversion_bind_point<long,
+                                                                  std::string>;
+    auto string_to_long_long =
+        &shadow::conversion_detail::generic_conversion_bind_point<long long,
+                                                                  std::string>;
+    auto string_to_unsigned_long =
+        &shadow::conversion_detail::generic_conversion_bind_point<unsigned long,
+                                                                  std::string>;
+    auto string_to_unsigned_long_long =
+        &shadow::conversion_detail::
+            generic_conversion_bind_point<unsigned long long, std::string>;
     auto string_to_float =
         &shadow::conversion_detail::generic_conversion_bind_point<float,
+                                                                  std::string>;
+    auto string_to_double =
+        &shadow::conversion_detail::generic_conversion_bind_point<double,
+                                                                  std::string>;
+    auto string_to_long_double =
+        &shadow::conversion_detail::generic_conversion_bind_point<long double,
                                                                   std::string>;
 
 
@@ -74,10 +92,52 @@ TEST_CASE("test conversion bindings between anys of different types",
         }
     }
 
+    SECTION("convert a string to long")
+    {
+        auto res = string_to_long(astring);
+
+        REQUIRE(res.get<long>() == 234);
+    }
+
+    SECTION("convert a string to long long")
+    {
+        auto res = string_to_long_long(astring);
+
+        REQUIRE(res.get<long long>() == 234);
+    }
+
+    SECTION("convert a string to unsigned long")
+    {
+        auto res = string_to_unsigned_long(astring);
+
+        REQUIRE(res.get<unsigned long>() == 234);
+    }
+
+    SECTION("convert a string to unsigned long long")
+    {
+        auto res = string_to_unsigned_long_long(astring);
+
+        REQUIRE(res.get<unsigned long long>() == 234);
+    }
+
     SECTION("convert a string to float")
     {
         auto res = string_to_float(astring);
 
-        REQUIRE(res.get<float>() == Approx(234.3));
+        REQUIRE(res.get<float>() == Approx(234.3f));
+    }
+
+    SECTION("convert a string to double")
+    {
+        auto res = string_to_double(astring);
+
+        REQUIRE(res.get<double>() == Approx(234.3));
+    }
+
+    SECTION("convert a string to long double")
+    {
+        auto res = string_to_long_double(astring);
+
+        REQUIRE(res.get<long double>() == Approx(234.3));
     }
 }
