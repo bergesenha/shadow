@@ -56,6 +56,9 @@ using generate_valid_compile_time_type_infos_t =
     typename generate_valid_compile_time_type_infos<CTI, IntSeqRange>::type;
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+// Type registration
 #define REGISTER_TYPE_BEGIN()                                                  \
     constexpr std::size_t type_line_begin = __LINE__;                          \
     template <std::size_t LineNum>                                             \
@@ -96,6 +99,20 @@ using generate_valid_compile_time_type_infos_t =
         type_info_array_holder;
 
 
+////////////////////////////////////////////////////////////////////////////////
+// Constructor registration
+#define REGISTER_CONSTRUCTOR_BEGIN()                                           \
+    constexpr std::size_t constructor_line_begin = __LINE__;
+
+
+#define REGISTER_CONSTRUCTOR(type_name, ...)
+
+
+#define REGISTER_CONSTRUCTOR_END()                                             \
+    constexpr std::size_t constructor_line_end = __LINE__;
+
+////////////////////////////////////////////////////////////////////////////////
+// Initialize Shadow reflection library
 #define SHADOW_INIT()                                                          \
     static const shadow::director reflection_director{                         \
         type_name_array_holder(), type_info_array_holder()};
