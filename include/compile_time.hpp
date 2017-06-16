@@ -132,6 +132,9 @@ constexpr std::size_t num_types_v = sizeof...(Types);
         static const std::size_t type_index =                                  \
             metamusil::t_list::index_of_type_v<type_universe, type_name>;      \
                                                                                \
+        static const std::size_t num_parameters =                              \
+            shadow::num_types_v<__VA_ARGS__>;                                  \
+                                                                               \
         static constexpr shadow::constructor_binding_signature bind_point =    \
             &shadow::constructor_detail::                                      \
                 generic_constructor_bind_point<type_name, __VA_ARGS__>;        \
