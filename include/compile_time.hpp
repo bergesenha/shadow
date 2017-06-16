@@ -10,30 +10,8 @@
 
 namespace shadow
 {
-
-template <class CompileTimeTypeInfo>
-struct extract_name
-{
-    static constexpr const char* value = CompileTimeTypeInfo::name;
-};
-
-template <class TypeListOfCompileTimeTypeInfo>
-using generate_array_of_strings =
-    metamusil::t_list::value_transform<TypeListOfCompileTimeTypeInfo,
-                                       extract_name>;
-
-template <class CompileTimeTypeInfo>
-struct extract_type_info
-{
-    static constexpr type_info value = {CompileTimeTypeInfo::name,
-                                        CompileTimeTypeInfo::size};
-};
-
-template <class TypeListOfCompileTimeTypeInfo>
-using generate_array_of_type_info =
-    metamusil::t_list::value_transform<TypeListOfCompileTimeTypeInfo,
-                                       extract_type_info>;
-
+// generate type_list of instantiated compile_time_type_info to feed
+// generate_array_of_type_info and generate_array_of_strings
 template <template <std::size_t> class CTI, class IntSeqRange>
 struct generate_valid_compile_time_type_infos
 {
@@ -54,6 +32,31 @@ struct generate_valid_compile_time_type_infos
 template <template <std::size_t> class CTI, class IntSeqRange>
 using generate_valid_compile_time_type_infos_t =
     typename generate_valid_compile_time_type_infos<CTI, IntSeqRange>::type;
+
+// extract name and make an array of type names at compile time
+template <class CompileTimeTypeInfo>
+struct extract_name
+{
+    static constexpr const char* value = CompileTimeTypeInfo::name;
+};
+
+template <class TypeListOfCompileTimeTypeInfo>
+using generate_array_of_strings =
+    metamusil::t_list::value_transform<TypeListOfCompileTimeTypeInfo,
+                                       extract_name>;
+
+// extract type info and make array of type_info at compile time
+template <class CompileTimeTypeInfo>
+struct extract_type_info
+{
+    static constexpr type_info value = {CompileTimeTypeInfo::name,
+                                        CompileTimeTypeInfo::size};
+};
+
+template <class TypeListOfCompileTimeTypeInfo>
+using generate_array_of_type_info =
+    metamusil::t_list::value_transform<TypeListOfCompileTimeTypeInfo,
+                                       extract_type_info>;
 }
 
 
