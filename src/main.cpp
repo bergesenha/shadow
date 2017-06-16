@@ -50,4 +50,10 @@ main()
               << '\n';
 
     p(myspace::compile_time_constructor_info<20>::parameter_index_sequence());
+
+    for(auto i : myspace::compile_time_constructor_info<
+            20>::parameter_type_indices_holder::value)
+    {
+        std::cout << i << '\n';
+    }
 }
