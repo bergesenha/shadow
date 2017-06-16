@@ -176,7 +176,11 @@ using generate_array_of_constructor_info =
     typedef shadow::generate_valid_compile_time_infos_t<                       \
         compile_time_constructor_info,                                         \
         constructor_line_range>                                                \
-        instantiated_compile_time_constructor_infos;
+        instantiated_compile_time_constructor_infos;                           \
+                                                                               \
+    typedef shadow::generate_array_of_constructor_info<                        \
+        instantiated_compile_time_constructor_infos>                           \
+        constructor_info_array_holder;
 
 
 ////////////////////////////////////////////////////////////////////////////////

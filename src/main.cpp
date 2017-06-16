@@ -77,4 +77,9 @@ main()
 
     p(myspace::constructor_line_range());
     p(myspace::instantiated_compile_time_constructor_infos());
+
+    for(auto& ci : myspace::constructor_info_array_holder::value)
+    {
+        std::cout << ci.num_parameters << " " << ci.type_index << '\n';
+    }
 }
