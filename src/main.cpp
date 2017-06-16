@@ -56,4 +56,22 @@ main()
     {
         std::cout << i << '\n';
     }
+
+    typedef metamusil::t_list::type_list<
+        myspace::compile_time_constructor_info<18>,
+        myspace::compile_time_constructor_info<19>,
+        myspace::compile_time_constructor_info<20>>
+        constructor_list;
+
+    p(constructor_list());
+
+    typedef shadow::generate_array_of_constructor_info<constructor_list>
+        constructor_info_holder;
+
+
+    for(auto& ci : constructor_info_holder::value)
+    {
+        std::cout << ci.type_index << " " << ci.num_parameters << " "
+                  << ci.parameter_type_indices[0] << '\n';
+    }
 }

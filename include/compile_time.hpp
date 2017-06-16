@@ -58,9 +58,28 @@ using generate_array_of_type_info =
     metamusil::t_list::value_transform<TypeListOfCompileTimeTypeInfo,
                                        extract_type_info>;
 
+
 // extract type from compile_time_info
 template <class CTI>
 using extract_type = typename CTI::type;
+
+
+// extract dynamic constructor_info from compile_time_constructor info template
+// instantiations
+template <class CTCI>
+struct extract_constructor_info
+{
+    static constexpr constructor_info value = {
+        CTCI::type_index,
+        CTCI::num_parameters,
+        CTCI::parameter_type_indices_holder::value,
+        CTCI::bind_point};
+};
+
+template <class TypeListOfCompileTimeConstructorInfo>
+using generate_array_of_constructor_info =
+    metamusil::t_list::value_transform<TypeListOfCompileTimeConstructorInfo,
+                                       extract_constructor_info>;
 }
 
 
