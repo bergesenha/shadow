@@ -61,6 +61,11 @@ using generate_array_of_type_info =
 // extract type from compile_time_info
 template <class CTI>
 using extract_type = typename CTI::type;
+
+
+// get length of a variadic template parameter pack
+template <class... Types>
+constexpr std::size_t num_types_v = sizeof...(Types);
 }
 
 

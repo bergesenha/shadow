@@ -45,4 +45,6 @@ main()
     auto constructed_double = double_constructor(&adouble);
 
     std::cout << constructed_double.get<double>() << '\n';
+
+    std::cout << shadow::num_types_v<int, float, double> << '\n';
 }
