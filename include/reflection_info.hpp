@@ -21,6 +21,13 @@ struct constructor_info
     constructor_binding_signature bind_point;
 };
 
+struct conversion_info
+{
+    std::size_t from_type_index;
+    std::size_t to_type_index;
+    conversion_binding_signature bind_point;
+};
+
 struct free_function_info
 {
     const char* name;
