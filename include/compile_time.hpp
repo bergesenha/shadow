@@ -187,4 +187,6 @@ using generate_array_of_constructor_info =
 // Initialize Shadow reflection library
 #define SHADOW_INIT()                                                          \
     static const shadow::director reflection_director{                         \
-        type_name_array_holder(), type_info_array_holder()};
+        type_name_array_holder(),                                              \
+        type_info_array_holder(),                                              \
+        constructor_info_array_holder()};
