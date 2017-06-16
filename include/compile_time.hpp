@@ -171,7 +171,12 @@ using generate_array_of_constructor_info =
         std::size_t,                                                           \
         constructor_line_begin + 1,                                            \
         constructor_line_end>                                                  \
-        constructor_line_range;
+        constructor_line_range;                                                \
+                                                                               \
+    typedef shadow::generate_valid_compile_time_infos_t<                       \
+        compile_time_constructor_info,                                         \
+        constructor_line_range>                                                \
+        instantiated_compile_time_constructor_infos;
 
 
 ////////////////////////////////////////////////////////////////////////////////

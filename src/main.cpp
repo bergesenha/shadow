@@ -76,4 +76,5 @@ main()
     }
 
     p(myspace::constructor_line_range());
+    p(myspace::instantiated_compile_time_constructor_infos());
 }
