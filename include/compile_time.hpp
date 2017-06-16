@@ -61,11 +61,6 @@ using generate_array_of_type_info =
 // extract type from compile_time_info
 template <class CTI>
 using extract_type = typename CTI::type;
-
-
-// get length of a variadic template parameter pack
-template <class... Types>
-constexpr std::size_t num_types_v = sizeof...(Types);
 }
 
 
@@ -132,8 +127,10 @@ constexpr std::size_t num_types_v = sizeof...(Types);
         static const std::size_t type_index =                                  \
             metamusil::t_list::index_of_type_v<type_universe, type_name>;      \
                                                                                \
+        typedef metamusil::t_list::type_list<__VA_ARGS__> parameter_type_list; \
+                                                                               \
         static const std::size_t num_parameters =                              \
-            shadow::num_types_v<__VA_ARGS__>;                                  \
+            metamusil::t_list::length_v<parameter_type_list>;                  \
                                                                                \
         static constexpr shadow::constructor_binding_signature bind_point =    \
             &shadow::constructor_detail::                                      \
