@@ -13,7 +13,7 @@ namespace shadow
 // generate type_list of instantiated compile_time_type_info to feed
 // generate_array_of_type_info and generate_array_of_strings
 template <template <std::size_t> class CTI, class IntSeqRange>
-struct generate_valid_compile_time_type_infos
+struct generate_valid_compile_time_infos
 {
     template <typename IntSeqRange::value_type LineNum>
     using is_defined_predicate =
@@ -30,8 +30,8 @@ struct generate_valid_compile_time_type_infos
 };
 
 template <template <std::size_t> class CTI, class IntSeqRange>
-using generate_valid_compile_time_type_infos_t =
-    typename generate_valid_compile_time_type_infos<CTI, IntSeqRange>::type;
+using generate_valid_compile_time_infos_t =
+    typename generate_valid_compile_time_infos<CTI, IntSeqRange>::type;
 
 // extract name and make an array of type names at compile time
 template <class CompileTimeTypeInfo>
@@ -112,7 +112,7 @@ using generate_array_of_constructor_info =
         type_line_end>                                                         \
         type_line_range;                                                       \
                                                                                \
-    typedef shadow::generate_valid_compile_time_type_infos_t<                  \
+    typedef shadow::generate_valid_compile_time_infos_t<                       \
         compile_time_type_info,                                                \
         type_line_range>                                                       \
         instantiated_compile_time_infos;                                       \
