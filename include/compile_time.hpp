@@ -57,6 +57,10 @@ template <class TypeListOfCompileTimeTypeInfo>
 using generate_array_of_type_info =
     metamusil::t_list::value_transform<TypeListOfCompileTimeTypeInfo,
                                        extract_type_info>;
+
+// extract type from compile_time_info
+template <class CTI>
+using extract_type = typename CTI::type;
 }
 
 
@@ -99,7 +103,12 @@ using generate_array_of_type_info =
                                                                                \
     typedef shadow::generate_array_of_type_info<                               \
         instantiated_compile_time_infos>                                       \
-        type_info_array_holder;
+        type_info_array_holder;                                                \
+                                                                               \
+    typedef metamusil::t_list::type_transform_t<                               \
+        instantiated_compile_time_infos,                                       \
+        shadow::extract_type>                                                  \
+        type_universe;
 
 
 ////////////////////////////////////////////////////////////////////////////////

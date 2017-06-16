@@ -13,6 +13,14 @@ REGISTER_TYPE(float)
 REGISTER_TYPE(double)
 REGISTER_TYPE_END()
 
+REGISTER_CONSTRUCTOR_BEGIN()
+
+REGISTER_CONSTRUCTOR(int, int)
+REGISTER_CONSTRUCTOR(float, float)
+REGISTER_CONSTRUCTOR(double, double)
+
+REGISTER_CONSTRUCTOR_END()
+
 SHADOW_INIT()
 }
 
@@ -26,4 +34,5 @@ void p(T)
 int
 main()
 {
+    p(myspace::type_universe());
 }
