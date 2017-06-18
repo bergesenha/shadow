@@ -80,6 +80,16 @@ template <class TypeListOfCompileTimeConstructorInfo>
 using generate_array_of_constructor_info =
     metamusil::t_list::value_transform<TypeListOfCompileTimeConstructorInfo,
                                        extract_constructor_info>;
+
+
+template <class ResultType, class... ParamTypes>
+constexpr shadow::constructor_binding_signature
+constructor_bind_point_from_type_list(
+    metamusil::t_list::type_list<ParamTypes...>)
+{
+    return &shadow::constructor_detail::
+        generic_constructor_bind_point<ResultType, ParamTypes...>;
+}
 }
 
 
@@ -159,8 +169,8 @@ using generate_array_of_constructor_info =
             parameter_type_indices_holder;                                     \
                                                                                \
         static constexpr shadow::constructor_binding_signature bind_point =    \
-            &shadow::constructor_detail::                                      \
-                generic_constructor_bind_point<type_name, __VA_ARGS__>;        \
+            shadow::constructor_bind_point_from_type_list<type_name>(          \
+                parameter_type_list());                                        \
     };
 
 

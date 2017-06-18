@@ -35,6 +35,9 @@ TEST_CASE("test constructor binding", "[generic_constructor_bind_point]")
         &shadow::constructor_detail::
             generic_constructor_bind_point<test_construct2, char, double>;
 
+    auto int_default_constructor =
+        &shadow::constructor_detail::generic_constructor_bind_point<int>;
+
 
     SECTION("construct int with int")
     {
@@ -74,5 +77,13 @@ TEST_CASE("test constructor binding", "[generic_constructor_bind_point]")
 
         REQUIRE(result.get<test_construct2>().c == 'a');
         REQUIRE(result.get<test_construct2>().d == 25.3);
+    }
+
+    SECTION(
+        "when using default constructor of int, the int in the any should be 0")
+    {
+        auto result = int_default_constructor(nullptr);
+
+        REQUIRE(result.get<int>() == 0);
     }
 }
