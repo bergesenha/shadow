@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <type_list.hpp>
 #include <integer_sequence.hpp>
 #include <sfinae.hpp>
@@ -112,8 +114,83 @@ constructor_bind_point_from_type_list(
                                                                                \
     constexpr char compile_time_type_info<__LINE__>::name[];
 
+#define REGISTER_FUNDAMENTAL_BEGIN()                                           \
+    template <class T>                                                         \
+    struct fundamental_compile_time_info;                                      \
+                                                                               \
+    typedef metamusil::t_list::type_list<void,                                 \
+                                         std::nullptr_t,                       \
+                                         bool,                                 \
+                                         signed char,                          \
+                                         unsigned char,                        \
+                                         char,                                 \
+                                         wchar_t,                              \
+                                         char16_t,                             \
+                                         char32_t,                             \
+                                         short int,                            \
+                                         unsigned short int,                   \
+                                         int,                                  \
+                                         unsigned int,                         \
+                                         long int,                             \
+                                         unsigned long int,                    \
+                                         long long int,                        \
+                                         unsigned long long int,               \
+                                         float,                                \
+                                         double,                               \
+                                         long double,                          \
+                                         std::string>                          \
+        fundamental_type_universe;                                             \
+                                                                               \
+    template <>                                                                \
+    struct fundamental_compile_time_info<void>                                 \
+    {                                                                          \
+        typedef void type;                                                     \
+        static constexpr char name[] = "void";                                 \
+        static const std::size_t size = 0;                                     \
+    };
+
+
+#define REGISTER_FUNDAMENTAL(type_name)                                        \
+    template <>                                                                \
+    struct fundamental_compile_time_info<type_name>                            \
+    {                                                                          \
+        typedef type_name type;                                                \
+        static constexpr char name[] = #type_name;                             \
+        static const std::size_t size = sizeof(type_name);                     \
+    };
+
+
+#define REGISTER_FUNDAMENTAL_END()                                             \
+    typedef metamusil::t_list::type_transform_t<fundamental_type_universe,     \
+                                                fundamental_compile_time_info> \
+        instantiated_fundamental_compile_time_infos;
+
 
 #define REGISTER_TYPE_END()                                                    \
+                                                                               \
+    REGISTER_FUNDAMENTAL_BEGIN()                                               \
+    REGISTER_FUNDAMENTAL(std::nullptr_t)                                       \
+    REGISTER_FUNDAMENTAL(bool)                                                 \
+    REGISTER_FUNDAMENTAL(signed char)                                          \
+    REGISTER_FUNDAMENTAL(unsigned char)                                        \
+    REGISTER_FUNDAMENTAL(char)                                                 \
+    REGISTER_FUNDAMENTAL(wchar_t)                                              \
+    REGISTER_FUNDAMENTAL(char16_t)                                             \
+    REGISTER_FUNDAMENTAL(char32_t)                                             \
+    REGISTER_FUNDAMENTAL(short int)                                            \
+    REGISTER_FUNDAMENTAL(unsigned short int)                                   \
+    REGISTER_FUNDAMENTAL(int)                                                  \
+    REGISTER_FUNDAMENTAL(unsigned int)                                         \
+    REGISTER_FUNDAMENTAL(long int)                                             \
+    REGISTER_FUNDAMENTAL(unsigned long int)                                    \
+    REGISTER_FUNDAMENTAL(long long int)                                        \
+    REGISTER_FUNDAMENTAL(unsigned long long int)                               \
+    REGISTER_FUNDAMENTAL(float)                                                \
+    REGISTER_FUNDAMENTAL(double)                                               \
+    REGISTER_FUNDAMENTAL(long double)                                          \
+    REGISTER_FUNDAMENTAL(std::string)                                          \
+    REGISTER_FUNDAMENTAL_END()                                                 \
+                                                                               \
     constexpr std::size_t type_line_end = __LINE__;                            \
                                                                                \
     typedef metamusil::int_seq::integer_sequence_from_range_t<                 \
