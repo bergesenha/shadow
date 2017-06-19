@@ -204,6 +204,11 @@ constructor_bind_point_from_type_list(
         type_line_range>                                                       \
         instantiated_compile_time_infos;                                       \
                                                                                \
+    typedef metamusil::t_list::concat_t<                                       \
+        instantiated_fundamental_compile_time_infos,                           \
+        instantiated_compile_time_infos>                                       \
+        all_compile_time_infos;                                                \
+                                                                               \
     typedef shadow::generate_array_of_strings<instantiated_compile_time_infos> \
         type_name_array_holder;                                                \
                                                                                \
