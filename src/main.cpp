@@ -28,14 +28,8 @@ REGISTER_TYPE_END()
 
 REGISTER_CONSTRUCTOR_BEGIN()
 
-REGISTER_CONSTRUCTOR(int)
-REGISTER_CONSTRUCTOR(float)
-REGISTER_CONSTRUCTOR(double)
 
-REGISTER_CONSTRUCTOR(int, int)
-REGISTER_CONSTRUCTOR(float, float)
-REGISTER_CONSTRUCTOR(double, double)
-
+REGISTER_CONSTRUCTOR(intholder)
 REGISTER_CONSTRUCTOR(intholder, int)
 
 REGISTER_CONSTRUCTOR_END()
@@ -53,5 +47,19 @@ void p(T)
 int
 main()
 {
-    p(myspace::instantiated_fundamental_compile_time_constructor_infos());
+    for(auto& ci : myspace::constructor_info_array_holder::value)
+    {
+        std::cout << myspace::type_info_array_holder::value[ci.type_index].name
+                  << "(";
+
+        for(auto i = 0; i < ci.num_parameters; ++i)
+        {
+            std::cout << myspace::type_info_array_holder::value
+                             [ci.parameter_type_indices[i]]
+                                 .name
+                      << ',';
+        }
+
+        std::cout << ")\n";
+    }
 }

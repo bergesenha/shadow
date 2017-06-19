@@ -362,8 +362,13 @@ constexpr shadow::constructor_binding_signature
         constructor_line_range>                                                \
         instantiated_compile_time_constructor_infos;                           \
                                                                                \
-    typedef shadow::generate_array_of_constructor_info<                        \
+    typedef metamusil::t_list::concat_t<                                       \
+        instantiated_fundamental_compile_time_constructor_infos,               \
         instantiated_compile_time_constructor_infos>                           \
+        all_instantiated_compile_time_constructor_infos;                       \
+                                                                               \
+    typedef shadow::generate_array_of_constructor_info<                        \
+        all_instantiated_compile_time_constructor_infos>                       \
         constructor_info_array_holder;
 
 
