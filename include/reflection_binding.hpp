@@ -289,117 +289,20 @@ generic_constructor_bind_point(any* argument_array)
 
 namespace conversion_detail
 {
-template <class TargetType,
-          class SourceType,
-          bool SourceIsArithmetic = std::is_arithmetic<SourceType>::value>
-struct conversion_specializer
+template <class TargetType, class SourceType, class = void>
+struct conversion_specializer;
+
+template <class TargetType, class SourceType>
+struct conversion_specializer<
+    TargetType,
+    SourceType,
+    metamusil::void_t<decltype((TargetType)(std::declval<SourceType>()))>>
 {
     static any
     dispatch(const any& src)
     {
         TargetType temp = src.get<SourceType>();
-        any out = temp;
-        return out;
-    }
-};
-
-template <class SourceType>
-struct conversion_specializer<std::string, SourceType, true>
-{
-    static any
-    dispatch(const any& src)
-    {
-        any out = std::to_string(src.get<SourceType>());
-        return out;
-    }
-};
-
-// string parsing specializations
-template <>
-struct conversion_specializer<int, std::string>
-{
-    static any
-    dispatch(const any& src)
-    {
-        any out = std::stoi(src.get<std::string>());
-        return out;
-    }
-};
-
-template <>
-struct conversion_specializer<long, std::string>
-{
-    static any
-    dispatch(const any& src)
-    {
-        any out = std::stol(src.get<std::string>());
-        return out;
-    }
-};
-
-template <>
-struct conversion_specializer<long long, std::string>
-{
-    static any
-    dispatch(const any& src)
-    {
-        any out = std::stoll(src.get<std::string>());
-        return out;
-    }
-};
-
-template <>
-struct conversion_specializer<unsigned long, std::string>
-{
-    static any
-    dispatch(const any& src)
-    {
-        any out = std::stoul(src.get<std::string>());
-        return out;
-    }
-};
-
-template <>
-struct conversion_specializer<unsigned long long, std::string>
-{
-    static any
-    dispatch(const any& src)
-    {
-        any out = std::stoull(src.get<std::string>());
-        return out;
-    }
-};
-
-template <>
-struct conversion_specializer<float, std::string>
-{
-    static any
-    dispatch(const any& src)
-    {
-        any out = std::stof(src.get<std::string>());
-        return out;
-    }
-};
-
-template <>
-struct conversion_specializer<double, std::string>
-{
-    static any
-    dispatch(const any& src)
-    {
-        any out = std::stod(src.get<std::string>());
-        return out;
-    }
-};
-
-template <>
-struct conversion_specializer<long double, std::string>
-{
-    static any
-    dispatch(const any& src)
-    {
-        any out = std::stold(src.get<std::string>());
-        return out;
+        return temp;
     }
 };
 
