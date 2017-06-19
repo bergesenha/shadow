@@ -22,13 +22,17 @@ TEST_CASE("test conversion bindings between anys of different types",
     auto intptr_to_voidstar =
         &shadow::conversion_detail::generic_conversion_bind_point<void*, int*>;
 
-    auto int_to_explicitly_convertible =
-        &shadow::conversion_detail::
-            generic_conversion_bind_point<explicitly_convertible, int>;
 
     shadow::any anint = 23;
+    int i = 300;
+    int* iptr = &i;
+
+    shadow::any anintptr = iptr;
 
     auto afloat = int_to_float(anint);
 
+    auto avoidstar = intptr_to_voidstar(anintptr);
+
     REQUIRE(afloat.get<float>() == Approx(23.0f));
+    REQUIRE(*((int*)(avoidstar.get<void*>())) == 300);
 }

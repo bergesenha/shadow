@@ -4,6 +4,14 @@
 
 #include <compile_time.hpp>
 
+#include <sfinae.hpp>
+#include <type_list.hpp>
+
+template <class T>
+void p(T)
+{
+    puts(__PRETTY_FUNCTION__);
+}
 
 class intholder
 {
@@ -44,28 +52,38 @@ SHADOW_INIT()
 }
 
 
-template <class T>
-void p(T)
+template <class A, class B>
+struct mypair
 {
-    puts(__PRETTY_FUNCTION__);
-}
+};
+
+
+typedef metamusil::t_list::
+    for_each_combination_t<myspace::fundamental_type_universe, mypair>
+        combinations;
+
+template <class Pair>
+struct is_defined_predicate;
+
+template <class A, class B>
+struct is_defined_predicate<mypair<A, B>>
+{
+    static const bool value = metamusil::specialization_defined_v<
+        shadow::conversion_detail::conversion_specializer,
+        A,
+        B>;
+};
+
+typedef metamusil::t_list::filter_t<combinations, is_defined_predicate>
+    filtered_combinations;
 
 int
 main()
 {
-    for(auto& ci : myspace::constructor_info_array_holder::value)
-    {
-        std::cout << myspace::type_info_array_holder::value[ci.type_index].name
-                  << "(";
+    p(filtered_combinations());
 
-        for(auto i = 0; i < ci.num_parameters; ++i)
-        {
-            std::cout << myspace::type_info_array_holder::value
-                             [ci.parameter_type_indices[i]]
-                                 .name
-                      << ", ";
-        }
 
-        std::cout << ")\n";
-    }
+    std::cout << std::boolalpha << std::is_convertible<float, void>::value
+              << '\n';
 }
+

@@ -292,11 +292,15 @@ namespace conversion_detail
 template <class TargetType, class SourceType, class = void>
 struct conversion_specializer;
 
+template <>
+struct conversion_specializer<void, void>;
+
 template <class TargetType, class SourceType>
 struct conversion_specializer<
     TargetType,
     SourceType,
-    metamusil::void_t<decltype((TargetType)(std::declval<SourceType>()))>>
+    metamusil::void_t<
+        std::enable_if_t<std::is_convertible<SourceType, TargetType>::value>>>
 {
     static any
     dispatch(const any& src)
