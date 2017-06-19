@@ -53,5 +53,5 @@ void p(T)
 int
 main()
 {
-    p(myspace::all_compile_time_infos());
+    p(myspace::instantiated_fundamental_compile_time_constructor_infos());
 }
