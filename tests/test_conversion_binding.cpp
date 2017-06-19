@@ -25,4 +25,10 @@ TEST_CASE("test conversion bindings between anys of different types",
     auto int_to_explicitly_convertible =
         &shadow::conversion_detail::
             generic_conversion_bind_point<explicitly_convertible, int>;
+
+    shadow::any anint = 23;
+
+    auto afloat = int_to_float(anint);
+
+    REQUIRE(afloat.get<float>() == Approx(23.0f));
 }
