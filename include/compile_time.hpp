@@ -147,7 +147,8 @@ constructor_bind_point_from_type_list(
         typedef void type;                                                     \
         static constexpr char name[] = "void";                                 \
         static const std::size_t size = 0;                                     \
-    };
+    };                                                                         \
+    constexpr char fundamental_compile_time_info<void>::name[];
 
 
 #define REGISTER_FUNDAMENTAL(type_name)                                        \
@@ -157,7 +158,9 @@ constructor_bind_point_from_type_list(
         typedef type_name type;                                                \
         static constexpr char name[] = #type_name;                             \
         static const std::size_t size = sizeof(type_name);                     \
-    };
+    };                                                                         \
+                                                                               \
+    constexpr char fundamental_compile_time_info<type_name>::name[];
 
 
 #define REGISTER_FUNDAMENTAL_END()                                             \
@@ -209,16 +212,14 @@ constructor_bind_point_from_type_list(
         instantiated_compile_time_infos>                                       \
         all_compile_time_infos;                                                \
                                                                                \
-    typedef shadow::generate_array_of_strings<instantiated_compile_time_infos> \
+    typedef shadow::generate_array_of_strings<all_compile_time_infos>          \
         type_name_array_holder;                                                \
                                                                                \
-    typedef shadow::generate_array_of_type_info<                               \
-        instantiated_compile_time_infos>                                       \
+    typedef shadow::generate_array_of_type_info<all_compile_time_infos>        \
         type_info_array_holder;                                                \
                                                                                \
-    typedef metamusil::t_list::type_transform_t<                               \
-        instantiated_compile_time_infos,                                       \
-        shadow::extract_type>                                                  \
+    typedef metamusil::t_list::type_transform_t<all_compile_time_infos,        \
+                                                shadow::extract_type>          \
         type_universe;
 
 
