@@ -10,12 +10,17 @@ class intholder
 public:
     intholder() = default;
 
-    intholder(int i) : i_(i)
+    intholder(int i) : i_(i), d_(0.0)
+    {
+    }
+
+    intholder(int i, double d) : i_(i), d_(d)
     {
     }
 
 private:
     int i_;
+    double d_;
 };
 
 
@@ -31,6 +36,7 @@ REGISTER_CONSTRUCTOR_BEGIN()
 
 REGISTER_CONSTRUCTOR(intholder)
 REGISTER_CONSTRUCTOR(intholder, int)
+REGISTER_CONSTRUCTOR(intholder, int, double)
 
 REGISTER_CONSTRUCTOR_END()
 
@@ -57,7 +63,7 @@ main()
             std::cout << myspace::type_info_array_holder::value
                              [ci.parameter_type_indices[i]]
                                  .name
-                      << ',';
+                      << ", ";
         }
 
         std::cout << ")\n";
