@@ -22,10 +22,6 @@ private:
 namespace myspace
 {
 REGISTER_TYPE_BEGIN()
-REGISTER_TYPE(int)
-REGISTER_TYPE(float)
-
-REGISTER_TYPE(double)
 
 REGISTER_TYPE(intholder)
 REGISTER_TYPE_END()
@@ -57,4 +53,5 @@ void p(T)
 int
 main()
 {
+    p(myspace::all_compile_time_infos());
 }
