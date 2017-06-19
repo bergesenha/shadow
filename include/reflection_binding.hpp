@@ -301,7 +301,7 @@ struct conversion_specializer<
     static any
     dispatch(const any& src)
     {
-        TargetType temp = src.get<SourceType>();
+        TargetType temp = (TargetType)src.get<SourceType>();
         return temp;
     }
 };
