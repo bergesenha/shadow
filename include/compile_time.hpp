@@ -84,14 +84,23 @@ using generate_array_of_constructor_info =
                                        extract_constructor_info>;
 
 
+template <class ResultType, class ParamTypeList>
+struct constructor_bind_point_from_type_list;
+
 template <class ResultType, class... ParamTypes>
-constexpr shadow::constructor_binding_signature
-constructor_bind_point_from_type_list(
-    metamusil::t_list::type_list<ParamTypes...>)
+struct constructor_bind_point_from_type_list<
+    ResultType,
+    metamusil::t_list::type_list<ParamTypes...>>
 {
-    return &shadow::constructor_detail::
-        generic_constructor_bind_point<ResultType, ParamTypes...>;
-}
+    static constexpr shadow::constructor_binding_signature value =
+        &shadow::constructor_detail::
+            generic_constructor_bind_point<ResultType, ParamTypes...>;
+};
+
+template <class ResultType, class ParamTypeList>
+constexpr shadow::constructor_binding_signature
+    constructor_bind_point_from_type_list_v =
+        constructor_bind_point_from_type_list<ResultType, ParamTypeList>::value;
 }
 
 
@@ -232,6 +241,84 @@ constructor_bind_point_from_type_list(
     struct compile_time_constructor_info;
 
 
+#define REGISTER_FUNDAMENTAL_CONSTRUCTORS()                                    \
+    template <class ResultType, class... ParamTypes>                           \
+    struct fundamental_compile_time_constructor_info                           \
+    {                                                                          \
+        static const std::size_t type_index =                                  \
+            metamusil::t_list::index_of_type_v<type_universe, ResultType>;     \
+                                                                               \
+        typedef metamusil::t_list::type_list<ParamTypes...>                    \
+            parameter_type_list;                                               \
+                                                                               \
+        static const std::size_t num_parameters =                              \
+            metamusil::t_list::length_v<parameter_type_list>;                  \
+                                                                               \
+        typedef metamusil::t_list::order_t<parameter_type_list, type_universe> \
+            parameter_index_sequence;                                          \
+                                                                               \
+        typedef metamusil::int_seq::integer_sequence_to_array<                 \
+            parameter_index_sequence>                                          \
+            parameter_type_indices_holder;                                     \
+                                                                               \
+        static constexpr shadow::constructor_binding_signature bind_point =    \
+            shadow::constructor_bind_point_from_type_list_v<                   \
+                ResultType,                                                    \
+                parameter_type_list>;                                          \
+    };                                                                         \
+                                                                               \
+    typedef metamusil::t_list::type_list<                                      \
+        fundamental_compile_time_constructor_info<std::nullptr_t>,             \
+        fundamental_compile_time_constructor_info<bool>,                       \
+        fundamental_compile_time_constructor_info<signed char>,                \
+        fundamental_compile_time_constructor_info<unsigned char>,              \
+        fundamental_compile_time_constructor_info<char>,                       \
+        fundamental_compile_time_constructor_info<wchar_t>,                    \
+        fundamental_compile_time_constructor_info<char16_t>,                   \
+        fundamental_compile_time_constructor_info<char32_t>,                   \
+        fundamental_compile_time_constructor_info<short int>,                  \
+        fundamental_compile_time_constructor_info<unsigned short int>,         \
+        fundamental_compile_time_constructor_info<int>,                        \
+        fundamental_compile_time_constructor_info<unsigned int>,               \
+        fundamental_compile_time_constructor_info<long int>,                   \
+        fundamental_compile_time_constructor_info<unsigned long int>,          \
+        fundamental_compile_time_constructor_info<long long int>,              \
+        fundamental_compile_time_constructor_info<unsigned long long int>,     \
+        fundamental_compile_time_constructor_info<float>,                      \
+        fundamental_compile_time_constructor_info<double>,                     \
+        fundamental_compile_time_constructor_info<long double>,                \
+        fundamental_compile_time_constructor_info<std::string>,                \
+                                                                               \
+                                                                               \
+        fundamental_compile_time_constructor_info<std::nullptr_t,              \
+                                                  std::nullptr_t>,             \
+        fundamental_compile_time_constructor_info<bool, bool>,                 \
+        fundamental_compile_time_constructor_info<signed char, signed char>,   \
+        fundamental_compile_time_constructor_info<unsigned char,               \
+                                                  unsigned char>,              \
+        fundamental_compile_time_constructor_info<char, char>,                 \
+        fundamental_compile_time_constructor_info<wchar_t, wchar_t>,           \
+        fundamental_compile_time_constructor_info<char16_t, char16_t>,         \
+        fundamental_compile_time_constructor_info<char32_t, char32_t>,         \
+        fundamental_compile_time_constructor_info<short int, short int>,       \
+        fundamental_compile_time_constructor_info<unsigned short int,          \
+                                                  unsigned short int>,         \
+        fundamental_compile_time_constructor_info<int, int>,                   \
+        fundamental_compile_time_constructor_info<unsigned int, unsigned int>, \
+        fundamental_compile_time_constructor_info<long int, long int>,         \
+        fundamental_compile_time_constructor_info<unsigned long int,           \
+                                                  unsigned long int>,          \
+        fundamental_compile_time_constructor_info<long long int,               \
+                                                  long long int>,              \
+        fundamental_compile_time_constructor_info<unsigned long long int,      \
+                                                  unsigned long long int>,     \
+        fundamental_compile_time_constructor_info<float, float>,               \
+        fundamental_compile_time_constructor_info<double, double>,             \
+        fundamental_compile_time_constructor_info<long double, long double>,   \
+        fundamental_compile_time_constructor_info<std::string, std::string>>   \
+        instantiated_fundamental_compile_time_constructor_infos;
+
+
 #define REGISTER_CONSTRUCTOR(type_name, ...)                                   \
     template <>                                                                \
     struct compile_time_constructor_info<__LINE__>                             \
@@ -252,12 +339,16 @@ constructor_bind_point_from_type_list(
             parameter_type_indices_holder;                                     \
                                                                                \
         static constexpr shadow::constructor_binding_signature bind_point =    \
-            shadow::constructor_bind_point_from_type_list<type_name>(          \
-                parameter_type_list());                                        \
+            shadow::constructor_bind_point_from_type_list_v<                   \
+                type_name,                                                     \
+                parameter_type_list>;                                          \
     };
 
 
 #define REGISTER_CONSTRUCTOR_END()                                             \
+                                                                               \
+    REGISTER_FUNDAMENTAL_CONSTRUCTORS()                                        \
+                                                                               \
     constexpr std::size_t constructor_line_end = __LINE__;                     \
                                                                                \
     typedef metamusil::int_seq::integer_sequence_from_range_t<                 \
@@ -271,8 +362,13 @@ constructor_bind_point_from_type_list(
         constructor_line_range>                                                \
         instantiated_compile_time_constructor_infos;                           \
                                                                                \
-    typedef shadow::generate_array_of_constructor_info<                        \
+    typedef metamusil::t_list::concat_t<                                       \
+        instantiated_fundamental_compile_time_constructor_infos,               \
         instantiated_compile_time_constructor_infos>                           \
+        all_instantiated_compile_time_constructor_infos;                       \
+                                                                               \
+    typedef shadow::generate_array_of_constructor_info<                        \
+        all_instantiated_compile_time_constructor_infos>                       \
         constructor_info_array_holder;
 
 
