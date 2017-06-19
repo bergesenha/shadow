@@ -268,6 +268,28 @@ constexpr shadow::constructor_binding_signature
     };                                                                         \
                                                                                \
     typedef metamusil::t_list::type_list<                                      \
+        fundamental_compile_time_constructor_info<std::nullptr_t>,             \
+        fundamental_compile_time_constructor_info<bool>,                       \
+        fundamental_compile_time_constructor_info<signed char>,                \
+        fundamental_compile_time_constructor_info<unsigned char>,              \
+        fundamental_compile_time_constructor_info<char>,                       \
+        fundamental_compile_time_constructor_info<wchar_t>,                    \
+        fundamental_compile_time_constructor_info<char16_t>,                   \
+        fundamental_compile_time_constructor_info<char32_t>,                   \
+        fundamental_compile_time_constructor_info<short int>,                  \
+        fundamental_compile_time_constructor_info<unsigned short int>,         \
+        fundamental_compile_time_constructor_info<int>,                        \
+        fundamental_compile_time_constructor_info<unsigned int>,               \
+        fundamental_compile_time_constructor_info<long int>,                   \
+        fundamental_compile_time_constructor_info<unsigned long int>,          \
+        fundamental_compile_time_constructor_info<long long int>,              \
+        fundamental_compile_time_constructor_info<unsigned long long int>,     \
+        fundamental_compile_time_constructor_info<float>,                      \
+        fundamental_compile_time_constructor_info<double>,                     \
+        fundamental_compile_time_constructor_info<long double>,                \
+        fundamental_compile_time_constructor_info<std::string>,                \
+                                                                               \
+                                                                               \
         fundamental_compile_time_constructor_info<std::nullptr_t,              \
                                                   std::nullptr_t>,             \
         fundamental_compile_time_constructor_info<bool, bool>,                 \
