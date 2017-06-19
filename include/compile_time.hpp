@@ -84,14 +84,23 @@ using generate_array_of_constructor_info =
                                        extract_constructor_info>;
 
 
+template <class ResultType, class ParamTypeList>
+struct constructor_bind_point_from_type_list;
+
 template <class ResultType, class... ParamTypes>
-constexpr shadow::constructor_binding_signature
-constructor_bind_point_from_type_list(
-    metamusil::t_list::type_list<ParamTypes...>)
+struct constructor_bind_point_from_type_list<
+    ResultType,
+    metamusil::t_list::type_list<ParamTypes...>>
 {
-    return &shadow::constructor_detail::
-        generic_constructor_bind_point<ResultType, ParamTypes...>;
-}
+    static constexpr shadow::constructor_binding_signature value =
+        &shadow::constructor_detail::
+            generic_constructor_bind_point<ResultType, ParamTypes...>;
+};
+
+template <class ResultType, class ParamTypeList>
+constexpr shadow::constructor_binding_signature
+    constructor_bind_point_from_type_list_v =
+        constructor_bind_point_from_type_list<ResultType, ParamTypeList>::value;
 }
 
 
@@ -252,8 +261,9 @@ constructor_bind_point_from_type_list(
             parameter_type_indices_holder;                                     \
                                                                                \
         static constexpr shadow::constructor_binding_signature bind_point =    \
-            shadow::constructor_bind_point_from_type_list<type_name>(          \
-                parameter_type_list());                                        \
+            shadow::constructor_bind_point_from_type_list_v<                   \
+                type_name,                                                     \
+                parameter_type_list>;                                          \
     };
 
 
