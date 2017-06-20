@@ -80,10 +80,12 @@ typedef metamusil::t_list::filter_t<combinations, is_defined_predicate>
 int
 main()
 {
-    p(filtered_combinations());
+    std::cout
+        << "number of type combinations: "
+        << metamusil::t_list::length_v<myspace::type_combinations> << '\n';
 
-
-    std::cout << std::boolalpha << std::is_convertible<float, void>::value
-              << '\n';
+    std::cout << "number of valid conversion combinations: "
+              << metamusil::t_list::length_v<
+                     myspace::valid_conversion_combinations> << '\n';
 }
 

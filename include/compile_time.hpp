@@ -101,6 +101,37 @@ template <class ResultType, class ParamTypeList>
 constexpr shadow::constructor_binding_signature
     constructor_bind_point_from_type_list_v =
         constructor_bind_point_from_type_list<ResultType, ParamTypeList>::value;
+
+
+// template for holding type combinations
+template <class T1, class T2>
+struct type_pair
+{
+};
+
+// filter for valid conversion combinations
+template <class CombinationList>
+struct filter_valid_combinations
+{
+    template <class Pair>
+    struct is_defined_predicate;
+
+    template <class A, class B>
+    struct is_defined_predicate<type_pair<A, B>>
+    {
+        static const bool value = metamusil::specialization_defined_v<
+            shadow::conversion_detail::conversion_specializer,
+            A,
+            B>;
+    };
+
+    typedef metamusil::t_list::filter_t<CombinationList, is_defined_predicate>
+        type;
+};
+
+template <class CombinationList>
+using filter_valid_combinations_t =
+    typename filter_valid_combinations<CombinationList>::type;
 }
 
 
@@ -375,6 +406,14 @@ constexpr shadow::constructor_binding_signature
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize Shadow reflection library
 #define SHADOW_INIT()                                                          \
+                                                                               \
+    typedef metamusil::t_list::for_each_combination_t<type_universe,           \
+                                                      shadow::type_pair>       \
+        type_combinations;                                                     \
+                                                                               \
+    typedef shadow::filter_valid_combinations_t<type_combinations>             \
+        valid_conversion_combinations;                                         \
+                                                                               \
     static const shadow::director reflection_director{                         \
         type_name_array_holder(),                                              \
         type_info_array_holder(),                                              \
