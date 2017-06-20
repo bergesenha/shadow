@@ -151,6 +151,19 @@ struct extract_conversion_info<type_pair<To, From>, AllTypesList>
 template <class To, class From, class AllTypesList>
 constexpr conversion_info
     extract_conversion_info<type_pair<To, From>, AllTypesList>::value;
+
+
+// extract free_function_info from compile_time_ff_info
+template <class CTFFI>
+struct extract_free_function_info
+{
+    static constexpr shadow::free_function_info value = {
+        CTFFI::name,
+        CTFFI::return_type_index,
+        metamusil::t_list::length_v<typename CTFFI::parameter_list>,
+        CTFFI::parameter_type_indices_holder::value,
+        CTFFI::bind_point};
+};
 }
 
 
@@ -456,7 +469,7 @@ constexpr conversion_info
             parameter_index_sequence>                                          \
             parameter_type_indices_holder;                                     \
                                                                                \
-        static constexpr shadow::free_function_binding_signature value =       \
+        static constexpr shadow::free_function_binding_signature bind_point =  \
             &shadow::free_function_detail::generic_free_function_bind_point<   \
                 decltype(&function_name),                                      \
                 &function_name>;                                               \

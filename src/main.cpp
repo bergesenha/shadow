@@ -74,5 +74,9 @@ SHADOW_INIT()
 int
 main()
 {
+    auto ffi = shadow::extract_free_function_info<
+        myspace::compile_time_ff_info<66>>::value;
+
+    std::cout << ffi.name << " " << ffi.return_type_index << '\n';
 }
 
