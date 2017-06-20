@@ -18,7 +18,7 @@ class intholder
 public:
     intholder() = default;
 
-    intholder(int i) : i_(i), d_(0.0)
+    explicit intholder(int i) : i_(i), d_(0.0)
     {
     }
 
@@ -52,40 +52,41 @@ SHADOW_INIT()
 }
 
 
-template <class A, class B>
-struct mypair
+template <class TypePair, class AllTypesList>
+struct extract_conversion_info;
+
+template <class To, class From, class AllTypesList>
+struct extract_conversion_info<shadow::type_pair<To, From>, AllTypesList>
 {
+    static constexpr shadow::conversion_info value = {
+        metamusil::t_list::index_of_type_v<AllTypesList, From>,
+        metamusil::t_list::index_of_type_v<AllTypesList, To>,
+        &shadow::conversion_detail::generic_conversion_bind_point<To, From>};
 };
 
+template <class To, class From, class AllTypesList>
+constexpr shadow::conversion_info
+    extract_conversion_info<shadow::type_pair<To, From>, AllTypesList>::value;
 
-typedef metamusil::t_list::
-    for_each_combination_t<myspace::fundamental_type_universe, mypair>
-        combinations;
+template <class TypePair>
+using bind_extract_conversion_info =
+    extract_conversion_info<TypePair, myspace::type_universe>;
 
-template <class Pair>
-struct is_defined_predicate;
+typedef metamusil::t_list::value_transform<
+    myspace::valid_conversion_combinations,
+    bind_extract_conversion_info>
+    conversion_info_holder;
 
-template <class A, class B>
-struct is_defined_predicate<mypair<A, B>>
-{
-    static const bool value = metamusil::specialization_defined_v<
-        shadow::conversion_detail::conversion_specializer,
-        A,
-        B>;
-};
-
-typedef metamusil::t_list::filter_t<combinations, is_defined_predicate>
-    filtered_combinations;
 
 int
 main()
 {
-    std::cout
-        << "number of type combinations: "
-        << metamusil::t_list::length_v<myspace::type_combinations> << '\n';
-
-    std::cout << "number of valid conversion combinations: "
-              << metamusil::t_list::length_v<
-                     myspace::valid_conversion_combinations> << '\n';
+    for(auto& ci : conversion_info_holder::value)
+    {
+        std::cout << myspace::type_name_array_holder::value[ci.from_type_index]
+                  << " -> "
+                  << myspace::type_name_array_holder::value[ci.to_type_index]
+                  << '\n';
+    }
 }
 
