@@ -443,4 +443,5 @@ constexpr conversion_info
     static const shadow::director reflection_director{                         \
         type_name_array_holder(),                                              \
         type_info_array_holder(),                                              \
-        constructor_info_array_holder()};
+        constructor_info_array_holder(),                                       \
+        conversion_info_array_holder()};
