@@ -33,7 +33,7 @@ struct free_function_info
     const char* name;
     std::size_t return_type_index;
     std::size_t num_parameters;
-    std::size_t* parameter_type_indices;
+    const std::size_t* parameter_type_indices;
     free_function_binding_signature bind_point;
 };
 
@@ -43,7 +43,7 @@ struct member_function_info
     std::size_t object_type_index;
     std::size_t return_type_index;
     std::size_t num_parameters;
-    std::size_t* parameter_type_indices;
+    const std::size_t* parameter_type_indices;
     member_function_binding_signature bind_point;
 };
 
