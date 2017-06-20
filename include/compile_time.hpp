@@ -432,6 +432,14 @@ constexpr conversion_info
     typedef shadow::filter_valid_combinations_t<type_combinations>             \
         valid_conversion_combinations;                                         \
                                                                                \
+    template <class TypePair>                                                  \
+    using bind_extract_conversion_info =                                       \
+        shadow::extract_conversion_info<TypePair, type_universe>;              \
+                                                                               \
+    typedef metamusil::t_list::value_transform<valid_conversion_combinations,  \
+                                               bind_extract_conversion_info>   \
+        conversion_info_array_holder;                                          \
+                                                                               \
     static const shadow::director reflection_director{                         \
         type_name_array_holder(),                                              \
         type_info_array_holder(),                                              \
