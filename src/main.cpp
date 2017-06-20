@@ -32,16 +32,22 @@ private:
 };
 
 
-int
+void
 free_function1(int i)
 {
-    return i * 2;
+    std::cout << i << '\n';
+}
+
+void
+hello()
+{
+    std::cout << "hello\n";
 }
 
 double
-free_function_ol(double d)
+mult(double d, int i)
 {
-    return 2.0 * d;
+    return d * i;
 }
 
 
@@ -64,6 +70,8 @@ REGISTER_CONSTRUCTOR_END()
 REGISTER_FREE_FUNCTION_BEGIN()
 
 REGISTER_FREE_FUNCTION(free_function1)
+REGISTER_FREE_FUNCTION(hello)
+REGISTER_FREE_FUNCTION(mult)
 
 REGISTER_FREE_FUNCTION_END()
 
@@ -74,9 +82,16 @@ SHADOW_INIT()
 int
 main()
 {
-    auto ffi = shadow::extract_free_function_info<
-        myspace::compile_time_ff_info<66>>::value;
 
-    std::cout << ffi.name << " " << ffi.return_type_index << '\n';
+
+    shadow::any anint = 234;
+    shadow::any args[] = {10.3, 200};
+
+    myspace::free_function_info_array_holder::value[0].bind_point(&anint);
+    myspace::free_function_info_array_holder::value[1].bind_point(nullptr);
+    auto result =
+        myspace::free_function_info_array_holder::value[2].bind_point(args);
+
+    std::cout << result.get<double>() << '\n';
 }
 

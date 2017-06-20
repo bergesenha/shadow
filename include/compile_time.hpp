@@ -164,6 +164,11 @@ struct extract_free_function_info
         CTFFI::parameter_type_indices_holder::value,
         CTFFI::bind_point};
 };
+
+template <class CompileTimeFfInfoList>
+using generate_array_of_ff_info =
+    metamusil::t_list::value_transform<CompileTimeFfInfoList,
+                                       extract_free_function_info>;
 }
 
 
@@ -479,7 +484,21 @@ struct extract_free_function_info
 
 
 #define REGISTER_FREE_FUNCTION_END()                                           \
-    constexpr std::size_t ff_line_end = __LINE__;
+    constexpr std::size_t ff_line_end = __LINE__;                              \
+                                                                               \
+    typedef metamusil::int_seq::integer_sequence_from_range_t<std::size_t,     \
+                                                              ff_line_begin +  \
+                                                                  1,           \
+                                                              ff_line_end>     \
+        ff_line_range;                                                         \
+                                                                               \
+    typedef shadow::generate_valid_compile_time_infos_t<compile_time_ff_info,  \
+                                                        ff_line_range>         \
+        instantiated_compile_time_ff_infos;                                    \
+                                                                               \
+    typedef shadow::generate_array_of_ff_info<                                 \
+        instantiated_compile_time_ff_infos>                                    \
+        free_function_info_array_holder;
 
 
 ////////////////////////////////////////////////////////////////////////////////
