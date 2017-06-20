@@ -32,6 +32,19 @@ private:
 };
 
 
+int
+free_function1(int i)
+{
+    return i * 2;
+}
+
+double
+free_function_ol(double d)
+{
+    return 2.0 * d;
+}
+
+
 namespace myspace
 {
 REGISTER_TYPE_BEGIN()
@@ -47,6 +60,12 @@ REGISTER_CONSTRUCTOR(intholder, int)
 REGISTER_CONSTRUCTOR(intholder, int, double)
 
 REGISTER_CONSTRUCTOR_END()
+
+REGISTER_FREE_FUNCTION_BEGIN()
+
+REGISTER_FREE_FUNCTION(free_function1)
+
+REGISTER_FREE_FUNCTION_END()
 
 SHADOW_INIT()
 }

@@ -424,11 +424,25 @@ constexpr conversion_info
 ////////////////////////////////////////////////////////////////////////////////
 // register free functions
 
-#define REGISTER_FREE_FUNCTION_BEGIN()
+#define REGISTER_FREE_FUNCTION_BEGIN()                                         \
+    constexpr std::size_t ff_line_begin = __LINE__;                            \
+                                                                               \
+    template <std::size_t>                                                     \
+    struct compile_time_ff_info;
 
-#define REGISTER_FREE_FUNCTION(function_name, ...)
 
-#define REGISTER_FREE_FUNCTION_END()
+#define REGISTER_FREE_FUNCTION(function_name, ...)                             \
+                                                                               \
+                                                                               \
+    template <>                                                                \
+    struct compile_time_ff_info<__LINE__>                                      \
+    {                                                                          \
+        static constexpr char name[] = #function_name;                         \
+    };
+
+
+#define REGISTER_FREE_FUNCTION_END()                                           \
+    constexpr std::size_t ff_line_end = __LINE__;
 
 
 ////////////////////////////////////////////////////////////////////////////////

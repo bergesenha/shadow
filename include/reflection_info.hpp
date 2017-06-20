@@ -32,6 +32,8 @@ struct free_function_info
 {
     const char* name;
     std::size_t return_type_index;
+    std::size_t num_parameters;
+    std::size_t* parameter_type_indices;
     free_function_binding_signature bind_point;
 };
 
