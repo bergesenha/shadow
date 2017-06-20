@@ -55,12 +55,5 @@ SHADOW_INIT()
 int
 main()
 {
-    for(auto& ci : myspace::conversion_info_array_holder::value)
-    {
-        std::cout << myspace::type_name_array_holder::value[ci.from_type_index]
-                  << " -> "
-                  << myspace::type_name_array_holder::value[ci.to_type_index]
-                  << '\n';
-    }
 }
 
