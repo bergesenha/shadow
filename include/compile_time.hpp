@@ -422,6 +422,16 @@ constexpr conversion_info
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// register free functions
+
+#define REGISTER_FREE_FUNCTION_BEGIN()
+
+#define REGISTER_FREE_FUNCTION(function_name, ...)
+
+#define REGISTER_FREE_FUNCTION_END()
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Initialize Shadow reflection library
 #define SHADOW_INIT()                                                          \
                                                                                \
