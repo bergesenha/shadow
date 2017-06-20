@@ -132,6 +132,20 @@ struct filter_valid_combinations
 template <class CombinationList>
 using filter_valid_combinations_t =
     typename filter_valid_combinations<CombinationList>::type;
+
+
+// extract conversion_struct from type_pair
+template <class TypePair, class TypeUniverseList>
+struct extract_conversion_info;
+
+template <class To, class From, class AllTypesList>
+struct extract_conversion_info<type_pair<To, From>, AllTypesList>
+{
+    static constexpr shadow::conversion_info value = {
+        metamusil::t_list::index_of_type_v<AllTypesList, From>,
+        metamusil::t_list::index_of_type_v<AllTypesList, To>,
+        &shadow::conversion_detail::generic_conversion_bind_point<To, From>};
+};
 }
 
 
