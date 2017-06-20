@@ -32,6 +32,25 @@ private:
 };
 
 
+void
+free_function1(int i)
+{
+    std::cout << i << '\n';
+}
+
+void
+hello()
+{
+    std::cout << "hello\n";
+}
+
+double
+mult(double d, int i)
+{
+    return d * i;
+}
+
+
 namespace myspace
 {
 REGISTER_TYPE_BEGIN()
@@ -48,6 +67,14 @@ REGISTER_CONSTRUCTOR(intholder, int, double)
 
 REGISTER_CONSTRUCTOR_END()
 
+REGISTER_FREE_FUNCTION_BEGIN()
+
+REGISTER_FREE_FUNCTION(free_function1)
+REGISTER_FREE_FUNCTION(hello)
+REGISTER_FREE_FUNCTION(mult)
+
+REGISTER_FREE_FUNCTION_END()
+
 SHADOW_INIT()
 }
 
@@ -55,12 +82,16 @@ SHADOW_INIT()
 int
 main()
 {
-    for(auto& ci : myspace::conversion_info_array_holder::value)
-    {
-        std::cout << myspace::type_name_array_holder::value[ci.from_type_index]
-                  << " -> "
-                  << myspace::type_name_array_holder::value[ci.to_type_index]
-                  << '\n';
-    }
+
+
+    shadow::any anint = 234;
+    shadow::any args[] = {10.3, 200};
+
+    myspace::free_function_info_array_holder::value[0].bind_point(&anint);
+    myspace::free_function_info_array_holder::value[1].bind_point(nullptr);
+    auto result =
+        myspace::free_function_info_array_holder::value[2].bind_point(args);
+
+    std::cout << result.get<double>() << '\n';
 }
 
