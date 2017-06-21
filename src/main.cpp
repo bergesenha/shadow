@@ -50,6 +50,10 @@ public:
         return d_ * f;
     }
 
+
+    int mem_var1;
+    double mem_var2;
+
 private:
     int i_;
     double d_;
@@ -123,6 +127,13 @@ REGISTER_MEMBER_FUNCTION_EXPLICIT(intholder, member_overload, int, int)
 REGISTER_MEMBER_FUNCTION_EXPLICIT(intholder, member_overload, int, float)
 
 REGISTER_MEMBER_FUNCTION_END()
+
+REGISTER_MEMBER_VARIABLE_BEGIN()
+
+REGISTER_MEMBER_VARIABLE(intholder, mem_var1)
+REGISTER_MEMBER_VARIABLE(intholder, mem_var2)
+
+REGISTER_MEMBER_VARIABLE_END()
 
 SHADOW_INIT()
 }

@@ -689,6 +689,15 @@ using generate_array_of_mf_info =
         member_function_info_array_holder;
 
 
+#define REGISTER_MEMBER_VARIABLE_BEGIN()
+
+
+#define REGISTER_MEMBER_VARIABLE(class_name, variable_name)
+
+
+#define REGISTER_MEMBER_VARIABLE_END()
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize Shadow reflection library
 #define SHADOW_INIT()                                                          \
