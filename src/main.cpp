@@ -26,6 +26,30 @@ public:
     {
     }
 
+    void
+    member_function1(void)
+    {
+        std::cout << "hello member function\n";
+    }
+
+    int
+    member_function2(int i, char c)
+    {
+        return i * c;
+    }
+
+    int
+    member_overload(int i)
+    {
+        return i_ * i;
+    }
+
+    int
+    member_overload(float f)
+    {
+        return d_ * f;
+    }
+
 private:
     int i_;
     double d_;
@@ -89,6 +113,13 @@ REGISTER_FREE_FUNCTION_EXPLICIT(overload1, int, int)
 REGISTER_FREE_FUNCTION_EXPLICIT(overload1, int, double)
 
 REGISTER_FREE_FUNCTION_END()
+
+REGISTER_MEMBER_FUNCTION_BEGIN()
+
+REGISTER_MEMBER_FUNCTION(intholder, member_function1)
+REGISTER_MEMBER_FUNCTION(intholder, member_function2)
+
+REGISTER_MEMBER_FUNCTION_END()
 
 SHADOW_INIT()
 }

@@ -545,6 +545,33 @@ using generate_array_of_ff_info =
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// member function registration
+
+#define REGISTER_MEMBER_FUNCTION_BEGIN()                                       \
+    constexpr std::size_t mf_line_begin = __LINE__;                            \
+                                                                               \
+    template <std::size_t>                                                     \
+    struct compile_time_mf_info;
+
+
+#define REGISTER_MEMBER_FUNCTION(class_name, function_name)                    \
+                                                                               \
+    template <>                                                                \
+    struct compile_time_mf_info<__LINE__>                                      \
+    {                                                                          \
+        static constexpr char name[] = #function_name;                         \
+                                                                               \
+        static const std::size_t object_type_index =                           \
+            metamusil::t_list::index_of_type_v<type_universe, class_name>;     \
+    };                                                                         \
+                                                                               \
+    constexpr char compile_time_mf_info<__LINE__>::name[];
+
+
+#define REGISTER_MEMBER_FUNCTION_END()                                         \
+    constexpr std::size_t mf_line_end = __LINE__;
+
+////////////////////////////////////////////////////////////////////////////////
 // Initialize Shadow reflection library
 #define SHADOW_INIT()                                                          \
                                                                                \
