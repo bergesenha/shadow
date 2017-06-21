@@ -689,13 +689,48 @@ using generate_array_of_mf_info =
         member_function_info_array_holder;
 
 
-#define REGISTER_MEMBER_VARIABLE_BEGIN()
+#define REGISTER_MEMBER_VARIABLE_BEGIN()                                       \
+    constexpr std::size_t mv_line_begin = __LINE__;                            \
+                                                                               \
+    template <std::size_t>                                                     \
+    struct compile_time_mv_info;
 
 
-#define REGISTER_MEMBER_VARIABLE(class_name, variable_name)
+#define REGISTER_MEMBER_VARIABLE(class_name, variable_name)                    \
+                                                                               \
+    template <>                                                                \
+    struct compile_time_mv_info<__LINE__>                                      \
+    {                                                                          \
+        static constexpr char name[] = #variable_name;                         \
+                                                                               \
+        static const std::size_t object_type_index =                           \
+            metamusil::t_list::index_of_type_v<type_universe, class_name>;     \
+                                                                               \
+        typedef metamusil::deduce_member_variable_type_t<decltype(             \
+            &class_name::variable_name)>                                       \
+            type_type;                                                         \
+                                                                               \
+        static const std::size_t type_index =                                  \
+            metamusil::t_list::index_of_type_v<type_universe, type_type>;      \
+                                                                               \
+        static constexpr shadow::member_variable_get_binding_signature         \
+            get_bind_point = &shadow::member_variable_detail::                 \
+                                 generic_member_variable_get_bind_point<       \
+                                     decltype(&class_name::variable_name),     \
+                                     &class_name::variable_name>;              \
+                                                                               \
+        static constexpr shadow::member_variable_set_binding_signature         \
+            set_bind_point = &shadow::member_variable_detail::                 \
+                                 generic_member_variable_set_bind_point<       \
+                                     decltype(&class_name::variable_name),     \
+                                     &class_name::variable_name>;              \
+    };                                                                         \
+                                                                               \
+    constexpr char compile_time_mv_info<__LINE__>::name[];
 
 
-#define REGISTER_MEMBER_VARIABLE_END()
+#define REGISTER_MEMBER_VARIABLE_END()                                         \
+    constexpr std::size_t mv_line_end = __LINE__;
 
 
 ////////////////////////////////////////////////////////////////////////////////
