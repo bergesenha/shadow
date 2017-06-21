@@ -187,6 +187,21 @@ template <class CompileTimeMfInfoList>
 using generate_array_of_mf_info =
     metamusil::t_list::value_transform<CompileTimeMfInfoList,
                                        extract_member_function_info>;
+
+template <class CTMVI>
+struct extract_member_variable_info
+{
+    static constexpr member_variable_info value = {CTMVI::name,
+                                                   CTMVI::object_type_index,
+                                                   CTMVI::type_index,
+                                                   CTMVI::get_bind_point,
+                                                   CTMVI::set_bind_point};
+};
+
+template <class CompileTimeMvInfoList>
+using generate_array_of_mv_info =
+    metamusil::t_list::value_transform<CompileTimeMvInfoList,
+                                       extract_member_variable_info>;
 }
 
 
@@ -730,7 +745,18 @@ using generate_array_of_mf_info =
 
 
 #define REGISTER_MEMBER_VARIABLE_END()                                         \
-    constexpr std::size_t mv_line_end = __LINE__;
+    constexpr std::size_t mv_line_end = __LINE__;                              \
+                                                                               \
+    typedef metamusil::int_seq::                                               \
+        integer_sequence_from_range_t<std::size_t, mv_line_begin, mv_line_end> \
+            mv_line_range;                                                     \
+                                                                               \
+    typedef shadow::generate_valid_compile_time_infos_t<compile_time_mv_info,  \
+                                                        mv_line_range>         \
+        valid_compile_time_mv_infos;                                           \
+                                                                               \
+    typedef shadow::generate_array_of_mv_info<valid_compile_time_mv_infos>     \
+        member_variable_info_array_holder;
 
 
 ////////////////////////////////////////////////////////////////////////////////

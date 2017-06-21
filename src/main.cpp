@@ -145,8 +145,8 @@ SHADOW_INIT()
 int
 main()
 {
-    for(auto& mfi : myspace::member_function_info_array_holder::value)
+    for(auto& mvi : myspace::member_variable_info_array_holder::value)
     {
-        std::cout << mfi.name << " " << mfi.num_parameters << '\n';
+        std::cout << mvi.name << '\n';
     }
 }
