@@ -50,6 +50,10 @@ public:
         return d_ * f;
     }
 
+
+    int mem_var1;
+    double mem_var2;
+
 private:
     int i_;
     double d_;
@@ -94,14 +98,15 @@ REGISTER_TYPE_BEGIN()
 REGISTER_TYPE(intholder)
 REGISTER_TYPE_END()
 
-REGISTER_CONSTRUCTOR_BEGIN()
 
+REGISTER_CONSTRUCTOR_BEGIN()
 
 REGISTER_CONSTRUCTOR(intholder)
 REGISTER_CONSTRUCTOR(intholder, int)
 REGISTER_CONSTRUCTOR(intholder, int, double)
 
 REGISTER_CONSTRUCTOR_END()
+
 
 REGISTER_FREE_FUNCTION_BEGIN()
 
@@ -114,6 +119,7 @@ REGISTER_FREE_FUNCTION_EXPLICIT(overload1, int, double)
 
 REGISTER_FREE_FUNCTION_END()
 
+
 REGISTER_MEMBER_FUNCTION_BEGIN()
 
 REGISTER_MEMBER_FUNCTION(intholder, member_function1)
@@ -124,6 +130,14 @@ REGISTER_MEMBER_FUNCTION_EXPLICIT(intholder, member_overload, int, float)
 
 REGISTER_MEMBER_FUNCTION_END()
 
+
+REGISTER_MEMBER_VARIABLE_BEGIN()
+
+REGISTER_MEMBER_VARIABLE(intholder, mem_var1)
+REGISTER_MEMBER_VARIABLE(intholder, mem_var2)
+
+REGISTER_MEMBER_VARIABLE_END()
+
 SHADOW_INIT()
 }
 
@@ -131,8 +145,8 @@ SHADOW_INIT()
 int
 main()
 {
-    for(auto& mfi : myspace::member_function_info_array_holder::value)
+    for(auto& mvi : myspace::member_variable_info_array_holder::value)
     {
-        std::cout << mfi.name << " " << mfi.num_parameters << '\n';
+        std::cout << mvi.name << '\n';
     }
 }
