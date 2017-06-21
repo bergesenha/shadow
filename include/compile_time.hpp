@@ -169,6 +169,24 @@ template <class CompileTimeFfInfoList>
 using generate_array_of_ff_info =
     metamusil::t_list::value_transform<CompileTimeFfInfoList,
                                        extract_free_function_info>;
+
+
+template <class CTMFI>
+struct extract_member_function_info
+{
+    static constexpr shadow::member_function_info value = {
+        CTMFI::name,
+        CTMFI::object_type_index,
+        CTMFI::return_type_index,
+        CTMFI::num_parameters,
+        CTMFI::parameter_type_indices_holder::value,
+        CTMFI::bind_point};
+};
+
+template <class CompileTimeMfInfoList>
+using generate_array_of_mf_info =
+    metamusil::t_list::value_transform<CompileTimeMfInfoList,
+                                       extract_member_function_info>;
 }
 
 
@@ -599,7 +617,21 @@ using generate_array_of_ff_info =
 
 
 #define REGISTER_MEMBER_FUNCTION_END()                                         \
-    constexpr std::size_t mf_line_end = __LINE__;
+    constexpr std::size_t mf_line_end = __LINE__;                              \
+                                                                               \
+    typedef metamusil::int_seq::integer_sequence_from_range_t<std::size_t,     \
+                                                              mf_line_begin +  \
+                                                                  1,           \
+                                                              mf_line_end>     \
+        mf_line_range;                                                         \
+                                                                               \
+    typedef shadow::generate_valid_compile_time_infos_t<compile_time_mf_info,  \
+                                                        mf_line_range>         \
+        valid_compile_time_mf_infos;                                           \
+                                                                               \
+    typedef shadow::generate_array_of_mf_info<valid_compile_time_mf_infos>     \
+        member_function_info_array_holder;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize Shadow reflection library

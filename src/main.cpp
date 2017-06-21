@@ -128,32 +128,8 @@ SHADOW_INIT()
 int
 main()
 {
-
-
-    shadow::any anint = 234;
-    shadow::any args[] = {10.3, 200};
-
-    myspace::free_function_info_array_holder::value[0].bind_point(&anint);
-    myspace::free_function_info_array_holder::value[1].bind_point(nullptr);
-    auto result =
-        myspace::free_function_info_array_holder::value[2].bind_point(args);
-
-    std::cout << result.get<double>() << '\n';
-
-    for(auto& ffi : myspace::free_function_info_array_holder::value)
+    for(auto& mfi : myspace::member_function_info_array_holder::value)
     {
-        std::cout << ffi.name << '\n';
+        std::cout << mfi.name << '\n';
     }
-
-    p(myspace::compile_time_mf_info<120>::parameter_type_list());
-
-    auto memfun2 = myspace::compile_time_mf_info<120>::bind_point;
-    shadow::any object = intholder(10);
-    shadow::any mfargs[] = {10, 'a'};
-
-    auto shouldbeint = memfun2(object, mfargs);
-
-    std::cout << shouldbeint.get<int>() << '\n';
-    std::cout << 10 * 'a' << '\n';
 }
-
