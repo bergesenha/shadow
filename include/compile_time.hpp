@@ -447,7 +447,10 @@ using generate_array_of_ff_info =
     constexpr std::size_t ff_line_begin = __LINE__;                            \
                                                                                \
     template <std::size_t>                                                     \
-    struct compile_time_ff_info;
+    struct compile_time_ff_info;                                               \
+                                                                               \
+    template <std::size_t>                                                     \
+    struct exp_compile_time_ff_info;
 
 
 #define REGISTER_FREE_FUNCTION(function_name)                                  \
@@ -483,6 +486,36 @@ using generate_array_of_ff_info =
     constexpr char compile_time_ff_info<__LINE__>::name[];
 
 
+#define REGISTER_FREE_FUNCTION_EXPLICIT(function_name, return_type, ...)       \
+                                                                               \
+    template <>                                                                \
+    struct exp_compile_time_ff_info<__LINE__>                                  \
+    {                                                                          \
+        static constexpr char name[] = #function_name;                         \
+                                                                               \
+        typedef return_type (*function_pointer_type)(__VA_ARGS__);             \
+                                                                               \
+        static const std::size_t return_type_index =                           \
+            metamusil::t_list::index_of_type_v<type_universe, return_type>;    \
+                                                                               \
+        typedef metamusil::t_list::type_list<__VA_ARGS__> parameter_list;      \
+                                                                               \
+        typedef metamusil::t_list::order_t<parameter_list, type_universe>      \
+            parameter_index_sequence;                                          \
+                                                                               \
+        typedef metamusil::int_seq::integer_sequence_to_array<                 \
+            parameter_index_sequence>                                          \
+            parameter_type_indices_holder;                                     \
+                                                                               \
+        static constexpr shadow::free_function_binding_signature bind_point =  \
+            &shadow::free_function_detail::generic_free_function_bind_point<   \
+                function_pointer_type,                                         \
+                &function_name>;                                               \
+    };                                                                         \
+                                                                               \
+    constexpr char exp_compile_time_ff_info<__LINE__>::name[];
+
+
 #define REGISTER_FREE_FUNCTION_END()                                           \
     constexpr std::size_t ff_line_end = __LINE__;                              \
                                                                                \
@@ -496,8 +529,18 @@ using generate_array_of_ff_info =
                                                         ff_line_range>         \
         instantiated_compile_time_ff_infos;                                    \
                                                                                \
+    typedef shadow::generate_valid_compile_time_infos_t<                       \
+        exp_compile_time_ff_info,                                              \
+        ff_line_range>                                                         \
+        instantiated_exp_compile_time_ff_infos;                                \
+                                                                               \
+    typedef metamusil::t_list::concat_t<                                       \
+        instantiated_compile_time_ff_infos,                                    \
+        instantiated_exp_compile_time_ff_infos>                                \
+        all_instantiated_compile_time_ff_infos;                                \
+                                                                               \
     typedef shadow::generate_array_of_ff_info<                                 \
-        instantiated_compile_time_ff_infos>                                    \
+        all_instantiated_compile_time_ff_infos>                                \
         free_function_info_array_holder;
 
 

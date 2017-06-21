@@ -51,6 +51,18 @@ mult(double d, int i)
 }
 
 
+int
+overload1(int i)
+{
+    return 3 * i;
+}
+
+int
+overload1(double d)
+{
+    return 3 * d;
+}
+
 namespace myspace
 {
 REGISTER_TYPE_BEGIN()
@@ -73,6 +85,9 @@ REGISTER_FREE_FUNCTION(free_function1)
 REGISTER_FREE_FUNCTION(hello)
 REGISTER_FREE_FUNCTION(mult)
 
+REGISTER_FREE_FUNCTION_EXPLICIT(overload1, int, int)
+REGISTER_FREE_FUNCTION_EXPLICIT(overload1, int, double)
+
 REGISTER_FREE_FUNCTION_END()
 
 SHADOW_INIT()
@@ -93,5 +108,10 @@ main()
         myspace::free_function_info_array_holder::value[2].bind_point(args);
 
     std::cout << result.get<double>() << '\n';
+
+    for(auto& ffi : myspace::free_function_info_array_holder::value)
+    {
+        std::cout << ffi.name << '\n';
+    }
 }
 
