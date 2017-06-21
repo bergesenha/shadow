@@ -569,7 +569,10 @@ using generate_array_of_mf_info =
     constexpr std::size_t mf_line_begin = __LINE__;                            \
                                                                                \
     template <std::size_t>                                                     \
-    struct compile_time_mf_info;
+    struct compile_time_mf_info;                                               \
+                                                                               \
+    template <std::size_t>                                                     \
+    struct exp_compile_time_mf_info;
 
 
 #define REGISTER_MEMBER_FUNCTION(class_name, function_name)                    \
@@ -616,6 +619,50 @@ using generate_array_of_mf_info =
     constexpr char compile_time_mf_info<__LINE__>::name[];
 
 
+#define REGISTER_MEMBER_FUNCTION_EXPLICIT(                                     \
+    class_name, function_name, return_type, ...)                               \
+                                                                               \
+    template <>                                                                \
+    struct exp_compile_time_mf_info<__LINE__>                                  \
+    {                                                                          \
+        static constexpr char name[] = #function_name;                         \
+                                                                               \
+        typedef return_type (class_name::*member_function_signature_type)(     \
+            __VA_ARGS__);                                                      \
+                                                                               \
+        static const std::size_t object_type_index =                           \
+            metamusil::t_list::index_of_type_v<type_universe, class_name>;     \
+                                                                               \
+        static const std::size_t return_type_index =                           \
+            metamusil::t_list::index_of_type_v<                                \
+                type_universe,                                                 \
+                metamusil::deduce_return_type_t<                               \
+                    member_function_signature_type>>;                          \
+                                                                               \
+        typedef metamusil::deduce_parameter_types_t<                           \
+            member_function_signature_type>                                    \
+            parameter_type_list;                                               \
+                                                                               \
+        static const std::size_t num_parameters =                              \
+            metamusil::t_list::length_v<parameter_type_list>;                  \
+                                                                               \
+        typedef metamusil::t_list::order_t<parameter_type_list, type_universe> \
+            parameter_index_sequence;                                          \
+                                                                               \
+        typedef metamusil::int_seq::integer_sequence_to_array<                 \
+            parameter_index_sequence>                                          \
+            parameter_type_indices_holder;                                     \
+                                                                               \
+        static constexpr shadow::member_function_binding_signature             \
+            bind_point = &shadow::member_function_detail::                     \
+                             generic_member_function_bind_point<               \
+                                 member_function_signature_type,               \
+                                 &class_name::function_name>;                  \
+    };                                                                         \
+                                                                               \
+    constexpr char exp_compile_time_mf_info<__LINE__>::name[];
+
+
 #define REGISTER_MEMBER_FUNCTION_END()                                         \
     constexpr std::size_t mf_line_end = __LINE__;                              \
                                                                                \
@@ -629,7 +676,16 @@ using generate_array_of_mf_info =
                                                         mf_line_range>         \
         valid_compile_time_mf_infos;                                           \
                                                                                \
-    typedef shadow::generate_array_of_mf_info<valid_compile_time_mf_infos>     \
+    typedef shadow::generate_valid_compile_time_infos_t<                       \
+        exp_compile_time_mf_info,                                              \
+        mf_line_range>                                                         \
+        valid_exp_compile_time_mf_infos;                                       \
+                                                                               \
+    typedef metamusil::t_list::concat_t<valid_compile_time_mf_infos,           \
+                                        valid_exp_compile_time_mf_infos>       \
+        all_compile_time_mf_infos;                                             \
+                                                                               \
+    typedef shadow::generate_array_of_mf_info<all_compile_time_mf_infos>       \
         member_function_info_array_holder;
 
 

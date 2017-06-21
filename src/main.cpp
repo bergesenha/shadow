@@ -119,6 +119,9 @@ REGISTER_MEMBER_FUNCTION_BEGIN()
 REGISTER_MEMBER_FUNCTION(intholder, member_function1)
 REGISTER_MEMBER_FUNCTION(intholder, member_function2)
 
+REGISTER_MEMBER_FUNCTION_EXPLICIT(intholder, member_overload, int, int)
+REGISTER_MEMBER_FUNCTION_EXPLICIT(intholder, member_overload, int, float)
+
 REGISTER_MEMBER_FUNCTION_END()
 
 SHADOW_INIT()
@@ -130,6 +133,6 @@ main()
 {
     for(auto& mfi : myspace::member_function_info_array_holder::value)
     {
-        std::cout << mfi.name << '\n';
+        std::cout << mfi.name << " " << mfi.num_parameters << '\n';
     }
 }
