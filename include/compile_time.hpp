@@ -561,9 +561,39 @@ using generate_array_of_ff_info =
     {                                                                          \
         static constexpr char name[] = #function_name;                         \
                                                                                \
+        typedef decltype(                                                      \
+            &class_name::function_name) member_function_signature_type;        \
+                                                                               \
         static const std::size_t object_type_index =                           \
             metamusil::t_list::index_of_type_v<type_universe, class_name>;     \
+                                                                               \
+        static const std::size_t return_type_index =                           \
+            metamusil::t_list::index_of_type_v<                                \
+                type_universe,                                                 \
+                metamusil::deduce_return_type_t<                               \
+                    member_function_signature_type>>;                          \
+                                                                               \
+        typedef metamusil::deduce_parameter_types_t<                           \
+            member_function_signature_type>                                    \
+            parameter_type_list;                                               \
+                                                                               \
+        static const std::size_t num_parameters =                              \
+            metamusil::t_list::length_v<parameter_type_list>;                  \
+                                                                               \
+        typedef metamusil::t_list::order_t<parameter_type_list, type_universe> \
+            parameter_index_sequence;                                          \
+                                                                               \
+        typedef metamusil::int_seq::integer_sequence_to_array<                 \
+            parameter_index_sequence>                                          \
+            parameter_type_indices_holder;                                     \
+                                                                               \
+        static constexpr shadow::member_function_binding_signature             \
+            bind_point = &shadow::member_function_detail::                     \
+                             generic_member_function_bind_point<               \
+                                 member_function_signature_type,               \
+                                 &class_name::function_name>;                  \
     };                                                                         \
+                                                                               \
                                                                                \
     constexpr char compile_time_mf_info<__LINE__>::name[];
 
