@@ -25,6 +25,10 @@ typedef void (*member_variable_set_binding_signature)(any&, const any&);
 typedef any (*constructor_binding_signature)(any*);
 // conversion signature
 typedef any (*conversion_binding_signature)(const any&);
+// string serialize signature
+typedef std::string (*string_serialization_signature)(const any&);
+// string deserialization signature
+typedef any (*string_deserialization_signature)(const std::string&);
 
 
 ////////////////////////////////////////////////////////////////////////////////
