@@ -362,6 +362,16 @@ struct string_serialize_type_selector<char>
     }
 };
 
+template <>
+struct string_serialize_type_selector<void>
+{
+    static std::string
+    dispatch(const any& value)
+    {
+        return "empty";
+    }
+};
+
 template <class T>
 std::string
 generic_string_serialization_bind_point(const any& value)

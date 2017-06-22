@@ -146,9 +146,14 @@ int
 main()
 {
     shadow::any achar = 'a';
+    shadow::any empty;
 
     auto serialize_char = &shadow::string_serialization_detail::
                               generic_string_serialization_bind_point<char>;
 
+    auto serialize_void = &shadow::string_serialization_detail::
+                              generic_string_serialization_bind_point<void>;
+
     std::cout << serialize_char(achar) << '\n';
+    std::cout << serialize_void(empty) << '\n';
 }
