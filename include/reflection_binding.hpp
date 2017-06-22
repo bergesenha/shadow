@@ -345,7 +345,99 @@ template <class T>
 std::string
 generic_string_serialization_bind_point(const any& value)
 {
-    return type_selector<T>::serialize_dispatch(value);
+    return string_serialize_type_selector<T>::dispatch(value);
+}
+
+
+template <class T>
+struct string_deserialize_type_selector;
+
+template <>
+struct string_deserialize_type_selector<int>
+{
+    static any
+    dispatch(const std::string& str_value)
+    {
+        return std::stoi(str_value);
+    }
+};
+
+template <>
+struct string_deserialize_type_selector<long>
+{
+    static any
+    dispatch(const std::string& str_value)
+    {
+        return std::stol(str_value);
+    }
+};
+
+template <>
+struct string_deserialize_type_selector<long long>
+{
+    static any
+    dispatch(const std::string& str_value)
+    {
+        return std::stoll(str_value);
+    }
+};
+
+template <>
+struct string_deserialize_type_selector<unsigned long>
+{
+    static any
+    dispatch(const std::string& str_value)
+    {
+        return std::stoul(str_value);
+    }
+};
+
+template <>
+struct string_deserialize_type_selector<unsigned long long>
+{
+    static any
+    dispatch(const std::string& str_value)
+    {
+        return std::stoull(str_value);
+    }
+};
+
+template <>
+struct string_deserialize_type_selector<float>
+{
+    static any
+    dispatch(const std::string& str_value)
+    {
+        return std::stof(str_value);
+    }
+};
+
+template <>
+struct string_deserialize_type_selector<double>
+{
+    static any
+    dispatch(const std::string& str_value)
+    {
+        return std::stod(str_value);
+    }
+};
+
+template <>
+struct string_deserialize_type_selector<long double>
+{
+    static any
+    dispatch(const std::string& str_value)
+    {
+        return std::stold(str_value);
+    }
+};
+
+
+template <class T>
+any
+generic_string_deserialization_bind_point(const std::string& str_value)
+{
+    return string_deserialize_type_selector<T>::dispatch(str_value);
 }
 }
 }
