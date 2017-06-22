@@ -320,4 +320,30 @@ generic_conversion_bind_point(const any& src)
     return conversion_specializer<TargetType, SourceType>::dispatch(src);
 }
 }
+
+
+namespace string_serialization_detail
+{
+
+template <class T, class = void>
+struct type_selector;
+
+template <class T>
+struct type_selector<T, std::enable_if_t<std::is_arithmetic<T>::value>>
+{
+    static std::string
+    serialize_dispatch(const any& value)
+    {
+        std::to_string(value.get<T>());
+    }
+};
+
+
+template <class T>
+std::string
+generic_string_serialization_bind_point(const any& value)
+{
+    return type_selector<T>::serialize_dispatch(value);
+}
+}
 }
