@@ -145,8 +145,10 @@ SHADOW_INIT()
 int
 main()
 {
-    for(auto& mvi : myspace::member_variable_info_array_holder::value)
+    p(myspace::string_serialization_info_array_holder::type());
+
+    for(auto& ssi : myspace::string_serialization_info_array_holder::value)
     {
-        std::cout << mvi.name << '\n';
+        std::cout << ssi.type_index << '\n';
     }
 }
