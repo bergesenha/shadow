@@ -340,6 +340,37 @@ struct string_serialize_type_selector<
     }
 };
 
+template <>
+struct string_serialize_type_selector<std::string>
+{
+    static std::string
+    dispatch(const any& value)
+    {
+        return value.get<std::string>();
+    }
+};
+
+template <>
+struct string_serialize_type_selector<char>
+{
+    static std::string
+    dispatch(const any& value)
+    {
+        std::string out;
+        out.push_back(value.get<char>());
+        return out;
+    }
+};
+
+template <>
+struct string_serialize_type_selector<void>
+{
+    static std::string
+    dispatch(const any& value)
+    {
+        return "empty";
+    }
+};
 
 template <class T>
 std::string
@@ -349,8 +380,42 @@ generic_string_serialization_bind_point(const any& value)
 }
 
 
-template <class T>
+template <class T, class = void>
 struct string_deserialize_type_selector;
+
+template <class T>
+struct string_deserialize_type_selector<
+    T,
+    std::enable_if_t<std::is_arithmetic<T>::value>>
+{
+    static any
+    dispatch(const std::string& str_value)
+    {
+        T out = std::stold(str_value);
+        return out;
+    }
+};
+
+
+template <>
+struct string_deserialize_type_selector<char>
+{
+    static any
+    dispatch(const std::string& str_value)
+    {
+        return str_value[0];
+    }
+};
+
+template <>
+struct string_deserialize_type_selector<std::string>
+{
+    static any
+    dispatch(const std::string& str_value)
+    {
+        return str_value;
+    }
+};
 
 template <>
 struct string_deserialize_type_selector<int>
@@ -429,6 +494,16 @@ struct string_deserialize_type_selector<long double>
     dispatch(const std::string& str_value)
     {
         return std::stold(str_value);
+    }
+};
+
+template <>
+struct string_deserialize_type_selector<void>
+{
+    static any
+    dispatch(const std::string& str_value)
+    {
+        return shadow::any();
     }
 };
 

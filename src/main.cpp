@@ -145,10 +145,15 @@ SHADOW_INIT()
 int
 main()
 {
-    p(myspace::string_serialization_info_array_holder::type());
+    shadow::any achar = 'a';
+    shadow::any empty;
 
-    for(auto& ssi : myspace::string_serialization_info_array_holder::value)
-    {
-        std::cout << ssi.type_index << '\n';
-    }
+    auto serialize_char = &shadow::string_serialization_detail::
+                              generic_string_serialization_bind_point<char>;
+
+    auto serialize_void = &shadow::string_serialization_detail::
+                              generic_string_serialization_bind_point<void>;
+
+    std::cout << serialize_char(achar) << '\n';
+    std::cout << serialize_void(empty) << '\n';
 }
