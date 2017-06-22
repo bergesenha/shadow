@@ -326,15 +326,17 @@ namespace string_serialization_detail
 {
 
 template <class T, class = void>
-struct type_selector;
+struct string_serialize_type_selector;
 
 template <class T>
-struct type_selector<T, std::enable_if_t<std::is_arithmetic<T>::value>>
+struct string_serialize_type_selector<
+    T,
+    std::enable_if_t<std::is_arithmetic<T>::value>>
 {
     static std::string
-    serialize_dispatch(const any& value)
+    dispatch(const any& value)
     {
-        std::to_string(value.get<T>());
+        return std::to_string(value.get<T>());
     }
 };
 
