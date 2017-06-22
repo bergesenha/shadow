@@ -303,8 +303,7 @@ template <class TargetType, class SourceType>
 struct conversion_specializer<
     TargetType,
     SourceType,
-    metamusil::void_t<
-        std::enable_if_t<std::is_convertible<SourceType, TargetType>::value>>>
+    std::enable_if_t<std::is_convertible<SourceType, TargetType>::value>>
 {
     static any
     dispatch(const any& src)
