@@ -145,23 +145,10 @@ SHADOW_INIT()
 int
 main()
 {
-    for(auto& mvi : myspace::member_variable_info_array_holder::value)
+    p(myspace::string_serialization_info_array_holder::type());
+
+    for(auto& ssi : myspace::string_serialization_info_array_holder::value)
     {
-        std::cout << mvi.name << '\n';
+        std::cout << ssi.type_index << '\n';
     }
-
-    auto int_to_string = &shadow::string_serialization_detail::
-                             generic_string_serialization_bind_point<int>;
-
-
-    auto string_to_int = &shadow::string_serialization_detail::
-                             generic_string_deserialization_bind_point<int>;
-
-    shadow::any anint = 236;
-
-    std::cout << int_to_string(anint) << '\n';
-
-    auto intback = string_to_int(int_to_string(anint));
-
-    std::cout << intback.get<int>() << '\n';
 }

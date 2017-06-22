@@ -202,6 +202,43 @@ template <class CompileTimeMvInfoList>
 using generate_array_of_mv_info =
     metamusil::t_list::value_transform<CompileTimeMvInfoList,
                                        extract_member_variable_info>;
+
+
+template <class UsedTypesList>
+struct generate_array_of_string_serialization_info_holder
+{
+    // filter for types that can be string serialized and deserialized
+    template <class T>
+    using is_serializable = metamusil::specialization_defined<
+        shadow::string_serialization_detail::string_serialize_type_selector,
+        T>;
+
+    template <class T>
+    using is_deserializable = metamusil::specialization_defined<
+        shadow::string_serialization_detail::string_deserialize_type_selector,
+        T>;
+
+    typedef metamusil::t_list::filter_t<UsedTypesList, is_serializable>
+        serializable_list;
+
+    typedef metamusil::t_list::filter_t<serializable_list, is_deserializable>
+        valid_types;
+
+    template <class T>
+    struct extract_string_serialization_info
+    {
+        static constexpr string_serialization_info value = {
+            metamusil::t_list::index_of_type_v<UsedTypesList, T>,
+            &shadow::string_serialization_detail::
+                generic_string_serialization_bind_point<T>,
+            &shadow::string_serialization_detail::
+                generic_string_deserialization_bind_point<T>};
+    };
+
+    typedef metamusil::t_list::
+        value_transform<valid_types, extract_string_serialization_info>
+            type;
+};
 }
 
 
@@ -777,6 +814,9 @@ using generate_array_of_mv_info =
     typedef metamusil::t_list::value_transform<valid_conversion_combinations,  \
                                                bind_extract_conversion_info>   \
         conversion_info_array_holder;                                          \
+                                                                               \
+    typedef shadow::generate_array_of_string_serialization_info_holder<        \
+        type_universe>::type string_serialization_info_array_holder;           \
                                                                                \
     static const shadow::director reflection_director{                         \
         type_name_array_holder(),                                              \
