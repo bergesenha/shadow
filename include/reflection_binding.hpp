@@ -340,6 +340,15 @@ struct string_serialize_type_selector<
     }
 };
 
+template <>
+struct string_serialize_type_selector<std::string>
+{
+    static std::string
+    dispatch(const any& value)
+    {
+        return value.get<std::string>();
+    }
+};
 
 template <class T>
 std::string

@@ -166,4 +166,10 @@ main()
     auto astring = string_to_string("hello");
 
     std::cout << astring.get<std::string>() << '\n';
+
+    auto serialize_string =
+        &shadow::string_serialization_detail::
+            generic_string_serialization_bind_point<std::string>;
+
+    std::cout << serialize_string(astring) << '\n';
 }
