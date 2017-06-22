@@ -145,16 +145,16 @@ SHADOW_INIT()
 int
 main()
 {
-    auto string_to_ui =
-        &shadow::string_serialization_detail::
-            generic_string_deserialization_bind_point<unsigned int>;
+    std::cout << "The following types are deserializable from std::string:\n";
+    for(auto& si : myspace::string_serialization_info_array_holder::value)
+    {
+        std::cout << myspace::type_name_array_holder::value[si.type_index]
+                  << '\n';
+    }
 
-    auto string_to_int = &shadow::string_serialization_detail::
-                             generic_string_deserialization_bind_point<int>;
+    auto string_to_char = &shadow::string_serialization_detail::
+                              generic_string_deserialization_bind_point<char>;
 
-    auto result = string_to_ui("1253");
-    auto result2 = string_to_int("-124");
-
-    std::cout << result.get<unsigned int>() << '\n';
-    std::cout << result2.get<int>() << '\n';
+    auto achar = string_to_char("b");
+    std::cout << achar.get<char>() << '\n';
 }

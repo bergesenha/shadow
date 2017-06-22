@@ -365,6 +365,18 @@ struct string_deserialize_type_selector<
     }
 };
 
+
+template <>
+struct string_deserialize_type_selector<char>
+{
+    static any
+    dispatch(const std::string& str_value)
+    {
+        return str_value[0];
+    }
+};
+
+
 template <>
 struct string_deserialize_type_selector<int>
 {
