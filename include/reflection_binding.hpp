@@ -497,6 +497,16 @@ struct string_deserialize_type_selector<long double>
     }
 };
 
+template <>
+struct string_deserialize_type_selector<void>
+{
+    static any
+    dispatch(const std::string& str_value)
+    {
+        return shadow::any();
+    }
+};
+
 
 template <class T>
 any
