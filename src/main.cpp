@@ -157,4 +157,13 @@ main()
 
     auto achar = string_to_char("b");
     std::cout << achar.get<char>() << '\n';
+
+
+    auto string_to_string =
+        &shadow::string_serialization_detail::
+            generic_string_deserialization_bind_point<std::string>;
+
+    auto astring = string_to_string("hello");
+
+    std::cout << astring.get<std::string>() << '\n';
 }

@@ -376,6 +376,15 @@ struct string_deserialize_type_selector<char>
     }
 };
 
+template <>
+struct string_deserialize_type_selector<std::string>
+{
+    static any
+    dispatch(const std::string& str_value)
+    {
+        return str_value;
+    }
+};
 
 template <>
 struct string_deserialize_type_selector<int>
