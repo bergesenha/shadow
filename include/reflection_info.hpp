@@ -55,4 +55,11 @@ struct member_variable_info
     member_variable_get_binding_signature get_bind_point;
     member_variable_set_binding_signature set_bind_point;
 };
+
+struct string_serialization_info
+{
+    std::size_t type_index;
+    string_serialization_signature serialize_bind_point;
+    string_deserialization_signature deserialize_bind_point;
+};
 }
