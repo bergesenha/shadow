@@ -350,6 +350,18 @@ struct string_serialize_type_selector<std::string>
     }
 };
 
+template <>
+struct string_serialize_type_selector<char>
+{
+    static std::string
+    dispatch(const any& value)
+    {
+        std::string out;
+        out.push_back(value.get<char>());
+        return out;
+    }
+};
+
 template <class T>
 std::string
 generic_string_serialization_bind_point(const any& value)

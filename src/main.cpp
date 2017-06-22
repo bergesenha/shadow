@@ -145,31 +145,10 @@ SHADOW_INIT()
 int
 main()
 {
-    std::cout << "The following types are deserializable from std::string:\n";
-    for(auto& si : myspace::string_serialization_info_array_holder::value)
-    {
-        std::cout << myspace::type_name_array_holder::value[si.type_index]
-                  << '\n';
-    }
+    shadow::any achar = 'a';
 
-    auto string_to_char = &shadow::string_serialization_detail::
-                              generic_string_deserialization_bind_point<char>;
+    auto serialize_char = &shadow::string_serialization_detail::
+                              generic_string_serialization_bind_point<char>;
 
-    auto achar = string_to_char("b");
-    std::cout << achar.get<char>() << '\n';
-
-
-    auto string_to_string =
-        &shadow::string_serialization_detail::
-            generic_string_deserialization_bind_point<std::string>;
-
-    auto astring = string_to_string("hello");
-
-    std::cout << astring.get<std::string>() << '\n';
-
-    auto serialize_string =
-        &shadow::string_serialization_detail::
-            generic_string_serialization_bind_point<std::string>;
-
-    std::cout << serialize_string(astring) << '\n';
+    std::cout << serialize_char(achar) << '\n';
 }
