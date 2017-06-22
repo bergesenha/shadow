@@ -349,8 +349,21 @@ generic_string_serialization_bind_point(const any& value)
 }
 
 
-template <class T>
+template <class T, class = void>
 struct string_deserialize_type_selector;
+
+template <class T>
+struct string_deserialize_type_selector<
+    T,
+    std::enable_if_t<std::is_arithmetic<T>::value>>
+{
+    static any
+    dispatch(const std::string& str_value)
+    {
+        T out = std::stold(str_value);
+        return out;
+    }
+};
 
 template <>
 struct string_deserialize_type_selector<int>
