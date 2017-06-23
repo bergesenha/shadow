@@ -129,6 +129,20 @@ TEST_CASE("test info_iterator_ with const type", "[info_iterator_]")
 
             REQUIRE(front.name() == std::string("type1"));
         }
+
+        SECTION("increment by adding integer to it_begin")
+        {
+            it_begin += 4;
+
+            REQUIRE(it_begin == it_end);
+        }
+
+        SECTION("add number to it_begin")
+        {
+            auto res = it_begin + 3;
+
+            REQUIRE(res->name() == std::string("type4"));
+        }
     }
 
 

@@ -117,6 +117,19 @@ public:
         return temp;
     }
 
+    info_iterator_&
+    operator+=(difference_type n)
+    {
+        current_ += n;
+        return *this;
+    }
+
+    info_iterator_
+    operator+(difference_type n) const
+    {
+        return info_iterator_(current_ + n);
+    }
+
     bool
     operator==(const info_iterator_& other) const
     {
