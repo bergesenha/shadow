@@ -4,7 +4,7 @@
 #include <iterator>
 
 
-TEST_CASE("test info_iterator_", "[info_iterator_]")
+TEST_CASE("test info_iterator_ with const type", "[info_iterator_]")
 {
     constexpr shadow::type_info type_info_array[] = {
         {"type1", 1}, {"type2", 2}, {"type3", 3}, {"type4", 4},
