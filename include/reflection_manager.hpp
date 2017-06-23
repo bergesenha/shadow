@@ -172,6 +172,30 @@ public:
         return current_ != other.current_;
     }
 
+    bool
+    operator<(const info_iterator_& other) const
+    {
+        return current_ < other.current_;
+    }
+
+    bool
+    operator>(const info_iterator_& other) const
+    {
+        return current_ > other.current_;
+    }
+
+    bool
+    operator<=(const info_iterator_& other) const
+    {
+        return current_ <= other.current_;
+    }
+
+    bool
+    operator>=(const info_iterator_& other) const
+    {
+        return current_ >= other.current_;
+    }
+
 private:
     InfoType* current_;
 };

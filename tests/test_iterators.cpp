@@ -182,6 +182,30 @@ TEST_CASE("test info_iterator_ with const type", "[info_iterator_]")
             REQUIRE(res2.name() == std::string("type2"));
             REQUIRE(res3.name() == std::string("type4"));
         }
+
+        SECTION("comparisons")
+        {
+            auto res1 = it_begin < it_end;
+            auto res2 = it_end < it_begin;
+
+            auto res3 = it_end > it_begin;
+            auto res4 = it_begin > it_end;
+
+            auto res5 = it_begin <= it_end;
+            auto res6 = it_begin <= it_begin;
+
+            auto res7 = it_end >= it_begin;
+            auto res8 = it_end >= it_end;
+
+            REQUIRE(res1);
+            REQUIRE(!res2);
+            REQUIRE(res3);
+            REQUIRE(!res4);
+            REQUIRE(res5);
+            REQUIRE(res6);
+            REQUIRE(res7);
+            REQUIRE(res8);
+        }
     }
 
 
