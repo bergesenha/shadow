@@ -33,6 +33,7 @@ if(SHADOW_BUILD_TESTS)
         tests/test_conversion_binding.cpp
         tests/test_compile_time1.cpp
         tests/test_compile_time2.cpp
+        tests/test_iterators.cpp
         )
 
     add_executable(unit_tests ${SHADOW_TEST_SRC})
