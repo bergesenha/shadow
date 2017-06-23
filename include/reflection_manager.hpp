@@ -24,6 +24,18 @@ public:
                        FreeFunctionInfoArrayHolder,
                        MemberFunctionInfoArrayHolder,
                        MemberVariableInfoArrayHolder)
+        : type_info_range_(initialize_range(TypeInfoArrayHolder())),
+          constructor_info_range_(
+              initialize_range(ConstructorInfoArrayHolder())),
+          conversion_info_range_(initialize_range(ConversionInfoArrayHolder())),
+          string_serialization_info_range_(
+              initialize_range(StringSerializationInfoArrayHolder())),
+          free_function_info_range_(
+              initialize_range(FreeFunctionInfoArrayHolder())),
+          member_function_info_range_(
+              initialize_range(MemberFunctionInfoArrayHolder())),
+          member_variable_info_range_(
+              initialize_range(MemberVariableInfoArrayHolder()))
     {
     }
 
