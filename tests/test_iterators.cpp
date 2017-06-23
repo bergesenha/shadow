@@ -10,8 +10,6 @@ TEST_CASE("test info_iterator_", "[info_iterator_]")
         {"type1", 1}, {"type2", 2}, {"type3", 3}, {"type4", 4},
     };
 
-    ////////////////////////////////////////////////////////////////////////////
-    // Concepts
 
     SECTION("Construct info_iterator_'s with pointers to type_info in array")
     {
@@ -20,6 +18,12 @@ TEST_CASE("test info_iterator_", "[info_iterator_]")
 
         shadow::reflection_manager::type_iterator it_end(
             std::end(type_info_array));
+
+        SECTION("self comparison")
+        {
+            REQUIRE(it_begin == it_begin);
+            REQUIRE(it_end == it_end);
+        }
 
         SECTION("copy construct an info_iterator_ with it_begin")
         {
@@ -71,6 +75,7 @@ TEST_CASE("test info_iterator_", "[info_iterator_]")
                 swap(copy_constructed_it, it_end);
 
                 // it_end should be equivalent to it_begin
+                REQUIRE(it_end == it_begin);
             }
         }
 
