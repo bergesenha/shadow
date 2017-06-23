@@ -104,6 +104,12 @@ public:
         return temp;
     }
 
+    info_iterator_& operator--()
+    {
+        --current_;
+        return *this;
+    }
+
     bool
     operator==(const info_iterator_& other) const
     {
