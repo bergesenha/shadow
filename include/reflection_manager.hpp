@@ -55,10 +55,15 @@ private:
 };
 
 
-template <class InfoType>
+template <class InfoType, class ProxyType>
 class info_iterator_
 {
 public:
+    typedef ProxyType value_type;
+
+public:
+    info_iterator_() = default;
+
     info_iterator_(const InfoType* current) : current_(current)
     {
     }
@@ -89,7 +94,7 @@ namespace shadow
 class reflection_manager
 {
 public:
-    typedef info_iterator_<type_info> type_iterator;
+    typedef info_iterator_<type_info, type> type_iterator;
 
 public:
     template <class TypeInfoArrayHolder,
