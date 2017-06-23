@@ -63,6 +63,9 @@ public:
     typedef typename std::iterator_traits<const InfoType*>::difference_type
         difference_type;
     typedef ProxyType reference;
+    typedef ProxyType pointer;
+    typedef typename std::iterator_traits<const InfoType*>::iterator_category
+        iterator_category;
 
 public:
     info_iterator_() = default;
@@ -199,5 +202,10 @@ struct std::iterator_traits<shadow::info_iterator_<InfoType, ProxyType>>
             difference_type;
     typedef typename shadow::info_iterator_<InfoType, ProxyType>::reference
         reference;
+    typedef
+        typename shadow::info_iterator_<InfoType, ProxyType>::pointer pointer;
+    typedef
+        typename shadow::info_iterator_<InfoType, ProxyType>::iterator_category
+            iterator_category;
 };
 }
