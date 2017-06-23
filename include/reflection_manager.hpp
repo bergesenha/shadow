@@ -37,6 +37,7 @@ public:
         return this;
     }
 
+    // for const iterators
     const type* operator->() const
     {
         return this;
