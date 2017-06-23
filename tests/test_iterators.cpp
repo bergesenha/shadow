@@ -13,10 +13,10 @@ TEST_CASE("test info_iterator_", "[info_iterator_]")
 
     SECTION("Construct info_iterator_'s with pointers to type_info in array")
     {
-        shadow::reflection_manager::type_iterator it_begin(
+        shadow::reflection_manager::const_type_iterator it_begin(
             std::begin(type_info_array));
 
-        shadow::reflection_manager::type_iterator it_end(
+        shadow::reflection_manager::const_type_iterator it_end(
             std::end(type_info_array));
 
         SECTION("self comparison")
@@ -46,15 +46,15 @@ TEST_CASE("test info_iterator_", "[info_iterator_]")
 
             SECTION("default construct info_iterator_")
             {
-                shadow::reflection_manager::type_iterator
+                shadow::reflection_manager::const_type_iterator
                     default_constructed_it1;
 
-                shadow::reflection_manager::type_iterator
+                shadow::reflection_manager::const_type_iterator
                     default_constructed_it2{};
 
-                shadow::reflection_manager::type_iterator();
+                shadow::reflection_manager::const_type_iterator();
 
-                shadow::reflection_manager::type_iterator{};
+                shadow::reflection_manager::const_type_iterator{};
 
                 SECTION("copy assign it_begin to default_constructed_it1")
                 {
@@ -114,28 +114,28 @@ TEST_CASE("test info_iterator_", "[info_iterator_]")
     {
         auto value_type_same = std::is_same<
             std::iterator_traits<
-                shadow::reflection_manager::type_iterator>::value_type,
-            shadow::type>::value;
+                shadow::reflection_manager::const_type_iterator>::value_type,
+            const shadow::type>::value;
 
         auto difference_type_same = std::is_same<
-            std::iterator_traits<
-                shadow::reflection_manager::type_iterator>::difference_type,
+            std::iterator_traits<shadow::reflection_manager::
+                                     const_type_iterator>::difference_type,
             std::iterator_traits<const shadow::type_info*>::difference_type>::
             value;
 
         auto reference_same = std::is_same<
             std::iterator_traits<
-                shadow::reflection_manager::type_iterator>::reference,
-            shadow::type>::value;
+                shadow::reflection_manager::const_type_iterator>::reference,
+            const shadow::type>::value;
 
         auto pointer_same = std::is_same<
             std::iterator_traits<
-                shadow::reflection_manager::type_iterator>::pointer,
-            shadow::type>::value;
+                shadow::reflection_manager::const_type_iterator>::pointer,
+            const shadow::type>::value;
 
         auto category_same = std::is_same<
-            std::iterator_traits<
-                shadow::reflection_manager::type_iterator>::iterator_category,
+            std::iterator_traits<shadow::reflection_manager::
+                                     const_type_iterator>::iterator_category,
             std::iterator_traits<const shadow::type_info*>::iterator_category>::
             value;
 

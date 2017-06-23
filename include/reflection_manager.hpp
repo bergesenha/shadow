@@ -117,15 +117,7 @@ public:
     }
 
 private:
-    const InfoType* current_;
-};
-
-
-// represents a free function with reflection information
-class free_function
-{
-private:
-    const free_function_info* info_;
+    InfoType* current_;
 };
 }
 
@@ -135,7 +127,7 @@ namespace shadow
 class reflection_manager
 {
 public:
-    typedef info_iterator_<type_info, type> type_iterator;
+    typedef info_iterator_<const type_info, const type> const_type_iterator;
 
 public:
     template <class TypeInfoArrayHolder,
