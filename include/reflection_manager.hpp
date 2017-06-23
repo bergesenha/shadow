@@ -124,6 +124,13 @@ public:
         return *this;
     }
 
+    info_iterator_&
+    operator-=(difference_type n)
+    {
+        current_ -= n;
+        return *this;
+    }
+
     info_iterator_
     operator+(difference_type n) const
     {

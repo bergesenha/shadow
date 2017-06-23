@@ -150,6 +150,13 @@ TEST_CASE("test info_iterator_ with const type", "[info_iterator_]")
 
             REQUIRE(res->name() == std::string("type4"));
         }
+
+        SECTION("decrement by -=")
+        {
+            it_end -= 1;
+
+            REQUIRE(it_end->name() == std::string("type4"));
+        }
     }
 
 
