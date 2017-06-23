@@ -54,6 +54,18 @@ private:
 };
 
 
+class type_iterator_
+{
+public:
+    type_iterator_(const type_info* current) : current_(current)
+    {
+    }
+
+private:
+    const type_info* current_;
+};
+
+
 // represents a free function with reflection information
 class free_function
 {
