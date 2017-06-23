@@ -105,6 +105,14 @@ TEST_CASE("test info_iterator_ with const type", "[info_iterator_]")
 
                 REQUIRE(it_begin->name() == std::string("type1"));
             }
+
+            SECTION("dereference and post-decrement")
+            {
+                auto res2 = *it_begin--;
+
+                REQUIRE(res2.name() == std::string("type2"));
+                REQUIRE(it_begin->name() == std::string("type1"));
+            }
         }
 
         SECTION("post-increment and dereference in one expression")
