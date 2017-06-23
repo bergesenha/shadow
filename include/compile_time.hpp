@@ -8,7 +8,7 @@
 #include <function_deduction.hpp>
 
 #include "reflection_info.hpp"
-#include "director.hpp"
+#include "reflection_manager.hpp"
 
 
 namespace shadow
@@ -818,8 +818,11 @@ struct generate_array_of_string_serialization_info_holder
     typedef shadow::generate_array_of_string_serialization_info_holder<        \
         type_universe>::type string_serialization_info_array_holder;           \
                                                                                \
-    static const shadow::director reflection_director{                         \
-        type_name_array_holder(),                                              \
+    static const shadow::reflection_manager manager{                           \
         type_info_array_holder(),                                              \
         constructor_info_array_holder(),                                       \
-        conversion_info_array_holder()};
+        conversion_info_array_holder(),                                        \
+        string_serialization_info_array_holder(),                              \
+        free_function_info_array_holder(),                                     \
+        member_function_info_array_holder(),                                   \
+        member_variable_info_array_holder()};

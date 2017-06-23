@@ -10,6 +10,23 @@ namespace shadow
 class reflection_manager
 {
 public:
+    template <class TypeInfoArrayHolder,
+              class ConstructorInfoArrayHolder,
+              class ConversionInfoArrayHolder,
+              class StringSerializationInfoArrayHolder,
+              class FreeFunctionInfoArrayHolder,
+              class MemberFunctionInfoArrayHolder,
+              class MemberVariableInfoArrayHolder>
+    reflection_manager(TypeInfoArrayHolder,
+                       ConstructorInfoArrayHolder,
+                       ConversionInfoArrayHolder,
+                       StringSerializationInfoArrayHolder,
+                       FreeFunctionInfoArrayHolder,
+                       MemberFunctionInfoArrayHolder,
+                       MemberVariableInfoArrayHolder)
+    {
+    }
+
 private:
     std::pair<const type_info*, const type_info*> type_info_range_;
     std::pair<const constructor_info*, const constructor_info*>
