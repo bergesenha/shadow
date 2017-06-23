@@ -37,6 +37,11 @@ public:
         return this;
     }
 
+    const type* operator->() const
+    {
+        return this;
+    }
+
 public:
     std::string
     name() const
