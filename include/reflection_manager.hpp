@@ -28,6 +28,35 @@ public:
     }
 
 private:
+    template <class ArrayHolderType>
+    std::pair<const typename ArrayHolderType::type*,
+              const typename ArrayHolderType::type*>
+        initialize_range(ArrayHolderType)
+    {
+// clang complains here due to the comparison of decayed array and
+// nullptr, since in the case ArrayHolderType::value was an array, this
+// would always evaluate to true. The fact is that
+// ArrayHolderType::value may be a pointer to nullptr for some cases of
+// ArrayHolderType.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wtautological-pointer-compare"
+        if(ArrayHolderType::value != nullptr)
+        {
+            return std::make_pair(std::begin(ArrayHolderType::value),
+                                  std::end(ArrayHolderType::value));
+        }
+        else
+        {
+            std::pair<const typename ArrayHolderType::type*,
+                      const typename ArrayHolderType::type*>
+                out(nullptr, nullptr);
+
+            return out;
+        }
+    }
+#pragma clang diagnostic pop
+
+private:
     std::pair<const type_info*, const type_info*> type_info_range_;
     std::pair<const constructor_info*, const constructor_info*>
         constructor_info_range_;
