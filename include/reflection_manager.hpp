@@ -23,6 +23,20 @@ private:
     std::size_t type_index_;
 };
 
+
+// represents a type with reflection information and functionality
+class type
+{
+public:
+    type(const type_info* info) : info_(info)
+    {
+    }
+
+private:
+    const type_info* info_;
+};
+
+
 // represents a free function with reflection information
 class free_function
 {
