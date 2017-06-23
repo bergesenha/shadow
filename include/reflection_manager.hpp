@@ -181,3 +181,15 @@ private:
         member_variable_info_range_;
 };
 }
+
+namespace std
+{
+// specialize std::iterator_traits for info_iterator_
+
+template <class InfoType, class ProxyType>
+struct std::iterator_traits<shadow::info_iterator_<InfoType, ProxyType>>
+{
+    typedef typename shadow::info_iterator_<InfoType, ProxyType>::value_type
+        value_type;
+};
+}
