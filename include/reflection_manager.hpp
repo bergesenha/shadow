@@ -130,6 +130,12 @@ public:
         return info_iterator_(current_ + n);
     }
 
+    friend info_iterator_
+    operator+(difference_type lhs, const info_iterator_& rhs)
+    {
+        return rhs + lhs;
+    }
+
     bool
     operator==(const info_iterator_& other) const
     {

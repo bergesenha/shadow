@@ -143,6 +143,13 @@ TEST_CASE("test info_iterator_ with const type", "[info_iterator_]")
 
             REQUIRE(res->name() == std::string("type4"));
         }
+
+        SECTION("add it_begin to number")
+        {
+            auto res = 3 + it_begin;
+
+            REQUIRE(res->name() == std::string("type4"));
+        }
     }
 
 
