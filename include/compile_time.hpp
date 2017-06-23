@@ -45,8 +45,9 @@ struct extract_name
 
 template <class TypeListOfCompileTimeTypeInfo>
 using generate_array_of_strings =
-    metamusil::t_list::value_transform<TypeListOfCompileTimeTypeInfo,
-                                       extract_name>;
+    metamusil::t_list::explicit_value_transform<TypeListOfCompileTimeTypeInfo,
+                                                extract_name,
+                                                const char*>;
 
 // extract type info and make array of type_info at compile time
 template <class CompileTimeTypeInfo>
@@ -58,8 +59,9 @@ struct extract_type_info
 
 template <class TypeListOfCompileTimeTypeInfo>
 using generate_array_of_type_info =
-    metamusil::t_list::value_transform<TypeListOfCompileTimeTypeInfo,
-                                       extract_type_info>;
+    metamusil::t_list::explicit_value_transform<TypeListOfCompileTimeTypeInfo,
+                                                extract_type_info,
+                                                type_info>;
 
 
 // extract type from compile_time_info
@@ -81,8 +83,10 @@ struct extract_constructor_info
 
 template <class TypeListOfCompileTimeConstructorInfo>
 using generate_array_of_constructor_info =
-    metamusil::t_list::value_transform<TypeListOfCompileTimeConstructorInfo,
-                                       extract_constructor_info>;
+    metamusil::t_list::explicit_value_transform<
+        TypeListOfCompileTimeConstructorInfo,
+        extract_constructor_info,
+        constructor_info>;
 
 
 template <class ResultType, class ParamTypeList>
@@ -167,8 +171,9 @@ struct extract_free_function_info
 
 template <class CompileTimeFfInfoList>
 using generate_array_of_ff_info =
-    metamusil::t_list::value_transform<CompileTimeFfInfoList,
-                                       extract_free_function_info>;
+    metamusil::t_list::explicit_value_transform<CompileTimeFfInfoList,
+                                                extract_free_function_info,
+                                                free_function_info>;
 
 
 template <class CTMFI>
@@ -185,8 +190,9 @@ struct extract_member_function_info
 
 template <class CompileTimeMfInfoList>
 using generate_array_of_mf_info =
-    metamusil::t_list::value_transform<CompileTimeMfInfoList,
-                                       extract_member_function_info>;
+    metamusil::t_list::explicit_value_transform<CompileTimeMfInfoList,
+                                                extract_member_function_info,
+                                                member_function_info>;
 
 template <class CTMVI>
 struct extract_member_variable_info
@@ -200,8 +206,9 @@ struct extract_member_variable_info
 
 template <class CompileTimeMvInfoList>
 using generate_array_of_mv_info =
-    metamusil::t_list::value_transform<CompileTimeMvInfoList,
-                                       extract_member_variable_info>;
+    metamusil::t_list::explicit_value_transform<CompileTimeMvInfoList,
+                                                extract_member_variable_info,
+                                                member_variable_info>;
 
 
 template <class UsedTypesList>
@@ -235,9 +242,11 @@ struct generate_array_of_string_serialization_info_holder
                 generic_string_deserialization_bind_point<T>};
     };
 
-    typedef metamusil::t_list::
-        value_transform<valid_types, extract_string_serialization_info>
-            type;
+    typedef metamusil::t_list::explicit_value_transform<
+        valid_types,
+        extract_string_serialization_info,
+        string_serialization_info>
+        type;
 };
 }
 
@@ -811,8 +820,10 @@ struct generate_array_of_string_serialization_info_holder
     using bind_extract_conversion_info =                                       \
         shadow::extract_conversion_info<TypePair, type_universe>;              \
                                                                                \
-    typedef metamusil::t_list::value_transform<valid_conversion_combinations,  \
-                                               bind_extract_conversion_info>   \
+    typedef metamusil::t_list::explicit_value_transform<                       \
+        valid_conversion_combinations,                                         \
+        bind_extract_conversion_info,                                          \
+        shadow::conversion_info>                                               \
         conversion_info_array_holder;                                          \
                                                                                \
     typedef shadow::generate_array_of_string_serialization_info_holder<        \
