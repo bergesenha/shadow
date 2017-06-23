@@ -75,6 +75,16 @@ public:
     }
 
 public:
+    ProxyType operator*() const
+    {
+        return ProxyType(current_);
+    }
+
+    ProxyType operator->() const
+    {
+        return ProxyType(current_);
+    }
+
     info_iterator_& operator++()
     {
         ++current_;

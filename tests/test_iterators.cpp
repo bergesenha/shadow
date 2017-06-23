@@ -77,8 +77,18 @@ TEST_CASE("test info_iterator_", "[info_iterator_]")
         SECTION("pre-increment info_iterator_")
         {
             ++it_begin;
+
+            REQUIRE(it_begin->name() == std::string("type2"));
+        }
+
+        SECTION("dereference it_begin")
+        {
+            auto front = *it_begin;
+
+            REQUIRE(front.name() == std::string("type1"));
         }
     }
+
 
     SECTION("inspect iterator_traits of info_iterator_")
     {
