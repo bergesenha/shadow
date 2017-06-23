@@ -25,6 +25,12 @@ TEST_CASE("test info_iterator_", "[info_iterator_]")
             REQUIRE(it_end == it_end);
         }
 
+        SECTION("it_end and it_begin should not compare equal")
+        {
+            REQUIRE(it_begin != it_end);
+            REQUIRE(!(it_begin == it_end));
+        }
+
         SECTION("copy construct an info_iterator_ with it_begin")
         {
             auto copy_constructed_it = it_begin;
