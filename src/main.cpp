@@ -145,15 +145,10 @@ SHADOW_INIT()
 int
 main()
 {
-    shadow::any achar = 'a';
-    shadow::any empty;
-
-    auto serialize_char = &shadow::string_serialization_detail::
-                              generic_string_serialization_bind_point<char>;
-
-    auto serialize_void = &shadow::string_serialization_detail::
-                              generic_string_serialization_bind_point<void>;
-
-    std::cout << serialize_char(achar) << '\n';
-    std::cout << serialize_void(empty) << '\n';
+    for(auto i = myspace::manager.type_begin();
+        i != myspace::manager.type_end();
+        ++i)
+    {
+        std::cout << i->name() << " " << i->size() << '\n';
+    }
 }
