@@ -273,7 +273,17 @@ private:
 public:
     ////////////////////////////////////////////////////////////////////////////
     // main api interface for interacting with the reflection system
+    const_type_iterator
+    type_begin() const
+    {
+        return type_info_range_.first;
+    }
 
+    const_type_iterator
+    type_end() const
+    {
+        return type_info_range_.second;
+    }
 
 private:
     // pairs hold iterators to beginning and end of arrays of information
