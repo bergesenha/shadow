@@ -4,6 +4,33 @@
 
 #include "reflection_info.hpp"
 
+namespace shadow
+{
+////////////////////////////////////////////////////////////////////////////////
+// user facing API types carrying information and functionality for the
+// reflection system
+
+class reflection_manager;
+
+// holds one value with type/reflection information
+class variable
+{
+private:
+    // holds type erased value
+    any value_;
+    // these identify the type erased value
+    const reflection_manager* manager_;
+    std::size_t type_index_;
+};
+
+// represents a free function with reflection information
+class free_function
+{
+private:
+    const free_function_info* info_;
+};
+}
+
 
 namespace shadow
 {
@@ -40,6 +67,7 @@ public:
     }
 
 private:
+    // generic initialization helper function
     template <class ArrayHolderType>
     std::pair<const typename ArrayHolderType::type*,
               const typename ArrayHolderType::type*>
@@ -67,6 +95,12 @@ private:
         }
     }
 #pragma clang diagnostic pop
+
+
+public:
+    ////////////////////////////////////////////////////////////////////////////
+    // main api interface for interacting with the reflection system
+
 
 private:
     // pairs hold iterators to beginning and end of arrays of information
