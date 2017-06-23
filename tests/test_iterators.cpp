@@ -157,6 +157,20 @@ TEST_CASE("test info_iterator_ with const type", "[info_iterator_]")
 
             REQUIRE(it_end->name() == std::string("type4"));
         }
+
+        SECTION("subtract number from it_end")
+        {
+            auto res = it_end - 2;
+
+            REQUIRE(res->name() == std::string("type3"));
+        }
+
+        SECTION("take the difference between end and begin")
+        {
+            auto res = it_end - it_begin;
+
+            REQUIRE(res == 4);
+        }
     }
 
 

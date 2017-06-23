@@ -137,6 +137,18 @@ public:
         return info_iterator_(current_ + n);
     }
 
+    info_iterator_
+    operator-(difference_type n) const
+    {
+        return info_iterator_(current_ - n);
+    }
+
+    difference_type
+    operator-(const info_iterator_& other)
+    {
+        return current_ - other.current_;
+    }
+
     friend info_iterator_
     operator+(difference_type lhs, const info_iterator_& rhs)
     {
