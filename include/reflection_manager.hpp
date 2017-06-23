@@ -32,6 +32,18 @@ public:
     {
     }
 
+    std::string
+    name() const
+    {
+        return info_->name;
+    }
+
+    std::size_t
+    size() const
+    {
+        return info_->size;
+    }
+
 private:
     const type_info* info_;
 };
