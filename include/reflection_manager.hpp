@@ -60,6 +60,8 @@ class info_iterator_
 {
 public:
     typedef ProxyType value_type;
+    typedef typename std::iterator_traits<const InfoType*>::difference_type
+        difference_type;
 
 public:
     info_iterator_() = default;
@@ -191,5 +193,8 @@ struct std::iterator_traits<shadow::info_iterator_<InfoType, ProxyType>>
 {
     typedef typename shadow::info_iterator_<InfoType, ProxyType>::value_type
         value_type;
+    typedef
+        typename shadow::info_iterator_<InfoType, ProxyType>::difference_type
+            difference_type;
 };
 }

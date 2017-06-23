@@ -87,6 +87,13 @@ TEST_CASE("test info_iterator_", "[info_iterator_]")
                 shadow::reflection_manager::type_iterator>::value_type,
             shadow::type>::value;
 
+        auto difference_type_same = std::is_same<
+            std::iterator_traits<
+                shadow::reflection_manager::type_iterator>::difference_type,
+            std::iterator_traits<const shadow::type_info*>::difference_type>::
+            value;
+
         REQUIRE(value_type_same);
+        REQUIRE(difference_type_same);
     }
 }
