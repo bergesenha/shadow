@@ -50,21 +50,28 @@ public:
         return info_->size;
     }
 
-
 private:
     const type_info* info_;
 };
 
 
-class type_iterator_
+template <class InfoType>
+class info_iterator_
 {
 public:
-    type_iterator_(const type_info* current) : current_(current)
+    info_iterator_(const InfoType* current) : current_(current)
     {
     }
 
+public:
+    info_iterator_& operator++()
+    {
+        ++current_;
+        return *this;
+    }
+
 private:
-    const type_info* current_;
+    const InfoType* current_;
 };
 
 
@@ -81,6 +88,9 @@ namespace shadow
 {
 class reflection_manager
 {
+public:
+    typedef info_iterator_<type_info> type_iterator;
+
 public:
     template <class TypeInfoArrayHolder,
               class ConstructorInfoArrayHolder,
