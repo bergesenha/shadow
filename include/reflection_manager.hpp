@@ -69,6 +69,8 @@ private:
 #pragma clang diagnostic pop
 
 private:
+    // pairs hold iterators to beginning and end of arrays of information
+    // generated at compile time
     std::pair<const type_info*, const type_info*> type_info_range_;
     std::pair<const constructor_info*, const constructor_info*>
         constructor_info_range_;
