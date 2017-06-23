@@ -87,8 +87,17 @@ TEST_CASE("test info_iterator_", "[info_iterator_]")
 
         SECTION("pre-increment info_iterator_")
         {
-            ++it_begin;
+            auto res = ++it_begin;
 
+            REQUIRE(it_begin->name() == std::string("type2"));
+            REQUIRE(res->name() == std::string("type2"));
+        }
+
+        SECTION("post-increment and dereference in one expression")
+        {
+            auto res = *it_begin++;
+
+            REQUIRE(res->name() == std::string("type1"));
             REQUIRE(it_begin->name() == std::string("type2"));
         }
 
