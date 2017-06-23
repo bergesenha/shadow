@@ -91,6 +91,11 @@ public:
         return ProxyType(current_);
     }
 
+    ProxyType operator[](difference_type n) const
+    {
+        return ProxyType(current_ + n);
+    }
+
     info_iterator_& operator++()
     {
         ++current_;

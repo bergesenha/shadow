@@ -171,6 +171,17 @@ TEST_CASE("test info_iterator_ with const type", "[info_iterator_]")
 
             REQUIRE(res == 4);
         }
+
+        SECTION("array access")
+        {
+            auto res1 = it_begin[0];
+            auto res2 = it_begin[1];
+            auto res3 = it_end[-1];
+
+            REQUIRE(res1.name() == std::string("type1"));
+            REQUIRE(res2.name() == std::string("type2"));
+            REQUIRE(res3.name() == std::string("type4"));
+        }
     }
 
 
