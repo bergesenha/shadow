@@ -110,6 +110,13 @@ public:
         return *this;
     }
 
+    info_iterator_ operator--(int)
+    {
+        auto temp = *this;
+        --(*this);
+        return temp;
+    }
+
     bool
     operator==(const info_iterator_& other) const
     {
