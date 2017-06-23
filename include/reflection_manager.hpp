@@ -44,6 +44,11 @@ public:
         return info_->size;
     }
 
+    type* operator->()
+    {
+        return this;
+    }
+
 private:
     const type_info* info_;
 };
