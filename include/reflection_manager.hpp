@@ -296,6 +296,10 @@ public:
           member_function_info_by_index_(buckets_by_index(
               member_function_info_range_,
               TypeInfoArrayHolder(),
+              [](const auto& info) { return info.object_type_index; })),
+          member_variable_info_by_index_(buckets_by_index(
+              member_variable_info_range_,
+              TypeInfoArrayHolder(),
               [](const auto& info) { return info.object_type_index; }))
     {
     }
@@ -419,6 +423,8 @@ private:
     std::vector<std::vector<conversion_info>> conversion_info_by_index_;
     std::vector<std::vector<member_function_info>>
         member_function_info_by_index_;
+    std::vector<std::vector<member_variable_info>>
+        member_variable_info_by_index_;
 };
 }
 
