@@ -285,8 +285,14 @@ public:
               initialize_range(MemberFunctionInfoArrayHolder())),
           member_variable_info_range_(
               initialize_range(MemberVariableInfoArrayHolder())),
-          constructor_info_by_index_(
-              buckets_by_index(constructor_info_range_, TypeInfoArrayHolder()))
+          constructor_info_by_index_(buckets_by_index(
+              constructor_info_range_,
+              TypeInfoArrayHolder(),
+              [](const auto& info) { return info.type_index; })),
+          conversion_info_by_index_(buckets_by_index(
+              conversion_info_range_,
+              TypeInfoArrayHolder(),
+              [](const auto& info) { return info.from_type_index; }))
     {
     }
 
@@ -333,19 +339,22 @@ private:
     }
 
 
-    template <class ValueType, class TypeInfoArrayHolder>
+    template <class ValueType, class TypeInfoArrayHolder, class Fun>
     std::vector<std::vector<ValueType>>
     buckets_by_index(const std::pair<const ValueType*, const ValueType*>& range,
-                     TypeInfoArrayHolder)
+                     TypeInfoArrayHolder,
+                     Fun index_extractor)
     {
         if(range.first != nullptr && range.second != nullptr)
         {
             std::vector<std::vector<ValueType>> out(
                 array_size(TypeInfoArrayHolder()));
 
-            std::for_each(range.first, range.second, [&out](const auto& info) {
-                out[info.type_index].push_back(info);
-            });
+            std::for_each(range.first,
+                          range.second,
+                          [&out, index_extractor](const auto& info) {
+                              out[index_extractor(info)].push_back(info);
+                          });
 
             return out;
         }
@@ -401,7 +410,9 @@ private:
     std::pair<const member_variable_info*, const member_variable_info*>
         member_variable_info_range_;
 
+    // sorted information
     std::vector<std::vector<constructor_info>> constructor_info_by_index_;
+    std::vector<std::vector<conversion_info>> conversion_info_by_index_;
 };
 }
 
