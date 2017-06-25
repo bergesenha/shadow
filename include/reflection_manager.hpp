@@ -1,6 +1,8 @@
 #pragma once
 
 #include <utility>
+#include <vector>
+#include <algorithm>
 
 #include "reflection_info.hpp"
 
@@ -282,17 +284,13 @@ public:
           member_function_info_range_(
               initialize_range(MemberFunctionInfoArrayHolder())),
           member_variable_info_range_(
-              initialize_range(MemberVariableInfoArrayHolder()))
+              initialize_range(MemberVariableInfoArrayHolder())),
+          constructor_info_by_index_(
+              buckets_by_index(constructor_info_range_, TypeInfoArrayHolder()))
     {
     }
 
 private:
-    // generic initialization helper function
-    template <class ArrayHolderType>
-    std::pair<const typename ArrayHolderType::type*,
-              const typename ArrayHolderType::type*>
-        initialize_range(ArrayHolderType)
-    {
 // clang complains here due to the comparison of decayed array and
 // nullptr, since in the case ArrayHolderType::value was an array, this
 // would always evaluate to true. The fact is that
@@ -300,6 +298,11 @@ private:
 // ArrayHolderType.
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wtautological-pointer-compare"
+    template <class ArrayHolderType>
+    std::pair<const typename ArrayHolderType::type*,
+              const typename ArrayHolderType::type*>
+        initialize_range(ArrayHolderType)
+    {
         if(ArrayHolderType::value != nullptr)
         {
             return std::make_pair(std::begin(ArrayHolderType::value),
@@ -326,6 +329,29 @@ private:
         else
         {
             return std::extent<decltype(ArrayHolderType::value)>::value;
+        }
+    }
+
+
+    template <class ValueType, class TypeInfoArrayHolder>
+    std::vector<std::vector<ValueType>>
+    buckets_by_index(const std::pair<const ValueType*, const ValueType*>& range,
+                     TypeInfoArrayHolder)
+    {
+        if(range.first != nullptr && range.second != nullptr)
+        {
+            std::vector<std::vector<ValueType>> out(
+                array_size(TypeInfoArrayHolder()));
+
+            std::for_each(range.first, range.second, [&out](const auto& info) {
+                out[info.type_index].push_back(info);
+            });
+
+            return out;
+        }
+        else
+        {
+            return std::vector<std::vector<ValueType>>();
         }
     }
 
@@ -374,6 +400,8 @@ private:
         member_function_info_range_;
     std::pair<const member_variable_info*, const member_variable_info*>
         member_variable_info_range_;
+
+    std::vector<std::vector<constructor_info>> constructor_info_by_index_;
 };
 }
 
