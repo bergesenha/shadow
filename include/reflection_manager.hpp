@@ -78,6 +78,26 @@ public:
 };
 
 
+typedef api_type_aggregator<type_info, get_name_policy, get_size_policy> type_;
+
+template <class Derived>
+class get_type_policy
+{
+public:
+    type_
+    get_type() const
+    {
+        // retrieve type index
+        const auto type_index =
+            static_cast<const Derived*>(this)->info_->type_index;
+
+        return static_cast<const Derived*>(this)->manager_->type_by_index(
+            type_index);
+    }
+};
+
+typedef api_type_aggregator<constructor_info, get_type_policy> constructor_;
+
 template <class InfoType, class ProxyType>
 class info_iterator_
 {
