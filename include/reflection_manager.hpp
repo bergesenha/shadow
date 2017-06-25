@@ -24,43 +24,6 @@ private:
 };
 
 
-// represents a type with reflection information and functionality
-class type
-{
-public:
-    type(const type_info* info) : info_(info)
-    {
-    }
-
-    type* operator->()
-    {
-        return this;
-    }
-
-    // for const iterators
-    const type* operator->() const
-    {
-        return this;
-    }
-
-public:
-    std::string
-    name() const
-    {
-        return info_->name;
-    }
-
-    std::size_t
-    size() const
-    {
-        return info_->size;
-    }
-
-private:
-    const type_info* info_;
-};
-
-
 template <class InfoType, template <class> class... Policies>
 class api_type_aggregator
     : public Policies<api_type_aggregator<InfoType, Policies...>>...
@@ -115,6 +78,8 @@ public:
 };
 
 
+typedef api_type_aggregator<type_info, get_name_policy, get_size_policy> type;
+
 template <class InfoType, class ProxyType>
 class info_iterator_
 {
@@ -130,24 +95,26 @@ public:
 public:
     info_iterator_() = default;
 
-    info_iterator_(const InfoType* current) : current_(current)
+
+    info_iterator_(const InfoType* current, const reflection_manager* manager)
+        : current_(current), manager_(manager)
     {
     }
 
 public:
     ProxyType operator*() const
     {
-        return ProxyType(current_);
+        return ProxyType(current_, manager_);
     }
 
     ProxyType operator->() const
     {
-        return ProxyType(current_);
+        return ProxyType(current_, manager_);
     }
 
     ProxyType operator[](difference_type n) const
     {
-        return ProxyType(current_ + n);
+        return ProxyType(current_ + n, manager_);
     }
 
     info_iterator_& operator++()
@@ -193,13 +160,13 @@ public:
     info_iterator_
     operator+(difference_type n) const
     {
-        return info_iterator_(current_ + n);
+        return info_iterator_(current_ + n, manager_);
     }
 
     info_iterator_
     operator-(difference_type n) const
     {
-        return info_iterator_(current_ - n);
+        return info_iterator_(current_ - n, manager_);
     }
 
     difference_type
@@ -252,6 +219,7 @@ public:
 
 private:
     InfoType* current_;
+    const reflection_manager* manager_;
 };
 }
 
@@ -264,6 +232,8 @@ public:
     typedef info_iterator_<const type_info, const type> const_type_iterator;
 
 public:
+    reflection_manager() = default;
+
     template <class TypeInfoArrayHolder,
               class ConstructorInfoArrayHolder,
               class ConversionInfoArrayHolder,
@@ -327,16 +297,12 @@ private:
 public:
     ////////////////////////////////////////////////////////////////////////////
     // main api interface for interacting with the reflection system
-    const_type_iterator
-    type_begin() const
+    std::pair<const_type_iterator, const_type_iterator>
+    types() const
     {
-        return type_info_range_.first;
-    }
-
-    const_type_iterator
-    type_end() const
-    {
-        return type_info_range_.second;
+        return std::make_pair(
+            const_type_iterator(type_info_range_.first, this),
+            const_type_iterator(type_info_range_.second, this));
     }
 
 private:

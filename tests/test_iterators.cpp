@@ -10,14 +10,15 @@ TEST_CASE("test info_iterator_ with const type", "[info_iterator_]")
         {"type1", 1}, {"type2", 2}, {"type3", 3}, {"type4", 4},
     };
 
+    shadow::reflection_manager man;
 
     SECTION("Construct info_iterator_'s with pointers to type_info in array")
     {
         shadow::reflection_manager::const_type_iterator it_begin(
-            std::begin(type_info_array));
+            std::begin(type_info_array), &man);
 
         shadow::reflection_manager::const_type_iterator it_end(
-            std::end(type_info_array));
+            std::end(type_info_array), &man);
 
         SECTION("self comparison")
         {
