@@ -66,6 +66,15 @@ class api_type_aggregator
     : public Policies<api_type_aggregator<InfoType, Policies...>>...
 {
 public:
+    api_type_aggregator() : info_(nullptr), manager_(nullptr)
+    {
+    }
+
+    api_type_aggregator(const InfoType* info, const reflection_manager* manager)
+        : info_(info), manager_(manager)
+    {
+    }
+
     api_type_aggregator* operator->()
     {
         return this;
