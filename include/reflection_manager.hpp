@@ -300,8 +300,15 @@ public:
           member_variable_info_by_index_(buckets_by_index(
               member_variable_info_range_,
               TypeInfoArrayHolder(),
-              [](const auto& info) { return info.object_type_index; }))
+              [](const auto& info) { return info.object_type_index; })),
+          string_serializer_info_by_index_(array_size(TypeInfoArrayHolder()))
     {
+        std::for_each(string_serialization_info_range_.first,
+                      string_serialization_info_range_.second,
+                      [this](const auto& info) {
+                          string_serializer_info_by_index_[info.type_index] =
+                              info;
+                      });
     }
 
 private:
@@ -425,6 +432,7 @@ private:
         member_function_info_by_index_;
     std::vector<std::vector<member_variable_info>>
         member_variable_info_by_index_;
+    std::vector<string_serialization_info> string_serializer_info_by_index_;
 };
 }
 
