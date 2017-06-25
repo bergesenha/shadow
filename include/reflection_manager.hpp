@@ -96,9 +96,21 @@ class get_name_policy
 {
 public:
     std::string
-    get_name() const
+    name() const
     {
         return (static_cast<const Derived*>(this))->info_->name;
+    }
+};
+
+
+template <class Derived>
+class get_size_policy
+{
+public:
+    std::size_t
+    size() const
+    {
+        return static_cast<const Derived*>(this)->info_->size;
     }
 };
 
