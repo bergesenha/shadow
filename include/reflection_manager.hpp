@@ -314,6 +314,21 @@ private:
             return out;
         }
     }
+
+
+    template <class ArrayHolderType>
+    std::size_t array_size(ArrayHolderType)
+    {
+        if(ArrayHolderType::value == nullptr)
+        {
+            return 0;
+        }
+        else
+        {
+            return std::extent<decltype(ArrayHolderType::value)>::value;
+        }
+    }
+
 #pragma clang diagnostic pop
 
 
