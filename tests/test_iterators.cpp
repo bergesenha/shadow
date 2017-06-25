@@ -215,7 +215,7 @@ TEST_CASE("test info_iterator_ with const type", "[info_iterator_]")
         auto value_type_same = std::is_same<
             std::iterator_traits<
                 shadow::reflection_manager::const_type_iterator>::value_type,
-            const shadow::type>::value;
+            const shadow::reflection_manager::type>::value;
 
         auto difference_type_same = std::is_same<
             std::iterator_traits<shadow::reflection_manager::
@@ -226,12 +226,12 @@ TEST_CASE("test info_iterator_ with const type", "[info_iterator_]")
         auto reference_same = std::is_same<
             std::iterator_traits<
                 shadow::reflection_manager::const_type_iterator>::reference,
-            const shadow::type>::value;
+            const shadow::reflection_manager::type>::value;
 
         auto pointer_same = std::is_same<
             std::iterator_traits<
                 shadow::reflection_manager::const_type_iterator>::pointer,
-            const shadow::type>::value;
+            const shadow::reflection_manager::type>::value;
 
         auto category_same = std::is_same<
             std::iterator_traits<shadow::reflection_manager::

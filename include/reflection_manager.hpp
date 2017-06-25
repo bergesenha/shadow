@@ -78,8 +78,6 @@ public:
 };
 
 
-typedef api_type_aggregator<type_info, get_name_policy, get_size_policy> type;
-
 template <class InfoType, class ProxyType>
 class info_iterator_
 {
@@ -229,6 +227,8 @@ namespace shadow
 class reflection_manager
 {
 public:
+    typedef api_type_aggregator<type_info, get_name_policy, get_size_policy>
+        type;
     typedef info_iterator_<const type_info, const type> const_type_iterator;
 
 public:
