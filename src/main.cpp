@@ -3,6 +3,7 @@
 #include <string>
 
 #include <compile_time.hpp>
+#include <algorithm>
 
 #include <sfinae.hpp>
 #include <type_list.hpp>
@@ -150,10 +151,10 @@ typedef shadow::api_type_aggregator<shadow::type_info,
 int
 main()
 {
-    shadow::type_info myinfo{"type0", 12};
+    auto constructor_pair = myspace::manager.constructors();
 
-    myapitype mat(&myinfo, &myspace::manager);
-
-    std::cout << mat.name() << '\n';
-    std::cout << mat.size() << '\n';
+    std::for_each(
+        constructor_pair.first, constructor_pair.second, [](const auto& ci) {
+            std::cout << ci.get_type().name() << '\n';
+        });
 }

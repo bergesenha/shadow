@@ -239,17 +239,20 @@ private:
     InfoType* current_;
     const reflection_manager* manager_;
 };
-}
 
 
-namespace shadow
-{
 class reflection_manager
 {
 public:
-    typedef api_type_aggregator<type_info, get_name_policy, get_size_policy>
-        type;
+    template <class Derived>
+    friend class get_type_policy;
+
+    typedef type_ type;
     typedef info_iterator_<const type_info, const type> const_type_iterator;
+
+    typedef constructor_ constructor;
+    typedef info_iterator_<const constructor_info, const constructor>
+        const_constructor_iterator;
 
 public:
     reflection_manager() = default;
@@ -314,6 +317,12 @@ private:
 #pragma clang diagnostic pop
 
 
+    type
+    type_by_index(std::size_t index) const
+    {
+        return type(type_info_range_.first + index, this);
+    }
+
 public:
     ////////////////////////////////////////////////////////////////////////////
     // main api interface for interacting with the reflection system
@@ -323,6 +332,14 @@ public:
         return std::make_pair(
             const_type_iterator(type_info_range_.first, this),
             const_type_iterator(type_info_range_.second, this));
+    }
+
+    std::pair<const_constructor_iterator, const_constructor_iterator>
+    constructors() const
+    {
+        return std::make_pair(
+            const_constructor_iterator(constructor_info_range_.first, this),
+            const_constructor_iterator(constructor_info_range_.second, this));
     }
 
 private:
