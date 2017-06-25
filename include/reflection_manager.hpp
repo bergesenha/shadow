@@ -61,6 +61,27 @@ private:
 };
 
 
+template <class InfoType, template <class> class... Policies>
+class api_type_aggregator
+    : public Policies<api_type_aggregator<InfoType, Policies...>>...
+{
+public:
+    api_type_aggregator* operator->()
+    {
+        return this;
+    }
+
+    const api_type_aggregator* operator->() const
+    {
+        return this;
+    }
+
+protected:
+    const InfoType* info_;
+    const reflection_manager* manager_;
+};
+
+
 template <class InfoType, class ProxyType>
 class info_iterator_
 {
