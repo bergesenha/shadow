@@ -85,9 +85,21 @@ public:
         return this;
     }
 
-protected:
+public:
     const InfoType* info_;
     const reflection_manager* manager_;
+};
+
+
+template <class Derived>
+class get_name_policy
+{
+public:
+    std::string
+    get_name() const
+    {
+        return (static_cast<const Derived*>(this))->info_->name;
+    }
 };
 
 

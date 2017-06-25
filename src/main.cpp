@@ -142,13 +142,15 @@ SHADOW_INIT()
 }
 
 
+typedef shadow::api_type_aggregator<shadow::type_info, shadow::get_name_policy>
+    myapitype;
+
 int
 main()
 {
-    for(auto i = myspace::manager.type_begin();
-        i != myspace::manager.type_end();
-        ++i)
-    {
-        std::cout << i->name() << " " << i->size() << '\n';
-    }
+    shadow::type_info myinfo{"type0", 12};
+
+    myapitype mat(&myinfo, &myspace::manager);
+
+    std::cout << mat.get_name() << '\n';
 }
