@@ -333,6 +333,13 @@ TEST_CASE("test indexed_info_iterator_", "[indexed_info_iterator_]")
 
                 REQUIRE(res2->name() == std::string("type0"));
             }
+
+            SECTION("get difference of res and fst")
+            {
+                const auto diff = res - fst;
+
+                REQUIRE(diff == 2);
+            }
         }
     }
 }

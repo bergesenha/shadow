@@ -109,6 +109,12 @@ public:
             current_index_ - n, index_buffer_, data_buffer_, manager_);
     }
 
+    difference_type
+    operator-(const indexed_info_iterator_& other) const
+    {
+        return current_index_ - other.current_index_;
+    }
+
 private:
     std::size_t current_index_;
     const std::size_t* index_buffer_;
