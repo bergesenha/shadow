@@ -341,5 +341,13 @@ TEST_CASE("test indexed_info_iterator_", "[indexed_info_iterator_]")
                 REQUIRE(diff == 2);
             }
         }
+
+        SECTION("add fst to 2")
+        {
+            auto res = 2 + fst;
+
+            REQUIRE(res->name() == std::string("type1"));
+            REQUIRE(fst->name() == std::string("type0"));
+        }
     }
 }

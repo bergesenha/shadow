@@ -115,6 +115,12 @@ public:
         return current_index_ - other.current_index_;
     }
 
+    friend indexed_info_iterator_
+    operator+(difference_type lhs, const indexed_info_iterator_& rhs)
+    {
+        return rhs + lhs;
+    }
+
 private:
     std::size_t current_index_;
     const std::size_t* index_buffer_;
