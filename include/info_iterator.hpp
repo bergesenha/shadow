@@ -207,7 +207,7 @@ public:
     }
 
     difference_type
-    operator-(const info_iterator_& other)
+    operator-(const info_iterator_& other) const
     {
         return current_ - other.current_;
     }
