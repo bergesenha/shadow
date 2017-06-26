@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <string>
 
 #include "reflection_binding.hpp"
 
@@ -13,6 +14,13 @@ struct type_info
     std::size_t size;
 };
 
+bool
+operator==(const type_info& lhs, const type_info& rhs)
+{
+    return std::string(lhs.name) == std::string(rhs.name);
+}
+
+
 struct constructor_info
 {
     std::size_t type_index;
@@ -21,12 +29,26 @@ struct constructor_info
     constructor_binding_signature bind_point;
 };
 
+bool
+operator==(const constructor_info& lhs, const constructor_info& rhs)
+{
+    return lhs.bind_point == rhs.bind_point;
+}
+
+
 struct conversion_info
 {
     std::size_t from_type_index;
     std::size_t to_type_index;
     conversion_binding_signature bind_point;
 };
+
+bool
+operator==(const conversion_info& lhs, const conversion_info& rhs)
+{
+    return lhs.bind_point == rhs.bind_point;
+}
+
 
 struct free_function_info
 {
@@ -36,6 +58,13 @@ struct free_function_info
     const std::size_t* parameter_type_indices;
     free_function_binding_signature bind_point;
 };
+
+bool
+operator==(const free_function_info& lhs, const free_function_info& rhs)
+{
+    return lhs.bind_point == rhs.bind_point;
+}
+
 
 struct member_function_info
 {
@@ -47,6 +76,13 @@ struct member_function_info
     member_function_binding_signature bind_point;
 };
 
+bool
+operator==(const member_function_info& lhs, const member_function_info& rhs)
+{
+    return lhs.bind_point == rhs.bind_point;
+}
+
+
 struct member_variable_info
 {
     const char* name;
@@ -56,10 +92,26 @@ struct member_variable_info
     member_variable_set_binding_signature set_bind_point;
 };
 
+bool
+operator==(const member_variable_info& lhs, const member_variable_info& rhs)
+{
+    return lhs.get_bind_point == rhs.get_bind_point &&
+           lhs.set_bind_point == rhs.set_bind_point;
+}
+
+
 struct string_serialization_info
 {
     std::size_t type_index;
     string_serialization_signature serialize_bind_point;
     string_deserialization_signature deserialize_bind_point;
 };
+
+bool
+operator==(const string_serialization_info& lhs,
+           const string_serialization_info& rhs)
+{
+    return lhs.serialize_bind_point == rhs.serialize_bind_point &&
+           lhs.deserialize_bind_point == rhs.deserialize_bind_point;
+}
 }
