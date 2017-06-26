@@ -10,22 +10,6 @@
 
 namespace shadow
 {
-////////////////////////////////////////////////////////////////////////////////
-// user facing API types carrying information and functionality for the
-// reflection system
-
-class reflection_manager;
-
-// holds one value with type/reflection information
-class variable
-{
-private:
-    // holds type erased value
-    any value_;
-    // these identify the type erased value
-    const reflection_manager* manager_;
-    std::size_t type_index_;
-};
 
 
 class reflection_manager
