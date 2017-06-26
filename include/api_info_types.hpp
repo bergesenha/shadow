@@ -1,8 +1,10 @@
 #pragma once
 
 #include <string>
+#include <utility>
 
 #include "reflection_info.hpp"
+#include "info_iterator.hpp"
 
 namespace shadow
 {
@@ -93,8 +95,22 @@ public:
     }
 };
 
+
+template <class Derived>
+class get_parameter_types_policy
+{
+public:
+    typedef indexed_info_iterator_<const type_info, const type_>
+        const_parameter_type_iterator;
+
+public:
+    std::pair<const_parameter_type_iterator, const_parameter_type_iterator>
+    parameter_types() const;
+};
+
 typedef api_type_aggregator<constructor_info,
                             get_type_policy,
-                            get_num_parameters_policy>
+                            get_num_parameters_policy,
+                            get_parameter_types_policy>
     constructor_;
 };

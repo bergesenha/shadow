@@ -34,6 +34,9 @@ public:
     template <class Derived>
     friend class get_type_policy;
 
+    template <class Derived>
+    friend class get_parameter_types_policy;
+
     typedef type_ type;
     typedef info_iterator_<const type_info, const type> const_type_iterator;
 
@@ -284,5 +287,35 @@ reflection_manager::constructors(const type& tp) const
     return std::make_pair(const_constructor_iterator(constr_vec.data(), this),
                           const_constructor_iterator(
                               constr_vec.data() + constr_vec.size(), this));
+}
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// DEFINITIONS for policies
+namespace shadow
+{
+template <class Derived>
+std::pair<
+    typename get_parameter_types_policy<Derived>::const_parameter_type_iterator,
+    typename get_parameter_types_policy<Derived>::const_parameter_type_iterator>
+get_parameter_types_policy<Derived>::parameter_types() const
+{
+    const auto num_parameters =
+        static_cast<const Derived*>(this)->info_->num_parameters;
+    const std::size_t* param_type_index_buffer =
+        static_cast<const Derived*>(this)->info_->parameter_type_indices;
+    const reflection_manager* manager =
+        static_cast<const Derived*>(this)->manager_;
+
+    return std::make_pair(
+        const_parameter_type_iterator(0,
+                                      param_type_index_buffer,
+                                      manager->type_info_range_.first,
+                                      manager),
+        const_parameter_type_iterator(num_parameters,
+                                      param_type_index_buffer,
+                                      manager->type_info_range_.first,
+                                      manager));
 }
 }
