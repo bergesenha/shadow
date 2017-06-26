@@ -305,5 +305,19 @@ TEST_CASE("test indexed_info_iterator_", "[indexed_info_iterator_]")
                 REQUIRE(res2->name() == std::string("type2"));
             }
         }
+
+        SECTION("test operator+= on fst")
+        {
+            fst += 2;
+
+            REQUIRE(fst->name() == std::string("type1"));
+
+            SECTION("test operator-= on fst")
+            {
+                fst -= 2;
+
+                REQUIRE(fst->name() == std::string("type0"));
+            }
+        }
     }
 }
