@@ -296,6 +296,14 @@ TEST_CASE("test indexed_info_iterator_", "[indexed_info_iterator_]")
                 REQUIRE(fst->name() == std::string("type0"));
                 REQUIRE(res2->size() == 0);
             }
+
+            SECTION("postdecrement fst")
+            {
+                auto res2 = fst--;
+
+                REQUIRE(fst->name() == std::string("type0"));
+                REQUIRE(res2->name() == std::string("type2"));
+            }
         }
     }
 }
