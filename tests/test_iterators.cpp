@@ -269,5 +269,9 @@ TEST_CASE("test indexed_info_iterator_", "[indexed_info_iterator_]")
 
         REQUIRE((*fst).name() == std::string("type0"));
         REQUIRE(fst->name() == std::string("type0"));
+        REQUIRE(fst->size() == 0);
+        REQUIRE(fst[0].name() == std::string("type0"));
+        REQUIRE(fst[1].name() == std::string("type2"));
+        REQUIRE(fst[2].name() == std::string("type1"));
     }
 }
