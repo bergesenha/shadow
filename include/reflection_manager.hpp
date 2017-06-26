@@ -77,43 +77,19 @@ private:
                      Fun index_extractor);
 
 
-    type
-    type_by_index(std::size_t index) const
-    {
-        return type(type_info_range_.first + index, this);
-    }
+    type type_by_index(std::size_t index) const;
+
 
 public:
     ////////////////////////////////////////////////////////////////////////////
     // main api interface for interacting with the reflection system
-    std::pair<const_type_iterator, const_type_iterator>
-    types() const
-    {
-        return std::make_pair(
-            const_type_iterator(type_info_range_.first, this),
-            const_type_iterator(type_info_range_.second, this));
-    }
+    std::pair<const_type_iterator, const_type_iterator> types() const;
 
     std::pair<const_constructor_iterator, const_constructor_iterator>
-    constructors() const
-    {
-        return std::make_pair(
-            const_constructor_iterator(constructor_info_range_.first, this),
-            const_constructor_iterator(constructor_info_range_.second, this));
-    }
+    constructors() const;
 
     std::pair<const_constructor_iterator, const_constructor_iterator>
-    constructors(const type& tp) const
-    {
-        const auto index_of_type = tp.info_ - type_info_range_.first;
-
-        const auto& constr_vec = constructor_info_by_index_[index_of_type];
-
-        return std::make_pair(
-            const_constructor_iterator(constr_vec.data(), this),
-            const_constructor_iterator(constr_vec.data() + constr_vec.size(),
-                                       this));
-    }
+    constructors(const type& tp) const;
 
 private:
     // pairs hold iterators to beginning and end of arrays of information
@@ -271,4 +247,42 @@ reflection_manager::buckets_by_index(
     }
 }
 #pragma clang diagnostic pop
+
+
+inline reflection_manager::type
+reflection_manager::type_by_index(std::size_t index) const
+{
+    return type(type_info_range_.first + index, this);
+}
+
+
+inline std::pair<reflection_manager::const_type_iterator,
+                 reflection_manager::const_type_iterator>
+reflection_manager::types() const
+{
+    return std::make_pair(const_type_iterator(type_info_range_.first, this),
+                          const_type_iterator(type_info_range_.second, this));
+}
+
+inline std::pair<reflection_manager::const_constructor_iterator,
+                 reflection_manager::const_constructor_iterator>
+reflection_manager::constructors() const
+{
+    return std::make_pair(
+        const_constructor_iterator(constructor_info_range_.first, this),
+        const_constructor_iterator(constructor_info_range_.second, this));
+}
+
+inline std::pair<reflection_manager::const_constructor_iterator,
+                 reflection_manager::const_constructor_iterator>
+reflection_manager::constructors(const type& tp) const
+{
+    const auto index_of_type = tp.info_ - type_info_range_.first;
+
+    const auto& constr_vec = constructor_info_by_index_[index_of_type];
+
+    return std::make_pair(const_constructor_iterator(constr_vec.data(), this),
+                          const_constructor_iterator(
+                              constr_vec.data() + constr_vec.size(), this));
+}
 }
