@@ -95,6 +95,13 @@ public:
         return *this;
     }
 
+    indexed_info_iterator_
+    operator+(difference_type n) const
+    {
+        return indexed_info_iterator_(
+            current_index_ + n, index_buffer_, data_buffer_, manager_);
+    }
+
 private:
     std::size_t current_index_;
     const std::size_t* index_buffer_;
