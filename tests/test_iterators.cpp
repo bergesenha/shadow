@@ -280,6 +280,14 @@ TEST_CASE("test indexed_info_iterator_", "[indexed_info_iterator_]")
 
             REQUIRE(fst->name() == std::string("type2"));
             REQUIRE(res->size() == 8);
+
+            SECTION("postincrement fst")
+            {
+                auto res2 = fst++;
+
+                REQUIRE(res2->size() == 8);
+                REQUIRE(fst->name() == std::string("type1"));
+            }
         }
     }
 }
