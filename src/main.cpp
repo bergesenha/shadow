@@ -163,4 +163,13 @@ main()
             std::cout << "\t" << *j << '\n';
         }
     }
+
+    std::cout << "\n\n\n";
+
+    for(auto i = myspace::manager.constructors().first;
+        i != myspace::manager.constructors().second;
+        ++i)
+    {
+        std::cout << *i << '\n';
+    }
 }
