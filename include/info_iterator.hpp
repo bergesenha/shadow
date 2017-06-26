@@ -35,6 +35,12 @@ public:
                          manager_);
     }
 
+    ProxyType operator->() const
+    {
+        return ProxyType(data_buffer_ + index_buffer_[current_index_],
+                         manager_);
+    }
+
 private:
     std::size_t current_index_;
     const std::size_t* index_buffer_;
