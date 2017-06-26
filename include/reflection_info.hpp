@@ -14,7 +14,7 @@ struct type_info
     std::size_t size;
 };
 
-bool
+inline bool
 operator==(const type_info& lhs, const type_info& rhs)
 {
     return std::string(lhs.name) == std::string(rhs.name);
@@ -29,7 +29,7 @@ struct constructor_info
     constructor_binding_signature bind_point;
 };
 
-bool
+inline bool
 operator==(const constructor_info& lhs, const constructor_info& rhs)
 {
     return lhs.bind_point == rhs.bind_point;
@@ -43,7 +43,7 @@ struct conversion_info
     conversion_binding_signature bind_point;
 };
 
-bool
+inline bool
 operator==(const conversion_info& lhs, const conversion_info& rhs)
 {
     return lhs.bind_point == rhs.bind_point;
@@ -59,7 +59,7 @@ struct free_function_info
     free_function_binding_signature bind_point;
 };
 
-bool
+inline bool
 operator==(const free_function_info& lhs, const free_function_info& rhs)
 {
     return lhs.bind_point == rhs.bind_point;
@@ -76,7 +76,7 @@ struct member_function_info
     member_function_binding_signature bind_point;
 };
 
-bool
+inline bool
 operator==(const member_function_info& lhs, const member_function_info& rhs)
 {
     return lhs.bind_point == rhs.bind_point;
@@ -92,7 +92,7 @@ struct member_variable_info
     member_variable_set_binding_signature set_bind_point;
 };
 
-bool
+inline bool
 operator==(const member_variable_info& lhs, const member_variable_info& rhs)
 {
     return lhs.get_bind_point == rhs.get_bind_point &&
@@ -107,7 +107,7 @@ struct string_serialization_info
     string_deserialization_signature deserialize_bind_point;
 };
 
-bool
+inline bool
 operator==(const string_serialization_info& lhs,
            const string_serialization_info& rhs)
 {
