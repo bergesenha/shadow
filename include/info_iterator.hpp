@@ -13,7 +13,7 @@ class indexed_info_iterator_
 {
 public:
     indexed_info_iterator_()
-        : index_buffer_(nullptr), current_index_(0), data_buffer_(nullptr)
+        : current_index_(0), index_buffer_(nullptr), data_buffer_(nullptr)
     {
     }
 
@@ -26,6 +26,13 @@ public:
           data_buffer_(data_buffer),
           manager_(manager)
     {
+    }
+
+public:
+    ProxyType operator*() const
+    {
+        return ProxyType(data_buffer_ + index_buffer_[current_index_],
+                         manager_);
     }
 
 private:

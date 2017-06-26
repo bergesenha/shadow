@@ -246,3 +246,27 @@ TEST_CASE("test info_iterator_ with const type", "[info_iterator_]")
         REQUIRE(category_same);
     }
 }
+
+
+TEST_CASE("test indexed_info_iterator_", "[indexed_info_iterator_]")
+{
+    typedef shadow::indexed_info_iterator_<const shadow::type_info,
+                                           const shadow::type_>
+        ititer;
+
+    std::vector<shadow::type_info> info_vector{
+        {"type0", 0}, {"type1", 2}, {"type2", 8}};
+
+    std::vector<std::size_t> indices_vector{0, 2, 1};
+
+    shadow::reflection_manager manager;
+
+    SECTION("create an indexed_info_iterator_ to first element of info_vector")
+    {
+        ititer fst(0, indices_vector.data(), info_vector.data(), &manager);
+
+        auto type0 = *fst;
+
+        REQUIRE(type0.name() == std::string("type0"));
+    }
+}
