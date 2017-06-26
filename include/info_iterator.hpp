@@ -329,4 +329,29 @@ struct iterator_traits<shadow::info_iterator_<InfoType, ProxyType>>
         typename shadow::info_iterator_<InfoType, ProxyType>::iterator_category
             iterator_category;
 };
+
+template <class InfoType, class ProxyType>
+struct iterator_traits<shadow::indexed_info_iterator_<InfoType, ProxyType>>
+{
+    typedef
+        typename shadow::indexed_info_iterator_<InfoType, ProxyType>::value_type
+            value_type;
+
+    typedef typename shadow::indexed_info_iterator_<InfoType,
+                                                    ProxyType>::difference_type
+        difference_type;
+
+    typedef
+        typename shadow::indexed_info_iterator_<InfoType, ProxyType>::reference
+            reference;
+
+    typedef
+        typename shadow::indexed_info_iterator_<InfoType, ProxyType>::pointer
+            pointer;
+
+    typedef
+        typename shadow::indexed_info_iterator_<InfoType,
+                                                ProxyType>::iterator_category
+            iterator_category;
+};
 }
