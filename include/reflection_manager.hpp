@@ -42,7 +42,7 @@ public:
         const_constructor_iterator;
 
 public:
-    reflection_manager() = default;
+    reflection_manager();
 
     template <class TypeInfoArrayHolder,
               class ConstructorInfoArrayHolder,
@@ -57,44 +57,7 @@ public:
                        StringSerializationInfoArrayHolder,
                        FreeFunctionInfoArrayHolder,
                        MemberFunctionInfoArrayHolder,
-                       MemberVariableInfoArrayHolder)
-        : type_info_range_(initialize_range(TypeInfoArrayHolder())),
-          constructor_info_range_(
-              initialize_range(ConstructorInfoArrayHolder())),
-          conversion_info_range_(initialize_range(ConversionInfoArrayHolder())),
-          string_serialization_info_range_(
-              initialize_range(StringSerializationInfoArrayHolder())),
-          free_function_info_range_(
-              initialize_range(FreeFunctionInfoArrayHolder())),
-          member_function_info_range_(
-              initialize_range(MemberFunctionInfoArrayHolder())),
-          member_variable_info_range_(
-              initialize_range(MemberVariableInfoArrayHolder())),
-          constructor_info_by_index_(buckets_by_index(
-              constructor_info_range_,
-              TypeInfoArrayHolder(),
-              [](const auto& info) { return info.type_index; })),
-          conversion_info_by_index_(buckets_by_index(
-              conversion_info_range_,
-              TypeInfoArrayHolder(),
-              [](const auto& info) { return info.from_type_index; })),
-          member_function_info_by_index_(buckets_by_index(
-              member_function_info_range_,
-              TypeInfoArrayHolder(),
-              [](const auto& info) { return info.object_type_index; })),
-          member_variable_info_by_index_(buckets_by_index(
-              member_variable_info_range_,
-              TypeInfoArrayHolder(),
-              [](const auto& info) { return info.object_type_index; })),
-          string_serializer_info_by_index_(array_size(TypeInfoArrayHolder()))
-    {
-        std::for_each(string_serialization_info_range_.first,
-                      string_serialization_info_range_.second,
-                      [this](const auto& info) {
-                          string_serializer_info_by_index_[info.type_index] =
-                              info;
-                      });
-    }
+                       MemberVariableInfoArrayHolder);
 
 private:
 // clang complains here due to the comparison of decayed array and
@@ -232,4 +195,63 @@ private:
         member_variable_info_by_index_;
     std::vector<string_serialization_info> string_serializer_info_by_index_;
 };
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// DEFINITIONS
+namespace shadow
+{
+inline reflection_manager::reflection_manager() = default;
+
+
+template <class TypeInfoArrayHolder,
+          class ConstructorInfoArrayHolder,
+          class ConversionInfoArrayHolder,
+          class StringSerializationInfoArrayHolder,
+          class FreeFunctionInfoArrayHolder,
+          class MemberFunctionInfoArrayHolder,
+          class MemberVariableInfoArrayHolder>
+inline reflection_manager::reflection_manager(
+    TypeInfoArrayHolder,
+    ConstructorInfoArrayHolder,
+    ConversionInfoArrayHolder,
+    StringSerializationInfoArrayHolder,
+    FreeFunctionInfoArrayHolder,
+    MemberFunctionInfoArrayHolder,
+    MemberVariableInfoArrayHolder)
+    : type_info_range_(initialize_range(TypeInfoArrayHolder())),
+      constructor_info_range_(initialize_range(ConstructorInfoArrayHolder())),
+      conversion_info_range_(initialize_range(ConversionInfoArrayHolder())),
+      string_serialization_info_range_(
+          initialize_range(StringSerializationInfoArrayHolder())),
+      free_function_info_range_(
+          initialize_range(FreeFunctionInfoArrayHolder())),
+      member_function_info_range_(
+          initialize_range(MemberFunctionInfoArrayHolder())),
+      member_variable_info_range_(
+          initialize_range(MemberVariableInfoArrayHolder())),
+      constructor_info_by_index_(
+          buckets_by_index(constructor_info_range_,
+                           TypeInfoArrayHolder(),
+                           [](const auto& info) { return info.type_index; })),
+      conversion_info_by_index_(buckets_by_index(
+          conversion_info_range_,
+          TypeInfoArrayHolder(),
+          [](const auto& info) { return info.from_type_index; })),
+      member_function_info_by_index_(buckets_by_index(
+          member_function_info_range_,
+          TypeInfoArrayHolder(),
+          [](const auto& info) { return info.object_type_index; })),
+      member_variable_info_by_index_(buckets_by_index(
+          member_variable_info_range_,
+          TypeInfoArrayHolder(),
+          [](const auto& info) { return info.object_type_index; })),
+      string_serializer_info_by_index_(array_size(TypeInfoArrayHolder()))
+{
+    std::for_each(string_serialization_info_range_.first,
+                  string_serialization_info_range_.second,
+                  [this](const auto& info) {
+                      string_serializer_info_by_index_[info.type_index] = info;
+                  });
+}
 }
