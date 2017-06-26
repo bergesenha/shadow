@@ -12,6 +12,30 @@ namespace shadow
 class reflection_manager;
 
 
+// holds one value with type/reflection information
+class variable
+{
+public:
+    variable() : value_(), type_index_(0), manager_(nullptr)
+    {
+    }
+
+    variable(const any& value,
+             std::size_t type_index,
+             const reflection_manager* manager)
+        : value_(value), type_index_(type_index), manager_(manager)
+    {
+    }
+
+private:
+    // holds type erased value
+    any value_;
+    // these identify the type erased value
+    std::size_t type_index_;
+    const reflection_manager* manager_;
+};
+
+
 template <class InfoType, template <class> class... Policies>
 class api_type_aggregator
     : public Policies<api_type_aggregator<InfoType, Policies...>>...
@@ -145,4 +169,42 @@ operator<<(std::ostream& out, const constructor_& con)
 
     return out;
 }
+
+
+template <class Derived>
+class get_from_type_policy
+{
+public:
+    type_
+    from_type() const
+    {
+        const auto from_type_index =
+            static_cast<const Derived*>(this)->info_->from_type_index;
+
+        return static_cast<const Derived*>(this)->manager_->type_by_index(
+            from_type_index);
+    }
 };
+
+
+template <class Derived>
+class get_to_type_policy
+{
+public:
+    type_
+    to_type() const
+    {
+        const auto to_type_index =
+            static_cast<const Derived*>(this)->info_->to_type_index;
+
+        return static_cast<const Derived*>(this)->manager_->type_by_index(
+            to_type_index);
+    }
+};
+
+
+typedef api_type_aggregator<conversion_info,
+                            get_from_type_policy,
+                            get_to_type_policy>
+    type_conversion_;
+}

@@ -10,22 +10,6 @@
 
 namespace shadow
 {
-////////////////////////////////////////////////////////////////////////////////
-// user facing API types carrying information and functionality for the
-// reflection system
-
-class reflection_manager;
-
-// holds one value with type/reflection information
-class variable
-{
-private:
-    // holds type erased value
-    any value_;
-    // these identify the type erased value
-    const reflection_manager* manager_;
-    std::size_t type_index_;
-};
 
 
 class reflection_manager
@@ -37,12 +21,22 @@ public:
     template <class Derived>
     friend class get_parameter_types_policy;
 
+    template <class Derived>
+    friend class get_from_type_policy;
+
+    template <class Derived>
+    friend class get_to_type_policy;
+
     typedef type_ type;
     typedef info_iterator_<const type_info, const type> const_type_iterator;
 
     typedef constructor_ constructor;
     typedef info_iterator_<const constructor_info, const constructor>
         const_constructor_iterator;
+
+    typedef type_conversion_ type_conversion;
+    typedef info_iterator_<const conversion_info, const type_conversion>
+        const_conversion_iterator;
 
 public:
     reflection_manager();
@@ -93,6 +87,9 @@ public:
 
     std::pair<const_constructor_iterator, const_constructor_iterator>
     constructors(const type& tp) const;
+
+    std::pair<const_conversion_iterator, const_conversion_iterator>
+    type_conversions() const;
 
 private:
     // pairs hold iterators to beginning and end of arrays of information
@@ -287,6 +284,16 @@ reflection_manager::constructors(const type& tp) const
     return std::make_pair(const_constructor_iterator(constr_vec.data(), this),
                           const_constructor_iterator(
                               constr_vec.data() + constr_vec.size(), this));
+}
+
+
+inline std::pair<typename reflection_manager::const_conversion_iterator,
+                 typename reflection_manager::const_conversion_iterator>
+reflection_manager::type_conversions() const
+{
+    return std::make_pair(
+        const_conversion_iterator(conversion_info_range_.first, this),
+        const_conversion_iterator(conversion_info_range_.second, this));
 }
 }
 

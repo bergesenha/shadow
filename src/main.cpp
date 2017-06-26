@@ -166,10 +166,11 @@ main()
 
     std::cout << "\n\n\n";
 
-    for(auto i = myspace::manager.constructors().first;
-        i != myspace::manager.constructors().second;
+
+    for(auto i = myspace::manager.type_conversions().first;
+        i != myspace::manager.type_conversions().second;
         ++i)
     {
-        std::cout << *i << '\n';
+        std::cout << i->from_type() << " --> " << i->to_type() << '\n';
     }
 }
