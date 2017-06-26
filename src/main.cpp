@@ -151,10 +151,17 @@ typedef shadow::api_type_aggregator<shadow::type_info,
 int
 main()
 {
-    auto constructor_pair = myspace::manager.constructors();
-
-    std::for_each(
-        constructor_pair.first, constructor_pair.second, [](const auto& ci) {
-            std::cout << ci.get_type().name() << '\n';
-        });
+    for(auto i = myspace::manager.types().first;
+        i != myspace::manager.types().second;
+        ++i)
+    {
+        std::cout << i->name() << ":\n";
+        for(auto j = myspace::manager.constructors(*i).first;
+            j != myspace::manager.constructors(*i).second;
+            ++j)
+        {
+            std::cout << "\tconstructor taking " << j->num_parameters()
+                      << " arguments\n";
+        }
+    }
 }

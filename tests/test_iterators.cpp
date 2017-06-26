@@ -246,3 +246,113 @@ TEST_CASE("test info_iterator_ with const type", "[info_iterator_]")
         REQUIRE(category_same);
     }
 }
+
+
+TEST_CASE("test indexed_info_iterator_", "[indexed_info_iterator_]")
+{
+    typedef shadow::indexed_info_iterator_<const shadow::type_info,
+                                           const shadow::type_>
+        ititer;
+
+    std::vector<shadow::type_info> info_vector{
+        {"type0", 0}, {"type1", 2}, {"type2", 8}};
+
+    std::vector<std::size_t> indices_vector{0, 2, 1};
+
+    shadow::reflection_manager manager;
+
+    SECTION("create an indexed_info_iterator_ to first element of info_vector")
+    {
+        ititer fst(0, indices_vector.data(), info_vector.data(), &manager);
+
+        auto type0 = *fst;
+
+        REQUIRE((*fst).name() == std::string("type0"));
+        REQUIRE(fst->name() == std::string("type0"));
+        REQUIRE(fst->size() == 0);
+        REQUIRE(fst[0].name() == std::string("type0"));
+        REQUIRE(fst[1].name() == std::string("type2"));
+        REQUIRE(fst[2].name() == std::string("type1"));
+
+        SECTION("preincrement fst")
+        {
+            auto res = ++fst;
+
+            REQUIRE(fst->name() == std::string("type2"));
+            REQUIRE(res->size() == 8);
+
+            SECTION("postincrement fst")
+            {
+                auto res2 = fst++;
+
+                REQUIRE(res2->size() == 8);
+                REQUIRE(fst->name() == std::string("type1"));
+            }
+
+            SECTION("predecrement fst")
+            {
+                auto res2 = --fst;
+
+                REQUIRE(fst->name() == std::string("type0"));
+                REQUIRE(res2->size() == 0);
+            }
+
+            SECTION("postdecrement fst")
+            {
+                auto res2 = fst--;
+
+                REQUIRE(fst->name() == std::string("type0"));
+                REQUIRE(res2->name() == std::string("type2"));
+            }
+        }
+
+        SECTION("test operator+= on fst")
+        {
+            fst += 2;
+
+            REQUIRE(fst->name() == std::string("type1"));
+
+            SECTION("test operator-= on fst")
+            {
+                fst -= 2;
+
+                REQUIRE(fst->name() == std::string("type0"));
+            }
+        }
+
+        SECTION("add 2 to fst")
+        {
+            auto res = fst + 2;
+
+            REQUIRE(res->name() == std::string("type1"));
+            REQUIRE(fst->name() == std::string("type0"));
+
+            SECTION("subtract 2 from res")
+            {
+                auto res2 = res - 2;
+
+                REQUIRE(res2->name() == std::string("type0"));
+                REQUIRE(res2 == fst);
+                REQUIRE(!(res2 == res));
+                REQUIRE(res2 != res);
+                REQUIRE(!(res2 != fst));
+                REQUIRE(res2 < res);
+            }
+
+            SECTION("get difference of res and fst")
+            {
+                const auto diff = res - fst;
+
+                REQUIRE(diff == 2);
+            }
+        }
+
+        SECTION("add fst to 2")
+        {
+            auto res = 2 + fst;
+
+            REQUIRE(res->name() == std::string("type1"));
+            REQUIRE(fst->name() == std::string("type0"));
+        }
+    }
+}
