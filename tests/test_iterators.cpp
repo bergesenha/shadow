@@ -334,6 +334,9 @@ TEST_CASE("test indexed_info_iterator_", "[indexed_info_iterator_]")
                 REQUIRE(res2->name() == std::string("type0"));
                 REQUIRE(res2 == fst);
                 REQUIRE(!(res2 == res));
+                REQUIRE(res2 != res);
+                REQUIRE(!(res2 != fst));
+                REQUIRE(res2 < res);
             }
 
             SECTION("get difference of res and fst")
