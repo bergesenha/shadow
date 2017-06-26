@@ -2,6 +2,7 @@
 
 #include <string>
 #include <utility>
+#include <ostream>
 
 #include "reflection_info.hpp"
 #include "info_iterator.hpp"
@@ -67,6 +68,13 @@ public:
 
 typedef api_type_aggregator<type_info, get_name_policy, get_size_policy> type_;
 
+inline std::ostream&
+operator<<(std::ostream& out, const type_& tp)
+{
+    out << tp.name();
+    return out;
+}
+
 template <class Derived>
 class get_type_policy
 {
@@ -113,4 +121,28 @@ typedef api_type_aggregator<constructor_info,
                             get_num_parameters_policy,
                             get_parameter_types_policy>
     constructor_;
+
+inline std::ostream&
+operator<<(std::ostream& out, const constructor_& con)
+{
+    out << con.get_type().name() << '(';
+
+    const auto num_params = con.num_parameters();
+
+    if(num_params > 0)
+    {
+        auto param_pair = con.parameter_types();
+        out << *param_pair.first;
+
+        for(++param_pair.first; param_pair.first != param_pair.second;
+            ++param_pair.first)
+        {
+            out << ", " << *param_pair.first;
+        }
+    }
+
+    out << ')';
+
+    return out;
+}
 };
