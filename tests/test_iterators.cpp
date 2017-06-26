@@ -326,6 +326,13 @@ TEST_CASE("test indexed_info_iterator_", "[indexed_info_iterator_]")
 
             REQUIRE(res->name() == std::string("type1"));
             REQUIRE(fst->name() == std::string("type0"));
+
+            SECTION("subtract 2 from res")
+            {
+                auto res2 = res - 2;
+
+                REQUIRE(res2->name() == std::string("type0"));
+            }
         }
     }
 }
