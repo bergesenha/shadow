@@ -60,74 +60,21 @@ public:
                        MemberVariableInfoArrayHolder);
 
 private:
-// clang complains here due to the comparison of decayed array and
-// nullptr, since in the case ArrayHolderType::value was an array, this
-// would always evaluate to true. The fact is that
-// ArrayHolderType::value may be a pointer to nullptr for some cases of
-// ArrayHolderType.
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wtautological-pointer-compare"
     template <class ArrayHolderType>
     std::pair<const typename ArrayHolderType::type*,
               const typename ArrayHolderType::type*>
-        initialize_range(ArrayHolderType)
-    {
-        if(ArrayHolderType::value != nullptr)
-        {
-            return std::make_pair(std::begin(ArrayHolderType::value),
-                                  std::end(ArrayHolderType::value));
-        }
-        else
-        {
-            std::pair<const typename ArrayHolderType::type*,
-                      const typename ArrayHolderType::type*>
-                out(nullptr, nullptr);
-
-            return out;
-        }
-    }
+        initialize_range(ArrayHolderType);
 
 
     template <class ArrayHolderType>
-    std::size_t array_size(ArrayHolderType)
-    {
-        if(ArrayHolderType::value == nullptr)
-        {
-            return 0;
-        }
-        else
-        {
-            return std::extent<decltype(ArrayHolderType::value)>::value;
-        }
-    }
+    std::size_t array_size(ArrayHolderType);
 
 
     template <class ValueType, class TypeInfoArrayHolder, class Fun>
     std::vector<std::vector<ValueType>>
     buckets_by_index(const std::pair<const ValueType*, const ValueType*>& range,
                      TypeInfoArrayHolder,
-                     Fun index_extractor)
-    {
-        if(range.first != nullptr && range.second != nullptr)
-        {
-            std::vector<std::vector<ValueType>> out(
-                array_size(TypeInfoArrayHolder()));
-
-            std::for_each(range.first,
-                          range.second,
-                          [&out, index_extractor](const auto& info) {
-                              out[index_extractor(info)].push_back(info);
-                          });
-
-            return out;
-        }
-        else
-        {
-            return std::vector<std::vector<ValueType>>();
-        }
-    }
-
-#pragma clang diagnostic pop
+                     Fun index_extractor);
 
 
     type
@@ -254,4 +201,74 @@ inline reflection_manager::reflection_manager(
                       string_serializer_info_by_index_[info.type_index] = info;
                   });
 }
+
+
+// clang complains here due to the comparison of decayed array and
+// nullptr, since in the case ArrayHolderType::value was an array, this
+// would always evaluate to true. The fact is that
+// ArrayHolderType::value may be a pointer to nullptr for some cases of
+// ArrayHolderType.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wtautological-pointer-compare"
+template <class ArrayHolderType>
+inline std::pair<const typename ArrayHolderType::type*,
+                 const typename ArrayHolderType::type*>
+    reflection_manager::initialize_range(ArrayHolderType)
+{
+    if(ArrayHolderType::value != nullptr)
+    {
+        return std::make_pair(std::begin(ArrayHolderType::value),
+                              std::end(ArrayHolderType::value));
+    }
+    else
+    {
+        std::pair<const typename ArrayHolderType::type*,
+                  const typename ArrayHolderType::type*>
+            out(nullptr, nullptr);
+
+        return out;
+    }
+}
+
+
+template <class ArrayHolderType>
+inline std::size_t reflection_manager::array_size(ArrayHolderType)
+{
+    if(ArrayHolderType::value == nullptr)
+    {
+        return 0;
+    }
+    else
+    {
+        return std::extent<decltype(ArrayHolderType::value)>::value;
+    }
+}
+
+
+template <class ValueType, class TypeInfoArrayHolder, class Fun>
+inline std::vector<std::vector<ValueType>>
+reflection_manager::buckets_by_index(
+    const std::pair<const ValueType*, const ValueType*>& range,
+    TypeInfoArrayHolder,
+    Fun index_extractor)
+{
+    if(range.first != nullptr && range.second != nullptr)
+    {
+        std::vector<std::vector<ValueType>> out(
+            array_size(TypeInfoArrayHolder()));
+
+        std::for_each(range.first,
+                      range.second,
+                      [&out, index_extractor](const auto& info) {
+                          out[index_extractor(info)].push_back(info);
+                      });
+
+        return out;
+    }
+    else
+    {
+        return std::vector<std::vector<ValueType>>();
+    }
+}
+#pragma clang diagnostic pop
 }
