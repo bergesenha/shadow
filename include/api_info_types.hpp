@@ -81,5 +81,20 @@ public:
     }
 };
 
-typedef api_type_aggregator<constructor_info, get_type_policy> constructor_;
+
+template <class Derived>
+class get_num_parameters_policy
+{
+public:
+    std::size_t
+    num_parameters() const
+    {
+        return static_cast<const Derived*>(this)->info_->num_parameters;
+    }
+};
+
+typedef api_type_aggregator<constructor_info,
+                            get_type_policy,
+                            get_num_parameters_policy>
+    constructor_;
 };

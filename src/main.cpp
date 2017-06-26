@@ -160,7 +160,8 @@ main()
             j != myspace::manager.constructors(*i).second;
             ++j)
         {
-            std::cout << '\t' << j->get_type().name() << '\n';
+            std::cout << "\tconstructor taking " << j->num_parameters()
+                      << " arguments\n";
         }
     }
 }
