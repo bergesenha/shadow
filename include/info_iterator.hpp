@@ -68,6 +68,13 @@ public:
         return temp;
     }
 
+    indexed_info_iterator_& operator--()
+    {
+        --current_index_;
+        return *this;
+    }
+
+
 private:
     std::size_t current_index_;
     const std::size_t* index_buffer_;

@@ -288,6 +288,14 @@ TEST_CASE("test indexed_info_iterator_", "[indexed_info_iterator_]")
                 REQUIRE(res2->size() == 8);
                 REQUIRE(fst->name() == std::string("type1"));
             }
+
+            SECTION("predecrement fst")
+            {
+                auto res2 = --fst;
+
+                REQUIRE(fst->name() == std::string("type0"));
+                REQUIRE(res2->size() == 0);
+            }
         }
     }
 }
