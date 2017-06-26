@@ -15,12 +15,24 @@ class reflection_manager;
 // holds one value with type/reflection information
 class variable
 {
+public:
+    variable() : value_(), type_index_(0), manager_(nullptr)
+    {
+    }
+
+    variable(const any& value,
+             std::size_t type_index,
+             const reflection_manager* manager)
+        : value_(value), type_index_(type_index), manager_(manager)
+    {
+    }
+
 private:
     // holds type erased value
     any value_;
     // these identify the type erased value
-    const reflection_manager* manager_;
     std::size_t type_index_;
+    const reflection_manager* manager_;
 };
 
 
