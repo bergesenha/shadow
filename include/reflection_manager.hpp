@@ -296,7 +296,7 @@ reflection_manager::constructors(const type& tp) const
 namespace shadow
 {
 template <class Derived>
-std::pair<
+inline std::pair<
     typename get_parameter_types_policy<Derived>::const_parameter_type_iterator,
     typename get_parameter_types_policy<Derived>::const_parameter_type_iterator>
 get_parameter_types_policy<Derived>::parameter_types() const
