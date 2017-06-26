@@ -202,4 +202,9 @@ public:
     }
 };
 
-};
+
+typedef api_type_aggregator<conversion_info,
+                            get_from_type_policy,
+                            get_to_type_policy>
+    type_conversion_;
+}
