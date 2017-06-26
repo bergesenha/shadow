@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iterator>
+#include <cstddef>
 
 
 namespace shadow
@@ -11,6 +12,13 @@ class reflection_manager;
 template <class InfoType, class ProxyType>
 class indexed_info_iterator_
 {
+public:
+    typedef ProxyType value_type;
+    typedef std::ptrdiff_t difference_type;
+    typedef ProxyType reference;
+    typedef ProxyType pointer;
+    typedef std::random_access_iterator_tag iterator_category;
+
 public:
     indexed_info_iterator_()
         : current_index_(0), index_buffer_(nullptr), data_buffer_(nullptr)
