@@ -17,9 +17,20 @@ public:
     {
     }
 
+    indexed_info_iterator_(std::size_t current_index,
+                           const std::size_t* index_buffer,
+                           InfoType* data_buffer,
+                           const reflection_manager* manager)
+        : current_index_(current_index),
+          index_buffer_(index_buffer),
+          data_buffer_(data_buffer),
+          manager_(manager)
+    {
+    }
+
 private:
-    const std::size_t* index_buffer_;
     std::size_t current_index_;
+    const std::size_t* index_buffer_;
     InfoType* data_buffer_;
     const reflection_manager* manager_;
 };
