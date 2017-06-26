@@ -9,6 +9,23 @@ class reflection_manager;
 
 
 template <class InfoType, class ProxyType>
+class indexed_info_iterator_
+{
+public:
+    indexed_info_iterator_()
+        : index_buffer_(nullptr), current_index_(0), data_buffer_(nullptr)
+    {
+    }
+
+private:
+    const std::size_t* index_buffer_;
+    std::size_t current_index_;
+    InfoType* data_buffer_;
+    const reflection_manager* manager_;
+};
+
+
+template <class InfoType, class ProxyType>
 class info_iterator_
 {
 public:
