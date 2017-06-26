@@ -169,4 +169,37 @@ operator<<(std::ostream& out, const constructor_& con)
 
     return out;
 }
+
+
+template <class Derived>
+class get_from_type_policy
+{
+public:
+    type_
+    from_type() const
+    {
+        const auto from_type_index =
+            static_cast<const Derived*>(this)->info_->from_type_index;
+
+        return static_cast<const Derived*>(this)->manager_->type_by_index(
+            from_type_index);
+    }
+};
+
+
+template <class Derived>
+class get_to_type_policy
+{
+public:
+    type_
+    to_type() const
+    {
+        const auto to_type_index =
+            static_cast<const Derived*>(this)->info_->to_type_index;
+
+        return static_cast<const Derived*>(this)->manager_->type_by_index(
+            to_type_index);
+    }
+};
+
 };
