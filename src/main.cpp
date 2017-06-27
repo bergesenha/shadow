@@ -157,8 +157,8 @@ main()
         ++i)
     {
         std::cout << i->name() << ":\n";
-        for(auto j = myspace::manager.constructors(*i).first;
-            j != myspace::manager.constructors(*i).second;
+        for(auto j = myspace::manager.constructors_by_type(*i).first;
+            j != myspace::manager.constructors_by_type(*i).second;
             ++j)
         {
             std::cout << "\t" << *j << '\n';
