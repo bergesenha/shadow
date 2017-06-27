@@ -52,6 +52,10 @@ public:
     typedef info_iterator_<const member_function_info, const member_function>
         const_member_function_iterator;
 
+    typedef member_variable_ member_variable;
+    typedef info_iterator_<const member_variable_info, const member_variable>
+        const_member_variable_iterator;
+
 public:
     reflection_manager();
 
@@ -110,6 +114,9 @@ public:
 
     std::pair<const_member_function_iterator, const_member_function_iterator>
     member_functions() const;
+
+    std::pair<const_member_variable_iterator, const_member_variable_iterator>
+    member_variables() const;
 
 private:
     // pairs hold iterators to beginning and end of arrays of information
@@ -334,6 +341,17 @@ reflection_manager::member_functions() const
     return std::make_pair(
         const_member_function_iterator(member_function_info_range_.first, this),
         const_member_function_iterator(member_function_info_range_.second,
+                                       this));
+}
+
+
+inline std::pair<reflection_manager::const_member_variable_iterator,
+                 reflection_manager::const_member_variable_iterator>
+reflection_manager::member_variables() const
+{
+    return std::make_pair(
+        const_member_variable_iterator(member_variable_info_range_.first, this),
+        const_member_variable_iterator(member_variable_info_range_.second,
                                        this));
 }
 }

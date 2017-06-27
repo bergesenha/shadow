@@ -299,4 +299,20 @@ operator<<(std::ostream& out, const member_function_& mf)
 
     return out;
 }
+
+
+typedef api_type_aggregator<member_variable_info,
+                            get_name_policy,
+                            get_object_type_policy,
+                            get_type_policy>
+    member_variable_;
+
+
+inline std::ostream&
+operator<<(std::ostream& out, const member_variable_& mv)
+{
+    out << mv.get_type() << " " << mv.object_type() << "::" << mv.name();
+
+    return out;
+}
 }

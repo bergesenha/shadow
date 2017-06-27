@@ -191,4 +191,12 @@ main()
     {
         std::cout << *i << '\n';
     }
+
+    std::cout << "\n\n\nMember Variables:\n";
+    for(auto i = myspace::manager.member_variables().first;
+        i != myspace::manager.member_variables().second;
+        ++i)
+    {
+        std::cout << *i << '\n';
+    }
 }
