@@ -45,6 +45,8 @@ public:
     typedef type_conversion_ type_conversion;
     typedef info_iterator_<const conversion_info, const type_conversion>
         const_conversion_iterator;
+    typedef indexed_info_iterator_<const conversion_info, const type_conversion>
+        const_indexed_conversion_iterator;
 
     typedef free_function_ free_function;
     typedef info_iterator_<const free_function_info, const free_function>
@@ -122,6 +124,10 @@ public:
 
     std::pair<const_conversion_iterator, const_conversion_iterator>
     type_conversions() const;
+
+    std::pair<const_indexed_conversion_iterator,
+              const_indexed_conversion_iterator>
+    type_conversions_by_type(const type& tp) const;
 
     std::pair<const_free_function_iterator, const_free_function_iterator>
     free_functions() const;
@@ -372,13 +378,32 @@ reflection_manager::constructors_by_type(const type& tp) const
 }
 
 
-inline std::pair<typename reflection_manager::const_conversion_iterator,
-                 typename reflection_manager::const_conversion_iterator>
+inline std::pair<reflection_manager::const_conversion_iterator,
+                 reflection_manager::const_conversion_iterator>
 reflection_manager::type_conversions() const
 {
     return std::make_pair(
         const_conversion_iterator(conversion_info_range_.first, this),
         const_conversion_iterator(conversion_info_range_.second, this));
+}
+
+
+inline std::pair<reflection_manager::const_indexed_conversion_iterator,
+                 reflection_manager::const_indexed_conversion_iterator>
+reflection_manager::type_conversions_by_type(const type& tp) const
+{
+    const auto index_of_type = tp.info_ - type_info_range_.first;
+    return std::make_pair(
+        const_indexed_conversion_iterator(
+            0,
+            conversion_info_indices_by_type_[index_of_type].data(),
+            conversion_info_range_.first,
+            this),
+        const_indexed_conversion_iterator(
+            conversion_info_indices_by_type_[index_of_type].size(),
+            conversion_info_indices_by_type_[index_of_type].data(),
+            conversion_info_range_.first,
+            this));
 }
 
 
