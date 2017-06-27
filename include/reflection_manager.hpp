@@ -96,6 +96,12 @@ private:
                      TypeInfoArrayHolder,
                      Fun index_extractor);
 
+    template <class ValueType, class TypeInfoArrayHolder, class Fun>
+    std::vector<std::vector<std::size_t>>
+    indices_by_type(const std::pair<const ValueType*, const ValueType*>& range,
+                    TypeInfoArrayHolder,
+                    Fun type_index_extractor);
+
 
     type type_by_index(std::size_t index) const;
 
@@ -153,6 +159,9 @@ private:
     std::vector<std::vector<member_variable_info>>
         member_variable_info_by_index_;
     std::vector<string_serialization_info> string_serializer_info_by_index_;
+
+    // sorted index information
+    std::vector<std::vector<std::size_t>> constructor_info_indices_by_type_;
 };
 }
 
@@ -205,7 +214,11 @@ inline reflection_manager::reflection_manager(
           member_variable_info_range_,
           TypeInfoArrayHolder(),
           [](const auto& info) { return info.object_type_index; })),
-      string_serializer_info_by_index_(array_size(TypeInfoArrayHolder()))
+      string_serializer_info_by_index_(array_size(TypeInfoArrayHolder())),
+      constructor_info_indices_by_type_(indices_by_type(
+          constructor_info_range_, TypeInfoArrayHolder(), [](const auto& ci) {
+              return ci.type_index;
+          }))
 {
     std::for_each(string_serialization_info_range_.first,
                   string_serialization_info_range_.second,
@@ -282,6 +295,33 @@ reflection_manager::buckets_by_index(
         return std::vector<std::vector<ValueType>>();
     }
 }
+
+
+template <class ValueType, class TypeInfoArrayHolder, class Fun>
+inline std::vector<std::vector<std::size_t>>
+reflection_manager::indices_by_type(
+    const std::pair<const ValueType*, const ValueType*>& range,
+    TypeInfoArrayHolder,
+    Fun type_index_extractor)
+{
+    if(range.first != nullptr && range.second != nullptr)
+    {
+        std::vector<std::vector<std::size_t>> out(
+            array_size(TypeInfoArrayHolder()));
+
+        for(auto i = 0ul; i < range.second - range.first; ++i)
+        {
+            out[type_index_extractor(range.first[i])].push_back(i);
+        }
+
+        return out;
+    }
+    else
+    {
+        return std::vector<std::vector<std::size_t>>();
+    }
+}
+
 #pragma clang diagnostic pop
 
 
