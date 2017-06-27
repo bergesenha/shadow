@@ -176,6 +176,13 @@ main()
         {
             std::cout << "\t" << *j << '\n';
         }
+        for(auto j = myspace::manager.member_variables_by_type(*i).first;
+            j != myspace::manager.member_variables_by_type(*i).second;
+            ++j)
+        {
+            std::cout << "\t" << *j << '\n';
+        }
+        std::cout << '\n';
     }
 
 
@@ -187,14 +194,6 @@ main()
         std::cout << *i << '\n';
     }
 
-
-    std::cout << "\n\n\nMember Variables:\n";
-    for(auto i = myspace::manager.member_variables().first;
-        i != myspace::manager.member_variables().second;
-        ++i)
-    {
-        std::cout << *i << '\n';
-    }
 
     std::cout << "\n\n\nString Serializers:\n";
     for(auto i = myspace::manager.string_serializers().first;
