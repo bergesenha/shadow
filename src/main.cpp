@@ -197,7 +197,6 @@ main()
         i != myspace::manager.member_variables().second;
         ++i)
     {
-        std::cout << i->get_type() << " " << i->object_type()
-                  << "::" << i->name() << '\n';
+        std::cout << *i << '\n';
     }
 }
