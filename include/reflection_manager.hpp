@@ -174,8 +174,6 @@ private:
     std::pair<const member_variable_info*, const member_variable_info*>
         member_variable_info_range_;
 
-    // sorted information
-    std::vector<string_serialization_info> string_serializer_info_by_index_;
 
     // sorted index information
     std::vector<std::vector<std::size_t>> constructor_info_indices_by_type_;
@@ -218,7 +216,6 @@ inline reflection_manager::reflection_manager(
           initialize_range(MemberFunctionInfoArrayHolder())),
       member_variable_info_range_(
           initialize_range(MemberVariableInfoArrayHolder())),
-      string_serializer_info_by_index_(array_size(TypeInfoArrayHolder())),
       constructor_info_indices_by_type_(
           indices_by_type(constructor_info_range_,
                           TypeInfoArrayHolder(),
@@ -236,11 +233,6 @@ inline reflection_manager::reflection_manager(
           TypeInfoArrayHolder(),
           [](const auto& mvi) { return mvi.object_type_index; }))
 {
-    std::for_each(string_serialization_info_range_.first,
-                  string_serialization_info_range_.second,
-                  [this](const auto& info) {
-                      string_serializer_info_by_index_[info.type_index] = info;
-                  });
 }
 
 
