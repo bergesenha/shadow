@@ -155,7 +155,6 @@ private:
         member_variable_info_range_;
 
     // sorted information
-    std::vector<std::vector<constructor_info>> constructor_info_by_index_;
     std::vector<std::vector<conversion_info>> conversion_info_by_index_;
     std::vector<std::vector<member_function_info>>
         member_function_info_by_index_;
@@ -201,10 +200,6 @@ inline reflection_manager::reflection_manager(
           initialize_range(MemberFunctionInfoArrayHolder())),
       member_variable_info_range_(
           initialize_range(MemberVariableInfoArrayHolder())),
-      constructor_info_by_index_(
-          buckets_by_index(constructor_info_range_,
-                           TypeInfoArrayHolder(),
-                           [](const auto& info) { return info.type_index; })),
       conversion_info_by_index_(buckets_by_index(
           conversion_info_range_,
           TypeInfoArrayHolder(),
