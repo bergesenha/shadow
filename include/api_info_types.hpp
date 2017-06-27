@@ -311,9 +311,7 @@ typedef api_type_aggregator<member_variable_info,
 inline std::ostream&
 operator<<(std::ostream& out, const member_variable_& mv)
 {
-
     out << mv.get_type() << " " << mv.object_type() << "::" << mv.name();
-
 
     return out;
 }
