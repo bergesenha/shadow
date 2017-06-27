@@ -116,9 +116,6 @@ public:
     std::pair<const_constructor_iterator, const_constructor_iterator>
     constructors() const;
 
-    std::pair<const_constructor_iterator, const_constructor_iterator>
-    constructors(const type& tp) const;
-
     std::pair<const_indexed_constructor_iterator,
               const_indexed_constructor_iterator>
     constructors_by_type(const type& tp) const;
@@ -353,19 +350,6 @@ reflection_manager::constructors() const
     return std::make_pair(
         const_constructor_iterator(constructor_info_range_.first, this),
         const_constructor_iterator(constructor_info_range_.second, this));
-}
-
-inline std::pair<reflection_manager::const_constructor_iterator,
-                 reflection_manager::const_constructor_iterator>
-reflection_manager::constructors(const type& tp) const
-{
-    const auto index_of_type = tp.info_ - type_info_range_.first;
-
-    const auto& constr_vec = constructor_info_by_index_[index_of_type];
-
-    return std::make_pair(const_constructor_iterator(constr_vec.data(), this),
-                          const_constructor_iterator(
-                              constr_vec.data() + constr_vec.size(), this));
 }
 
 
