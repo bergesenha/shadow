@@ -39,6 +39,8 @@ public:
     typedef constructor_ constructor;
     typedef info_iterator_<const constructor_info, const constructor>
         const_constructor_iterator;
+    typedef indexed_info_iterator_<const constructor_info, const constructor>
+        const_indexed_constructor_iterator;
 
     typedef type_conversion_ type_conversion;
     typedef info_iterator_<const conversion_info, const type_conversion>
@@ -116,6 +118,10 @@ public:
 
     std::pair<const_constructor_iterator, const_constructor_iterator>
     constructors(const type& tp) const;
+
+    std::pair<const_indexed_constructor_iterator,
+              const_indexed_constructor_iterator>
+    constructors_by_type(const type& tp) const;
 
     std::pair<const_conversion_iterator, const_conversion_iterator>
     type_conversions() const;
@@ -360,6 +366,25 @@ reflection_manager::constructors(const type& tp) const
     return std::make_pair(const_constructor_iterator(constr_vec.data(), this),
                           const_constructor_iterator(
                               constr_vec.data() + constr_vec.size(), this));
+}
+
+
+inline std::pair<reflection_manager::const_indexed_constructor_iterator,
+                 reflection_manager::const_indexed_constructor_iterator>
+reflection_manager::constructors_by_type(const type& tp) const
+{
+    const auto index_of_type = tp.info_ - type_info_range_.first;
+    return std::make_pair(
+        const_indexed_constructor_iterator(
+            0,
+            constructor_info_indices_by_type_[index_of_type].data(),
+            constructor_info_range_.first,
+            this),
+        const_indexed_constructor_iterator(
+            constructor_info_indices_by_type_[index_of_type].size(),
+            constructor_info_indices_by_type_[index_of_type].data(),
+            constructor_info_range_.first,
+            this));
 }
 
 
