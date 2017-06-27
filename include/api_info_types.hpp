@@ -315,4 +315,8 @@ operator<<(std::ostream& out, const member_variable_& mv)
 
     return out;
 }
+
+
+typedef api_type_aggregator<string_serialization_info, get_type_policy>
+    string_serializer_;
 }
