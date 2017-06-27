@@ -170,6 +170,12 @@ main()
             std::cout << '\t' << j->from_type() << " --> " << j->to_type()
                       << '\n';
         }
+        for(auto j = myspace::manager.member_functions_by_type(*i).first;
+            j != myspace::manager.member_functions_by_type(*i).second;
+            ++j)
+        {
+            std::cout << "\t" << *j << '\n';
+        }
     }
 
 
@@ -181,13 +187,6 @@ main()
         std::cout << *i << '\n';
     }
 
-    std::cout << "\n\n\nMember Functions:\n";
-    for(auto i = myspace::manager.member_functions().first;
-        i != myspace::manager.member_functions().second;
-        ++i)
-    {
-        std::cout << *i << '\n';
-    }
 
     std::cout << "\n\n\nMember Variables:\n";
     for(auto i = myspace::manager.member_variables().first;

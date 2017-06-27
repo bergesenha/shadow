@@ -55,6 +55,9 @@ public:
     typedef member_function_ member_function;
     typedef info_iterator_<const member_function_info, const member_function>
         const_member_function_iterator;
+    typedef indexed_info_iterator_<const member_function_info,
+                                   const member_function>
+        const_indexed_member_function_iterator;
 
     typedef member_variable_ member_variable;
     typedef info_iterator_<const member_variable_info, const member_variable>
@@ -135,6 +138,10 @@ public:
     std::pair<const_member_function_iterator, const_member_function_iterator>
     member_functions() const;
 
+    std::pair<const_indexed_member_function_iterator,
+              const_indexed_member_function_iterator>
+    member_functions_by_type(const type& tp) const;
+
     std::pair<const_member_variable_iterator, const_member_variable_iterator>
     member_variables() const;
 
@@ -161,8 +168,6 @@ private:
         member_variable_info_range_;
 
     // sorted information
-    std::vector<std::vector<member_function_info>>
-        member_function_info_by_index_;
     std::vector<std::vector<member_variable_info>>
         member_variable_info_by_index_;
     std::vector<string_serialization_info> string_serializer_info_by_index_;
@@ -170,6 +175,7 @@ private:
     // sorted index information
     std::vector<std::vector<std::size_t>> constructor_info_indices_by_type_;
     std::vector<std::vector<std::size_t>> conversion_info_indices_by_type_;
+    std::vector<std::vector<std::size_t>> member_function_info_indices_by_type_;
 };
 }
 
@@ -206,10 +212,6 @@ inline reflection_manager::reflection_manager(
           initialize_range(MemberFunctionInfoArrayHolder())),
       member_variable_info_range_(
           initialize_range(MemberVariableInfoArrayHolder())),
-      member_function_info_by_index_(buckets_by_index(
-          member_function_info_range_,
-          TypeInfoArrayHolder(),
-          [](const auto& info) { return info.object_type_index; })),
       member_variable_info_by_index_(buckets_by_index(
           member_variable_info_range_,
           TypeInfoArrayHolder(),
@@ -219,10 +221,14 @@ inline reflection_manager::reflection_manager(
           indices_by_type(constructor_info_range_,
                           TypeInfoArrayHolder(),
                           [](const auto& ci) { return ci.type_index; })),
-      conversion_info_indices_by_type_(indices_by_type(
-          conversion_info_range_, TypeInfoArrayHolder(), [](const auto& ci) {
-              return ci.from_type_index;
-          }))
+      conversion_info_indices_by_type_(
+          indices_by_type(conversion_info_range_,
+                          TypeInfoArrayHolder(),
+                          [](const auto& ci) { return ci.from_type_index; })),
+      member_function_info_indices_by_type_(indices_by_type(
+          member_function_info_range_,
+          TypeInfoArrayHolder(),
+          [](const auto& mfi) { return mfi.object_type_index; }))
 {
     std::for_each(string_serialization_info_range_.first,
                   string_serialization_info_range_.second,
@@ -422,6 +428,24 @@ reflection_manager::member_functions() const
                                        this));
 }
 
+
+inline std::pair<reflection_manager::const_indexed_member_function_iterator,
+                 reflection_manager::const_indexed_member_function_iterator>
+reflection_manager::member_functions_by_type(const type& tp) const
+{
+    const auto index_of_type = tp.info_ - type_info_range_.first;
+    return std::make_pair(
+        const_indexed_member_function_iterator(
+            0,
+            member_function_info_indices_by_type_[index_of_type].data(),
+            member_function_info_range_.first,
+            this),
+        const_indexed_member_function_iterator(
+            member_function_info_indices_by_type_[index_of_type].size(),
+            member_function_info_indices_by_type_[index_of_type].data(),
+            member_function_info_range_.first,
+            this));
+}
 
 inline std::pair<reflection_manager::const_member_variable_iterator,
                  reflection_manager::const_member_variable_iterator>
