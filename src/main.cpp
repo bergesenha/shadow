@@ -151,6 +151,7 @@ typedef shadow::api_type_aggregator<shadow::type_info,
 int
 main()
 {
+    std::cout << "Types and Constructors:\n";
     for(auto i = myspace::manager.types().first;
         i != myspace::manager.types().second;
         ++i)
@@ -164,7 +165,7 @@ main()
         }
     }
 
-    std::cout << "\n\n\n";
+    std::cout << "\n\n\nType Conversions:\n";
 
 
     for(auto i = myspace::manager.type_conversions().first;
@@ -172,5 +173,14 @@ main()
         ++i)
     {
         std::cout << i->from_type() << " --> " << i->to_type() << '\n';
+    }
+
+    std::cout << "\n\n\nFree Functions:\n";
+
+    for(auto i = myspace::manager.free_functions().first;
+        i != myspace::manager.free_functions().second;
+        ++i)
+    {
+        std::cout << *i << '\n';
     }
 }

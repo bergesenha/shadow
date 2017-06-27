@@ -207,4 +207,48 @@ typedef api_type_aggregator<conversion_info,
                             get_from_type_policy,
                             get_to_type_policy>
     type_conversion_;
+
+
+template <class Derived>
+class get_return_type_policy
+{
+public:
+    type_
+    return_type() const
+    {
+        const auto ret_type_index =
+            static_cast<const Derived*>(this)->info_->return_type_index;
+        return static_cast<const Derived*>(this)->manager_->type_by_index(
+            ret_type_index);
+    }
+};
+
+typedef api_type_aggregator<free_function_info,
+                            get_name_policy,
+                            get_num_parameters_policy,
+                            get_parameter_types_policy,
+                            get_return_type_policy>
+    free_function_;
+
+inline std::ostream&
+operator<<(std::ostream& out, const free_function_& ff)
+{
+    out << ff.return_type() << " (";
+
+    if(ff.num_parameters() > 0)
+    {
+        auto param_pair = ff.parameter_types();
+        out << *param_pair.first;
+
+        for(++param_pair.first; param_pair.first != param_pair.second;
+            ++param_pair.first)
+        {
+            out << ", " << *param_pair.first;
+        }
+    }
+
+    out << ')';
+
+    return out;
+}
 }

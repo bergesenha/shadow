@@ -27,6 +27,9 @@ public:
     template <class Derived>
     friend class get_to_type_policy;
 
+    template <class Derived>
+    friend class get_return_type_policy;
+
     typedef type_ type;
     typedef info_iterator_<const type_info, const type> const_type_iterator;
 
@@ -37,6 +40,10 @@ public:
     typedef type_conversion_ type_conversion;
     typedef info_iterator_<const conversion_info, const type_conversion>
         const_conversion_iterator;
+
+    typedef free_function_ free_function;
+    typedef info_iterator_<const free_function_info, const free_function>
+        const_free_function_iterator;
 
 public:
     reflection_manager();
@@ -90,6 +97,9 @@ public:
 
     std::pair<const_conversion_iterator, const_conversion_iterator>
     type_conversions() const;
+
+    std::pair<const_free_function_iterator, const_free_function_iterator>
+    free_functions() const;
 
 private:
     // pairs hold iterators to beginning and end of arrays of information
@@ -294,6 +304,16 @@ reflection_manager::type_conversions() const
     return std::make_pair(
         const_conversion_iterator(conversion_info_range_.first, this),
         const_conversion_iterator(conversion_info_range_.second, this));
+}
+
+
+inline std::pair<reflection_manager::const_free_function_iterator,
+                 reflection_manager::const_free_function_iterator>
+reflection_manager::free_functions() const
+{
+    return std::make_pair(
+        const_free_function_iterator(free_function_info_range_.first, this),
+        const_free_function_iterator(free_function_info_range_.second, this));
 }
 }
 
