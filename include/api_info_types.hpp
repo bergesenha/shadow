@@ -251,4 +251,52 @@ operator<<(std::ostream& out, const free_function_& ff)
 
     return out;
 }
+
+
+template <class Derived>
+class get_object_type_policy
+{
+public:
+    type_
+    object_type() const
+    {
+        const auto object_type_index =
+            static_cast<const Derived*>(this)->info_->object_type_index;
+
+        return static_cast<const Derived*>(this)->manager_->type_by_index(
+            object_type_index);
+    }
+};
+
+
+typedef api_type_aggregator<member_function_info,
+                            get_name_policy,
+                            get_num_parameters_policy,
+                            get_parameter_types_policy,
+                            get_return_type_policy,
+                            get_object_type_policy>
+    member_function_;
+
+inline std::ostream&
+operator<<(std::ostream& out, const member_function_& mf)
+{
+    out << mf.return_type() << " " << mf.object_type() << "::" << mf.name()
+        << "(";
+
+    if(mf.num_parameters() > 0)
+    {
+        auto param_pair = mf.parameter_types();
+        out << *param_pair.first;
+
+        for(++param_pair.first; param_pair.first != param_pair.second;
+            ++param_pair.first)
+        {
+            out << ", " << *param_pair.first;
+        }
+    }
+
+    out << ')';
+
+    return out;
+}
 }

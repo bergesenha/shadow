@@ -183,4 +183,12 @@ main()
     {
         std::cout << *i << '\n';
     }
+
+    std::cout << "\n\n\nMember Functions:\n";
+    for(auto i = myspace::manager.member_functions().first;
+        i != myspace::manager.member_functions().second;
+        ++i)
+    {
+        std::cout << *i << '\n';
+    }
 }
