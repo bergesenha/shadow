@@ -209,5 +209,9 @@ typedef api_type_aggregator<conversion_info,
     type_conversion_;
 
 
-typedef api_type_aggregator<free_function_info, get_name_policy> free_function_;
+typedef api_type_aggregator<free_function_info,
+                            get_name_policy,
+                            get_num_parameters_policy,
+                            get_parameter_types_policy>
+    free_function_;
 }
