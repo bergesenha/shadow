@@ -181,13 +181,6 @@ main()
         i != myspace::manager.free_functions().second;
         ++i)
     {
-        std::cout << i->return_type() << " " << i->name() << "(";
-        for(auto j = i->parameter_types().first;
-            j != i->parameter_types().second;
-            ++j)
-        {
-            std::cout << *j << ", ";
-        }
-        std::cout << ")\n";
+        std::cout << *i << '\n';
     }
 }
