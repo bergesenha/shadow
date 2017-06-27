@@ -39,10 +39,14 @@ public:
     typedef constructor_ constructor;
     typedef info_iterator_<const constructor_info, const constructor>
         const_constructor_iterator;
+    typedef indexed_info_iterator_<const constructor_info, const constructor>
+        const_indexed_constructor_iterator;
 
     typedef type_conversion_ type_conversion;
     typedef info_iterator_<const conversion_info, const type_conversion>
         const_conversion_iterator;
+    typedef indexed_info_iterator_<const conversion_info, const type_conversion>
+        const_indexed_conversion_iterator;
 
     typedef free_function_ free_function;
     typedef info_iterator_<const free_function_info, const free_function>
@@ -51,10 +55,16 @@ public:
     typedef member_function_ member_function;
     typedef info_iterator_<const member_function_info, const member_function>
         const_member_function_iterator;
+    typedef indexed_info_iterator_<const member_function_info,
+                                   const member_function>
+        const_indexed_member_function_iterator;
 
     typedef member_variable_ member_variable;
     typedef info_iterator_<const member_variable_info, const member_variable>
         const_member_variable_iterator;
+    typedef indexed_info_iterator_<const member_variable_info,
+                                   const member_variable>
+        const_indexed_member_variable_iterator;
 
     typedef string_serializer_ string_serializer;
     typedef info_iterator_<const string_serialization_info,
@@ -96,6 +106,12 @@ private:
                      TypeInfoArrayHolder,
                      Fun index_extractor);
 
+    template <class ValueType, class TypeInfoArrayHolder, class Fun>
+    std::vector<std::vector<std::size_t>>
+    indices_by_type(const std::pair<const ValueType*, const ValueType*>& range,
+                    TypeInfoArrayHolder,
+                    Fun type_index_extractor);
+
 
     type type_by_index(std::size_t index) const;
 
@@ -108,11 +124,16 @@ public:
     std::pair<const_constructor_iterator, const_constructor_iterator>
     constructors() const;
 
-    std::pair<const_constructor_iterator, const_constructor_iterator>
-    constructors(const type& tp) const;
+    std::pair<const_indexed_constructor_iterator,
+              const_indexed_constructor_iterator>
+    constructors_by_type(const type& tp) const;
 
     std::pair<const_conversion_iterator, const_conversion_iterator>
     type_conversions() const;
+
+    std::pair<const_indexed_conversion_iterator,
+              const_indexed_conversion_iterator>
+    type_conversions_by_type(const type& tp) const;
 
     std::pair<const_free_function_iterator, const_free_function_iterator>
     free_functions() const;
@@ -120,8 +141,16 @@ public:
     std::pair<const_member_function_iterator, const_member_function_iterator>
     member_functions() const;
 
+    std::pair<const_indexed_member_function_iterator,
+              const_indexed_member_function_iterator>
+    member_functions_by_type(const type& tp) const;
+
     std::pair<const_member_variable_iterator, const_member_variable_iterator>
     member_variables() const;
+
+    std::pair<const_indexed_member_variable_iterator,
+              const_indexed_member_variable_iterator>
+    member_variables_by_type(const type& tp) const;
 
     std::pair<const_string_serializer_iterator,
               const_string_serializer_iterator>
@@ -145,14 +174,12 @@ private:
     std::pair<const member_variable_info*, const member_variable_info*>
         member_variable_info_range_;
 
-    // sorted information
-    std::vector<std::vector<constructor_info>> constructor_info_by_index_;
-    std::vector<std::vector<conversion_info>> conversion_info_by_index_;
-    std::vector<std::vector<member_function_info>>
-        member_function_info_by_index_;
-    std::vector<std::vector<member_variable_info>>
-        member_variable_info_by_index_;
-    std::vector<string_serialization_info> string_serializer_info_by_index_;
+
+    // sorted index information
+    std::vector<std::vector<std::size_t>> constructor_info_indices_by_type_;
+    std::vector<std::vector<std::size_t>> conversion_info_indices_by_type_;
+    std::vector<std::vector<std::size_t>> member_function_info_indices_by_type_;
+    std::vector<std::vector<std::size_t>> member_variable_info_indices_by_type_;
 };
 }
 
@@ -189,29 +216,23 @@ inline reflection_manager::reflection_manager(
           initialize_range(MemberFunctionInfoArrayHolder())),
       member_variable_info_range_(
           initialize_range(MemberVariableInfoArrayHolder())),
-      constructor_info_by_index_(
-          buckets_by_index(constructor_info_range_,
-                           TypeInfoArrayHolder(),
-                           [](const auto& info) { return info.type_index; })),
-      conversion_info_by_index_(buckets_by_index(
-          conversion_info_range_,
-          TypeInfoArrayHolder(),
-          [](const auto& info) { return info.from_type_index; })),
-      member_function_info_by_index_(buckets_by_index(
+      constructor_info_indices_by_type_(
+          indices_by_type(constructor_info_range_,
+                          TypeInfoArrayHolder(),
+                          [](const auto& ci) { return ci.type_index; })),
+      conversion_info_indices_by_type_(
+          indices_by_type(conversion_info_range_,
+                          TypeInfoArrayHolder(),
+                          [](const auto& ci) { return ci.from_type_index; })),
+      member_function_info_indices_by_type_(indices_by_type(
           member_function_info_range_,
           TypeInfoArrayHolder(),
-          [](const auto& info) { return info.object_type_index; })),
-      member_variable_info_by_index_(buckets_by_index(
+          [](const auto& mfi) { return mfi.object_type_index; })),
+      member_variable_info_indices_by_type_(indices_by_type(
           member_variable_info_range_,
           TypeInfoArrayHolder(),
-          [](const auto& info) { return info.object_type_index; })),
-      string_serializer_info_by_index_(array_size(TypeInfoArrayHolder()))
+          [](const auto& mvi) { return mvi.object_type_index; }))
 {
-    std::for_each(string_serialization_info_range_.first,
-                  string_serialization_info_range_.second,
-                  [this](const auto& info) {
-                      string_serializer_info_by_index_[info.type_index] = info;
-                  });
 }
 
 
@@ -282,6 +303,33 @@ reflection_manager::buckets_by_index(
         return std::vector<std::vector<ValueType>>();
     }
 }
+
+
+template <class ValueType, class TypeInfoArrayHolder, class Fun>
+inline std::vector<std::vector<std::size_t>>
+reflection_manager::indices_by_type(
+    const std::pair<const ValueType*, const ValueType*>& range,
+    TypeInfoArrayHolder,
+    Fun type_index_extractor)
+{
+    if(range.first != nullptr && range.second != nullptr)
+    {
+        std::vector<std::vector<std::size_t>> out(
+            array_size(TypeInfoArrayHolder()));
+
+        for(auto i = 0ul; i < range.second - range.first; ++i)
+        {
+            out[type_index_extractor(range.first[i])].push_back(i);
+        }
+
+        return out;
+    }
+    else
+    {
+        return std::vector<std::vector<std::size_t>>();
+    }
+}
+
 #pragma clang diagnostic pop
 
 
@@ -309,27 +357,52 @@ reflection_manager::constructors() const
         const_constructor_iterator(constructor_info_range_.second, this));
 }
 
-inline std::pair<reflection_manager::const_constructor_iterator,
-                 reflection_manager::const_constructor_iterator>
-reflection_manager::constructors(const type& tp) const
+
+inline std::pair<reflection_manager::const_indexed_constructor_iterator,
+                 reflection_manager::const_indexed_constructor_iterator>
+reflection_manager::constructors_by_type(const type& tp) const
 {
     const auto index_of_type = tp.info_ - type_info_range_.first;
-
-    const auto& constr_vec = constructor_info_by_index_[index_of_type];
-
-    return std::make_pair(const_constructor_iterator(constr_vec.data(), this),
-                          const_constructor_iterator(
-                              constr_vec.data() + constr_vec.size(), this));
+    return std::make_pair(
+        const_indexed_constructor_iterator(
+            0,
+            constructor_info_indices_by_type_[index_of_type].data(),
+            constructor_info_range_.first,
+            this),
+        const_indexed_constructor_iterator(
+            constructor_info_indices_by_type_[index_of_type].size(),
+            constructor_info_indices_by_type_[index_of_type].data(),
+            constructor_info_range_.first,
+            this));
 }
 
 
-inline std::pair<typename reflection_manager::const_conversion_iterator,
-                 typename reflection_manager::const_conversion_iterator>
+inline std::pair<reflection_manager::const_conversion_iterator,
+                 reflection_manager::const_conversion_iterator>
 reflection_manager::type_conversions() const
 {
     return std::make_pair(
         const_conversion_iterator(conversion_info_range_.first, this),
         const_conversion_iterator(conversion_info_range_.second, this));
+}
+
+
+inline std::pair<reflection_manager::const_indexed_conversion_iterator,
+                 reflection_manager::const_indexed_conversion_iterator>
+reflection_manager::type_conversions_by_type(const type& tp) const
+{
+    const auto index_of_type = tp.info_ - type_info_range_.first;
+    return std::make_pair(
+        const_indexed_conversion_iterator(
+            0,
+            conversion_info_indices_by_type_[index_of_type].data(),
+            conversion_info_range_.first,
+            this),
+        const_indexed_conversion_iterator(
+            conversion_info_indices_by_type_[index_of_type].size(),
+            conversion_info_indices_by_type_[index_of_type].data(),
+            conversion_info_range_.first,
+            this));
 }
 
 
@@ -354,6 +427,24 @@ reflection_manager::member_functions() const
 }
 
 
+inline std::pair<reflection_manager::const_indexed_member_function_iterator,
+                 reflection_manager::const_indexed_member_function_iterator>
+reflection_manager::member_functions_by_type(const type& tp) const
+{
+    const auto index_of_type = tp.info_ - type_info_range_.first;
+    return std::make_pair(
+        const_indexed_member_function_iterator(
+            0,
+            member_function_info_indices_by_type_[index_of_type].data(),
+            member_function_info_range_.first,
+            this),
+        const_indexed_member_function_iterator(
+            member_function_info_indices_by_type_[index_of_type].size(),
+            member_function_info_indices_by_type_[index_of_type].data(),
+            member_function_info_range_.first,
+            this));
+}
+
 inline std::pair<reflection_manager::const_member_variable_iterator,
                  reflection_manager::const_member_variable_iterator>
 reflection_manager::member_variables() const
@@ -364,6 +455,24 @@ reflection_manager::member_variables() const
                                        this));
 }
 
+
+inline std::pair<reflection_manager::const_indexed_member_variable_iterator,
+                 reflection_manager::const_indexed_member_variable_iterator>
+reflection_manager::member_variables_by_type(const type& tp) const
+{
+    const auto index_of_type = tp.info_ - type_info_range_.first;
+    return std::make_pair(
+        const_indexed_member_variable_iterator(
+            0,
+            member_variable_info_indices_by_type_[index_of_type].data(),
+            member_variable_info_range_.first,
+            this),
+        const_indexed_member_variable_iterator(
+            member_variable_info_indices_by_type_[index_of_type].size(),
+            member_variable_info_indices_by_type_[index_of_type].data(),
+            member_variable_info_range_.first,
+            this));
+}
 
 inline std::pair<reflection_manager::const_string_serializer_iterator,
                  reflection_manager::const_string_serializer_iterator>

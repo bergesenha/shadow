@@ -157,26 +157,36 @@ main()
         ++i)
     {
         std::cout << i->name() << ":\n";
-        for(auto j = myspace::manager.constructors(*i).first;
-            j != myspace::manager.constructors(*i).second;
+        for(auto j = myspace::manager.constructors_by_type(*i).first;
+            j != myspace::manager.constructors_by_type(*i).second;
             ++j)
         {
             std::cout << "\t" << *j << '\n';
         }
+        for(auto j = myspace::manager.type_conversions_by_type(*i).first;
+            j != myspace::manager.type_conversions_by_type(*i).second;
+            ++j)
+        {
+            std::cout << '\t' << j->from_type() << " --> " << j->to_type()
+                      << '\n';
+        }
+        for(auto j = myspace::manager.member_functions_by_type(*i).first;
+            j != myspace::manager.member_functions_by_type(*i).second;
+            ++j)
+        {
+            std::cout << "\t" << *j << '\n';
+        }
+        for(auto j = myspace::manager.member_variables_by_type(*i).first;
+            j != myspace::manager.member_variables_by_type(*i).second;
+            ++j)
+        {
+            std::cout << "\t" << *j << '\n';
+        }
+        std::cout << '\n';
     }
 
-    std::cout << "\n\n\nType Conversions:\n";
-
-
-    for(auto i = myspace::manager.type_conversions().first;
-        i != myspace::manager.type_conversions().second;
-        ++i)
-    {
-        std::cout << i->from_type() << " --> " << i->to_type() << '\n';
-    }
 
     std::cout << "\n\n\nFree Functions:\n";
-
     for(auto i = myspace::manager.free_functions().first;
         i != myspace::manager.free_functions().second;
         ++i)
@@ -184,21 +194,6 @@ main()
         std::cout << *i << '\n';
     }
 
-    std::cout << "\n\n\nMember Functions:\n";
-    for(auto i = myspace::manager.member_functions().first;
-        i != myspace::manager.member_functions().second;
-        ++i)
-    {
-        std::cout << *i << '\n';
-    }
-
-    std::cout << "\n\n\nMember Variables:\n";
-    for(auto i = myspace::manager.member_variables().first;
-        i != myspace::manager.member_variables().second;
-        ++i)
-    {
-        std::cout << *i << '\n';
-    }
 
     std::cout << "\n\n\nString Serializers:\n";
     for(auto i = myspace::manager.string_serializers().first;
