@@ -199,4 +199,12 @@ main()
     {
         std::cout << *i << '\n';
     }
+
+    std::cout << "\n\n\nString Serializers:\n";
+    for(auto i = myspace::manager.string_serializers().first;
+        i != myspace::manager.string_serializers().second;
+        ++i)
+    {
+        std::cout << i->get_type() << '\n';
+    }
 }
