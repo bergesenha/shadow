@@ -189,7 +189,6 @@ main()
         i != myspace::manager.member_functions().second;
         ++i)
     {
-        std::cout << i->return_type() << " " << i->object_type()
-                  << "::" << i->name() << '\n';
+        std::cout << *i << '\n';
     }
 }

@@ -276,4 +276,27 @@ typedef api_type_aggregator<member_function_info,
                             get_return_type_policy,
                             get_object_type_policy>
     member_function_;
+
+inline std::ostream&
+operator<<(std::ostream& out, const member_function_& mf)
+{
+    out << mf.return_type() << " " << mf.object_type() << "::" << mf.name()
+        << "(";
+
+    if(mf.num_parameters() > 0)
+    {
+        auto param_pair = mf.parameter_types();
+        out << *param_pair.first;
+
+        for(++param_pair.first; param_pair.first != param_pair.second;
+            ++param_pair.first)
+        {
+            out << ", " << *param_pair.first;
+        }
+    }
+
+    out << ')';
+
+    return out;
+}
 }
