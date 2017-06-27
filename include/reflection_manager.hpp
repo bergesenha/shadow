@@ -164,6 +164,7 @@ private:
 
     // sorted index information
     std::vector<std::vector<std::size_t>> constructor_info_indices_by_type_;
+    std::vector<std::vector<std::size_t>> conversion_info_indices_by_type_;
 };
 }
 
@@ -213,9 +214,13 @@ inline reflection_manager::reflection_manager(
           TypeInfoArrayHolder(),
           [](const auto& info) { return info.object_type_index; })),
       string_serializer_info_by_index_(array_size(TypeInfoArrayHolder())),
-      constructor_info_indices_by_type_(indices_by_type(
-          constructor_info_range_, TypeInfoArrayHolder(), [](const auto& ci) {
-              return ci.type_index;
+      constructor_info_indices_by_type_(
+          indices_by_type(constructor_info_range_,
+                          TypeInfoArrayHolder(),
+                          [](const auto& ci) { return ci.type_index; })),
+      conversion_info_indices_by_type_(indices_by_type(
+          conversion_info_range_, TypeInfoArrayHolder(), [](const auto& ci) {
+              return ci.from_type_index;
           }))
 {
     std::for_each(string_serialization_info_range_.first,
