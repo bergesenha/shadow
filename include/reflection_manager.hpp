@@ -95,6 +95,9 @@ public:
     std::pair<const_conversion_iterator, const_conversion_iterator>
     type_conversions() const;
 
+    std::pair<const_free_function_iterator, const_free_function_iterator>
+    free_functions() const;
+
 private:
     // pairs hold iterators to beginning and end of arrays of information
     // generated at compile time
@@ -298,6 +301,16 @@ reflection_manager::type_conversions() const
     return std::make_pair(
         const_conversion_iterator(conversion_info_range_.first, this),
         const_conversion_iterator(conversion_info_range_.second, this));
+}
+
+
+inline std::pair<reflection_manager::const_free_function_iterator,
+                 reflection_manager::const_free_function_iterator>
+reflection_manager::free_functions() const
+{
+    return std::make_pair(
+        const_free_function_iterator(free_function_info_range_.first, this),
+        const_free_function_iterator(free_function_info_range_.second, this));
 }
 }
 
