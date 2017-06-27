@@ -38,6 +38,10 @@ public:
     typedef info_iterator_<const conversion_info, const type_conversion>
         const_conversion_iterator;
 
+    typedef free_function_ free_function;
+    typedef info_iterator_<const free_function_info, const free_function>
+        const_free_function_iterator;
+
 public:
     reflection_manager();
 
