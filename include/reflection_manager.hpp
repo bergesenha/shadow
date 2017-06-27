@@ -27,6 +27,9 @@ public:
     template <class Derived>
     friend class get_to_type_policy;
 
+    template <class Derived>
+    friend class get_return_type_policy;
+
     typedef type_ type;
     typedef info_iterator_<const type_info, const type> const_type_iterator;
 

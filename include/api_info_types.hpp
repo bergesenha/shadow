@@ -209,9 +209,24 @@ typedef api_type_aggregator<conversion_info,
     type_conversion_;
 
 
+template <class Derived>
+class get_return_type_policy
+{
+public:
+    type_
+    return_type() const
+    {
+        const auto ret_type_index =
+            static_cast<const Derived*>(this)->info_->return_type_index;
+        return static_cast<const Derived*>(this)->manager_->type_by_index(
+            ret_type_index);
+    }
+};
+
 typedef api_type_aggregator<free_function_info,
                             get_name_policy,
                             get_num_parameters_policy,
-                            get_parameter_types_policy>
+                            get_parameter_types_policy,
+                            get_return_type_policy>
     free_function_;
 }
