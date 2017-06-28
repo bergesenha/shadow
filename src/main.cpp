@@ -231,4 +231,8 @@ main()
     {
         std::cout << *i << '\n';
     }
+
+    auto my_float_var = myspace::static_create<float>(24.5f);
+
+    std::cout << my_float_var.type() << '\n';
 }

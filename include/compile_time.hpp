@@ -836,4 +836,14 @@ struct generate_array_of_string_serialization_info_holder
         string_serialization_info_array_holder(),                              \
         free_function_info_array_holder(),                                     \
         member_function_info_array_holder(),                                   \
-        member_variable_info_array_holder()};
+        member_variable_info_array_holder()};                                  \
+                                                                               \
+    template <class TypeUniverseList, class T>                                 \
+    shadow::variable static_create_binding(const T& val)                       \
+    {                                                                          \
+        return manager.static_create<TypeUniverseList>(val);                   \
+    }                                                                          \
+                                                                               \
+    template <class T>                                                         \
+    constexpr auto static_create = &static_create_binding<type_universe, T>;
+
