@@ -601,21 +601,19 @@ operator<<(std::ostream& out, const variable& var)
 
         out << "{ ";
 
-        std::for_each(
-            mem_var_info_indices.cbegin(),
-            mem_var_info_indices.cend(),
-            [&out, mem_var_info_buffer, &var](const auto index) {
-                out << "\n\t" << mem_var_info_buffer[index].name << ": ";
-                out << variable(mem_var_info_buffer[index].get_bind_point(
-                                    var.value_),
-                                mem_var_info_buffer[index].type_index,
-                                var.manager_)
-                    << " ";
-            }
+        std::for_each(mem_var_info_indices.cbegin(),
+                      mem_var_info_indices.cend(),
+                      [&out, mem_var_info_buffer, &var](const auto index) {
+                          out << " " << mem_var_info_buffer[index].name << ": ";
+                          out << variable(
+                                     mem_var_info_buffer[index].get_bind_point(
+                                         var.value_),
+                                     mem_var_info_buffer[index].type_index,
+                                     var.manager_)
+                              << " ";
+                      });
 
-            );
-
-        out << "\n}";
+        out << " }";
     }
 
     return out;
