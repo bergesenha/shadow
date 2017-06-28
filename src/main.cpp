@@ -19,11 +19,11 @@ class intholder
 public:
     intholder() = default;
 
-    explicit intholder(int i) : i_(i), d_(0.0)
+    explicit intholder(int i) : i_(i), d_(0.0), mem_var1(i), mem_var2(0.0)
     {
     }
 
-    intholder(int i, double d) : i_(i), d_(d)
+    intholder(int i, double d) : i_(i), d_(d), mem_var1(i), mem_var2(d)
     {
     }
 
@@ -61,6 +61,16 @@ private:
 };
 
 
+struct contains_intholder
+{
+    contains_intholder(float f, int i, double d) : f_(f), ih_(i, d)
+    {
+    }
+
+    float f_;
+    intholder ih_;
+};
+
 void
 free_function1(int i)
 {
@@ -97,6 +107,7 @@ namespace myspace
 REGISTER_TYPE_BEGIN()
 
 REGISTER_TYPE(intholder)
+REGISTER_TYPE(contains_intholder)
 REGISTER_TYPE_END()
 
 
@@ -105,6 +116,7 @@ REGISTER_CONSTRUCTOR_BEGIN()
 REGISTER_CONSTRUCTOR(intholder)
 REGISTER_CONSTRUCTOR(intholder, int)
 REGISTER_CONSTRUCTOR(intholder, int, double)
+REGISTER_CONSTRUCTOR(contains_intholder, float, int, double)
 
 REGISTER_CONSTRUCTOR_END()
 
@@ -136,6 +148,9 @@ REGISTER_MEMBER_VARIABLE_BEGIN()
 
 REGISTER_MEMBER_VARIABLE(intholder, mem_var1)
 REGISTER_MEMBER_VARIABLE(intholder, mem_var2)
+
+REGISTER_MEMBER_VARIABLE(contains_intholder, f_)
+REGISTER_MEMBER_VARIABLE(contains_intholder, ih_)
 
 REGISTER_MEMBER_VARIABLE_END()
 
@@ -202,4 +217,32 @@ main()
     {
         std::cout << i->get_type() << '\n';
     }
+
+    auto my_int_var =
+        myspace::manager.static_create<myspace::type_universe>(10);
+
+    std::cout << "\n\n\n";
+    std::cout << my_int_var.type() << ":\n" << my_int_var << '\n';
+
+    auto my_intholder_var =
+        myspace::manager.static_create<myspace::type_universe>(
+            intholder(13, 13.4));
+
+
+    std::cout << "\n\n\n";
+    std::cout << my_intholder_var << '\n';
+
+
+    auto my_float_var = myspace::static_create<float>(24.5f);
+
+    std::cout << "\n\n\n";
+    std::cout << my_float_var.type() << ":\n" << my_float_var << '\n';
+
+
+    auto my_contains_intholder_var = myspace::static_create<contains_intholder>(
+        contains_intholder(3.4f, 3, 100.25));
+
+    std::cout << "\n\n\n";
+    std::cout << my_contains_intholder_var.type() << ":\n"
+              << my_contains_intholder_var << '\n';
 }

@@ -12,30 +12,6 @@ namespace shadow
 class reflection_manager;
 
 
-// holds one value with type/reflection information
-class variable
-{
-public:
-    variable() : value_(), type_index_(0), manager_(nullptr)
-    {
-    }
-
-    variable(const any& value,
-             std::size_t type_index,
-             const reflection_manager* manager)
-        : value_(value), type_index_(type_index), manager_(manager)
-    {
-    }
-
-private:
-    // holds type erased value
-    any value_;
-    // these identify the type erased value
-    std::size_t type_index_;
-    const reflection_manager* manager_;
-};
-
-
 template <class InfoType, template <class> class... Policies>
 class api_type_aggregator
     : public Policies<api_type_aggregator<InfoType, Policies...>>...
@@ -319,4 +295,48 @@ operator<<(std::ostream& out, const member_variable_& mv)
 
 typedef api_type_aggregator<string_serialization_info, get_type_policy>
     string_serializer_;
+
+
+// holds one value with type/reflection information
+class variable
+{
+    friend std::ostream& operator<<(std::ostream&, const variable&);
+
+public:
+    typedef indexed_info_iterator_<const member_function_info,
+                                   const member_function_>
+        member_function_iterator;
+
+    typedef indexed_info_iterator_<const member_variable_info,
+                                   const member_variable_>
+        member_variable_iterator;
+
+public:
+    variable() : value_(), type_index_(0), manager_(nullptr)
+    {
+    }
+
+    variable(const any& value,
+             std::size_t type_index,
+             const reflection_manager* manager)
+        : value_(value), type_index_(type_index), manager_(manager)
+    {
+    }
+
+public:
+    type_ type() const;
+
+    std::pair<member_function_iterator, member_function_iterator>
+    member_functions() const;
+
+    std::pair<member_variable_iterator, member_variable_iterator>
+    member_variables() const;
+
+private:
+    // holds type erased value
+    any value_;
+    // these identify the type erased value
+    std::size_t type_index_;
+    const reflection_manager* manager_;
+};
 }

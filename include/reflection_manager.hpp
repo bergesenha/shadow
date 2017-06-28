@@ -33,6 +33,10 @@ public:
     template <class Derived>
     friend class get_object_type_policy;
 
+    friend class variable;
+
+    friend std::ostream& operator<<(std::ostream&, const variable&);
+
     typedef type_ type;
     typedef info_iterator_<const type_info, const type> const_type_iterator;
 
@@ -77,17 +81,17 @@ public:
     template <class TypeInfoArrayHolder,
               class ConstructorInfoArrayHolder,
               class ConversionInfoArrayHolder,
-              class StringSerializationInfoArrayHolder,
               class FreeFunctionInfoArrayHolder,
               class MemberFunctionInfoArrayHolder,
-              class MemberVariableInfoArrayHolder>
+              class MemberVariableInfoArrayHolder,
+              class StringSerializationInfoArrayHolder>
     reflection_manager(TypeInfoArrayHolder,
                        ConstructorInfoArrayHolder,
                        ConversionInfoArrayHolder,
-                       StringSerializationInfoArrayHolder,
                        FreeFunctionInfoArrayHolder,
                        MemberFunctionInfoArrayHolder,
-                       MemberVariableInfoArrayHolder);
+                       MemberVariableInfoArrayHolder,
+                       StringSerializationInfoArrayHolder);
 
 private:
     template <class ArrayHolderType>
@@ -156,6 +160,9 @@ public:
               const_string_serializer_iterator>
     string_serializers() const;
 
+    template <class TypeUniverseList, class T>
+    variable static_create(const T& value) const;
+
 private:
     // pairs hold iterators to beginning and end of arrays of information
     // generated at compile time
@@ -164,15 +171,15 @@ private:
         constructor_info_range_;
     std::pair<const conversion_info*, const conversion_info*>
         conversion_info_range_;
-    std::pair<const string_serialization_info*,
-              const string_serialization_info*>
-        string_serialization_info_range_;
     std::pair<const free_function_info*, const free_function_info*>
         free_function_info_range_;
     std::pair<const member_function_info*, const member_function_info*>
         member_function_info_range_;
     std::pair<const member_variable_info*, const member_variable_info*>
         member_variable_info_range_;
+    std::pair<const string_serialization_info*,
+              const string_serialization_info*>
+        string_serialization_info_range_;
 
 
     // sorted index information
@@ -193,29 +200,29 @@ inline reflection_manager::reflection_manager() = default;
 template <class TypeInfoArrayHolder,
           class ConstructorInfoArrayHolder,
           class ConversionInfoArrayHolder,
-          class StringSerializationInfoArrayHolder,
           class FreeFunctionInfoArrayHolder,
           class MemberFunctionInfoArrayHolder,
-          class MemberVariableInfoArrayHolder>
+          class MemberVariableInfoArrayHolder,
+          class StringSerializationInfoArrayHolder>
 inline reflection_manager::reflection_manager(
     TypeInfoArrayHolder,
     ConstructorInfoArrayHolder,
     ConversionInfoArrayHolder,
-    StringSerializationInfoArrayHolder,
     FreeFunctionInfoArrayHolder,
     MemberFunctionInfoArrayHolder,
-    MemberVariableInfoArrayHolder)
+    MemberVariableInfoArrayHolder,
+    StringSerializationInfoArrayHolder)
     : type_info_range_(initialize_range(TypeInfoArrayHolder())),
       constructor_info_range_(initialize_range(ConstructorInfoArrayHolder())),
       conversion_info_range_(initialize_range(ConversionInfoArrayHolder())),
-      string_serialization_info_range_(
-          initialize_range(StringSerializationInfoArrayHolder())),
       free_function_info_range_(
           initialize_range(FreeFunctionInfoArrayHolder())),
       member_function_info_range_(
           initialize_range(MemberFunctionInfoArrayHolder())),
       member_variable_info_range_(
           initialize_range(MemberVariableInfoArrayHolder())),
+      string_serialization_info_range_(
+          initialize_range(StringSerializationInfoArrayHolder())),
       constructor_info_indices_by_type_(
           indices_by_type(constructor_info_range_,
                           TypeInfoArrayHolder(),
@@ -483,6 +490,17 @@ reflection_manager::string_serializers() const
                           const_string_serializer_iterator(
                               string_serialization_info_range_.second, this));
 }
+
+
+template <class TypeUniverseList, class T>
+inline variable
+reflection_manager::static_create(const T& value) const
+{
+    const auto type_index =
+        metamusil::t_list::index_of_type_v<TypeUniverseList, T>;
+
+    return variable(value, type_index, this);
+}
 }
 
 
@@ -512,5 +530,92 @@ get_parameter_types_policy<Derived>::parameter_types() const
                                       param_type_index_buffer,
                                       manager->type_info_range_.first,
                                       manager));
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// DEFINITIONS for variable
+inline type_
+variable::type() const
+{
+    return manager_->type_by_index(type_index_);
+}
+
+inline std::pair<variable::member_function_iterator,
+                 variable::member_function_iterator>
+variable::member_functions() const
+{
+    return std::make_pair(
+        member_function_iterator(
+            0,
+            manager_->member_function_info_indices_by_type_[type_index_].data(),
+            manager_->member_function_info_range_.first,
+            manager_),
+        member_function_iterator(
+            manager_->member_function_info_indices_by_type_[type_index_].size(),
+            manager_->member_function_info_indices_by_type_[type_index_].data(),
+            manager_->member_function_info_range_.first,
+            manager_));
+}
+
+
+inline std::pair<variable::member_variable_iterator,
+                 variable::member_variable_iterator>
+variable::member_variables() const
+{
+    return std::make_pair(
+        member_variable_iterator(
+            0,
+            manager_->member_variable_info_indices_by_type_[type_index_].data(),
+            manager_->member_variable_info_range_.first,
+            manager_),
+        member_variable_iterator(
+            manager_->member_variable_info_indices_by_type_[type_index_].size(),
+            manager_->member_variable_info_indices_by_type_[type_index_].data(),
+            manager_->member_variable_info_range_.first,
+            manager_));
+}
+
+
+inline std::ostream&
+operator<<(std::ostream& out, const variable& var)
+{
+    // try to find a string serializer in the reflection_manager of var
+    auto ssi_range = var.manager_->string_serialization_info_range_;
+    auto found = std::find_if(
+        ssi_range.first, ssi_range.second, [&var](const auto& ssi) {
+            return ssi.type_index == var.type_index_;
+        });
+
+    if(found != ssi_range.second)
+    {
+        out << found->serialize_bind_point(var.value_);
+    }
+    else
+    {
+        const auto& mem_var_info_indices =
+            var.manager_
+                ->member_variable_info_indices_by_type_[var.type_index_];
+        const auto mem_var_info_buffer =
+            var.manager_->member_variable_info_range_.first;
+
+        out << "{ ";
+
+        std::for_each(mem_var_info_indices.cbegin(),
+                      mem_var_info_indices.cend(),
+                      [&out, mem_var_info_buffer, &var](const auto index) {
+                          out << " " << mem_var_info_buffer[index].name << ": ";
+                          out << variable(
+                                     mem_var_info_buffer[index].get_bind_point(
+                                         var.value_),
+                                     mem_var_info_buffer[index].type_index,
+                                     var.manager_)
+                              << " ";
+                      });
+
+        out << " }";
+    }
+
+    return out;
 }
 }
