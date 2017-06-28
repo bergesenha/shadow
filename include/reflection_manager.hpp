@@ -602,18 +602,31 @@ operator<<(std::ostream& out, const variable& var)
 
         out << "{ ";
 
-        std::for_each(mem_var_info_indices.cbegin(),
-                      mem_var_info_indices.cend(),
-                      [&out, mem_var_info_buffer, &var](const auto index) {
-                          out << " " << mem_var_info_buffer[index].name << ": ";
-                          out << variable(
-                                     mem_var_info_buffer[index].get_bind_point(
-                                         var.value_),
-                                     mem_var_info_buffer[index].type_index,
-                                     var.manager_)
-                              << " ";
-                      });
+        if(mem_var_info_indices.size() > 0)
+        {
 
+            auto index_begin = mem_var_info_indices.cbegin();
+            auto index_end = mem_var_info_indices.cend();
+
+            out << "\"" << mem_var_info_buffer[*index_begin].name << "\":"
+                << variable(mem_var_info_buffer[*index_begin].get_bind_point(
+                                var.value_),
+                            mem_var_info_buffer[*index_begin].type_index,
+                            var.manager_);
+
+            ++index_begin;
+
+            std::for_each(
+                index_begin,
+                index_end,
+                [&out, mem_var_info_buffer, &var](const auto index) {
+                    out << ", \"" << mem_var_info_buffer[index].name << "\":";
+                    out << variable(
+                        mem_var_info_buffer[index].get_bind_point(var.value_),
+                        mem_var_info_buffer[index].type_index,
+                        var.manager_);
+                });
+        }
         out << " }";
     }
 
