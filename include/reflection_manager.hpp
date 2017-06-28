@@ -36,6 +36,7 @@ public:
     friend class variable;
 
     friend std::ostream& operator<<(std::ostream&, const variable&);
+    friend std::istream& operator>>(std::istream&, variable&);
 
     typedef type_ type;
     typedef info_iterator_<const type_info, const type> const_type_iterator;
@@ -617,5 +618,15 @@ operator<<(std::ostream& out, const variable& var)
     }
 
     return out;
+}
+
+inline std::istream&
+operator>>(std::istream& in, variable& var)
+{
+    std::string instring;
+    in >> instring;
+
+
+    return in;
 }
 }

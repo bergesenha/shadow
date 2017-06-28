@@ -245,4 +245,9 @@ main()
     std::cout << "\n\n\n";
     std::cout << my_contains_intholder_var.type() << ":\n"
               << my_contains_intholder_var << '\n';
+
+
+    std::cin >> my_int_var;
+
+    std::cout << my_int_var << '\n';
 }
