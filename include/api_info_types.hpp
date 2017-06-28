@@ -12,30 +12,6 @@ namespace shadow
 class reflection_manager;
 
 
-// holds one value with type/reflection information
-class variable
-{
-public:
-    variable() : value_(), type_index_(0), manager_(nullptr)
-    {
-    }
-
-    variable(const any& value,
-             std::size_t type_index,
-             const reflection_manager* manager)
-        : value_(value), type_index_(type_index), manager_(manager)
-    {
-    }
-
-private:
-    // holds type erased value
-    any value_;
-    // these identify the type erased value
-    std::size_t type_index_;
-    const reflection_manager* manager_;
-};
-
-
 template <class InfoType, template <class> class... Policies>
 class api_type_aggregator
     : public Policies<api_type_aggregator<InfoType, Policies...>>...
@@ -319,4 +295,28 @@ operator<<(std::ostream& out, const member_variable_& mv)
 
 typedef api_type_aggregator<string_serialization_info, get_type_policy>
     string_serializer_;
+
+
+// holds one value with type/reflection information
+class variable
+{
+public:
+    variable() : value_(), type_index_(0), manager_(nullptr)
+    {
+    }
+
+    variable(const any& value,
+             std::size_t type_index,
+             const reflection_manager* manager)
+        : value_(value), type_index_(type_index), manager_(manager)
+    {
+    }
+
+private:
+    // holds type erased value
+    any value_;
+    // these identify the type erased value
+    std::size_t type_index_;
+    const reflection_manager* manager_;
+};
 }
