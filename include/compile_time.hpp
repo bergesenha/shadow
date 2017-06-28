@@ -833,10 +833,10 @@ struct generate_array_of_string_serialization_info_holder
         type_info_array_holder(),                                              \
         constructor_info_array_holder(),                                       \
         conversion_info_array_holder(),                                        \
-        string_serialization_info_array_holder(),                              \
         free_function_info_array_holder(),                                     \
         member_function_info_array_holder(),                                   \
-        member_variable_info_array_holder()};                                  \
+        member_variable_info_array_holder(),                                   \
+        string_serialization_info_array_holder()};                             \
                                                                                \
     template <class TypeUniverseList, class T>                                 \
     shadow::variable static_create_binding(const T& val)                       \

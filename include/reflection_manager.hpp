@@ -79,17 +79,17 @@ public:
     template <class TypeInfoArrayHolder,
               class ConstructorInfoArrayHolder,
               class ConversionInfoArrayHolder,
-              class StringSerializationInfoArrayHolder,
               class FreeFunctionInfoArrayHolder,
               class MemberFunctionInfoArrayHolder,
-              class MemberVariableInfoArrayHolder>
+              class MemberVariableInfoArrayHolder,
+              class StringSerializationInfoArrayHolder>
     reflection_manager(TypeInfoArrayHolder,
                        ConstructorInfoArrayHolder,
                        ConversionInfoArrayHolder,
-                       StringSerializationInfoArrayHolder,
                        FreeFunctionInfoArrayHolder,
                        MemberFunctionInfoArrayHolder,
-                       MemberVariableInfoArrayHolder);
+                       MemberVariableInfoArrayHolder,
+                       StringSerializationInfoArrayHolder);
 
 private:
     template <class ArrayHolderType>
@@ -169,15 +169,15 @@ private:
         constructor_info_range_;
     std::pair<const conversion_info*, const conversion_info*>
         conversion_info_range_;
-    std::pair<const string_serialization_info*,
-              const string_serialization_info*>
-        string_serialization_info_range_;
     std::pair<const free_function_info*, const free_function_info*>
         free_function_info_range_;
     std::pair<const member_function_info*, const member_function_info*>
         member_function_info_range_;
     std::pair<const member_variable_info*, const member_variable_info*>
         member_variable_info_range_;
+    std::pair<const string_serialization_info*,
+              const string_serialization_info*>
+        string_serialization_info_range_;
 
 
     // sorted index information
@@ -198,29 +198,29 @@ inline reflection_manager::reflection_manager() = default;
 template <class TypeInfoArrayHolder,
           class ConstructorInfoArrayHolder,
           class ConversionInfoArrayHolder,
-          class StringSerializationInfoArrayHolder,
           class FreeFunctionInfoArrayHolder,
           class MemberFunctionInfoArrayHolder,
-          class MemberVariableInfoArrayHolder>
+          class MemberVariableInfoArrayHolder,
+          class StringSerializationInfoArrayHolder>
 inline reflection_manager::reflection_manager(
     TypeInfoArrayHolder,
     ConstructorInfoArrayHolder,
     ConversionInfoArrayHolder,
-    StringSerializationInfoArrayHolder,
     FreeFunctionInfoArrayHolder,
     MemberFunctionInfoArrayHolder,
-    MemberVariableInfoArrayHolder)
+    MemberVariableInfoArrayHolder,
+    StringSerializationInfoArrayHolder)
     : type_info_range_(initialize_range(TypeInfoArrayHolder())),
       constructor_info_range_(initialize_range(ConstructorInfoArrayHolder())),
       conversion_info_range_(initialize_range(ConversionInfoArrayHolder())),
-      string_serialization_info_range_(
-          initialize_range(StringSerializationInfoArrayHolder())),
       free_function_info_range_(
           initialize_range(FreeFunctionInfoArrayHolder())),
       member_function_info_range_(
           initialize_range(MemberFunctionInfoArrayHolder())),
       member_variable_info_range_(
           initialize_range(MemberVariableInfoArrayHolder())),
+      string_serialization_info_range_(
+          initialize_range(StringSerializationInfoArrayHolder())),
       constructor_info_indices_by_type_(
           indices_by_type(constructor_info_range_,
                           TypeInfoArrayHolder(),
