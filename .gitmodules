@@ -1,3 +1,7 @@
 [submodule "external/Catch"]
 	path = external/Catch
 	url = https://github.com/philsquared/Catch.git
+[submodule "external/metamusil"]
+	path = external/metamusil
+	url = https://github.com/bergesenha/metamusil.git
+	branch = master
