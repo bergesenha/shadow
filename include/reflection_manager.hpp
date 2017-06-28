@@ -35,6 +35,8 @@ public:
 
     friend class variable;
 
+    friend std::ostream& operator<<(std::ostream&, const variable&);
+
     typedef type_ type;
     typedef info_iterator_<const type_info, const type> const_type_iterator;
 
@@ -572,5 +574,27 @@ variable::member_variables() const
             manager_->member_variable_info_indices_by_type_[type_index_].data(),
             manager_->member_variable_info_range_.first,
             manager_));
+}
+
+
+inline std::ostream&
+operator<<(std::ostream& out, const variable& var)
+{
+    // try to find a string serializer in the reflection_manager of var
+    auto ssi_range = var.manager_->string_serialization_info_range_;
+    auto found = std::find_if(
+        ssi_range.first, ssi_range.second, [&var](const auto& ssi) {
+            return ssi.type_index == var.type_index_;
+        });
+
+    if(found != ssi_range.second)
+    {
+        out << found->serialize_bind_point(var.value_);
+    }
+    else
+    {
+    }
+
+    return out;
 }
 }

@@ -300,6 +300,8 @@ typedef api_type_aggregator<string_serialization_info, get_type_policy>
 // holds one value with type/reflection information
 class variable
 {
+    friend std::ostream& operator<<(std::ostream&, const variable&);
+
 public:
     typedef indexed_info_iterator_<const member_function_info,
                                    const member_function_>

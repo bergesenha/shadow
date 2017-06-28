@@ -207,15 +207,7 @@ main()
         myspace::manager.static_create<myspace::type_universe>(10);
 
     std::cout << "\n\n\n";
-    std::cout << my_int_var.type() << '\n';
-
-    for(auto i = my_int_var.member_functions().first;
-        i != my_int_var.member_functions().second;
-        ++i)
-    {
-        std::cout << *i << '\n';
-    }
-
+    std::cout << my_int_var.type() << ": " << my_int_var << '\n';
 
     auto my_intholder_var =
         myspace::manager.static_create<myspace::type_universe>(
@@ -223,23 +215,11 @@ main()
 
 
     std::cout << "\n\n\n";
-    std::cout << my_intholder_var.type() << '\n';
+    std::cout << my_intholder_var.type() << ": " << my_intholder_var << '\n';
 
-    for(auto i = my_intholder_var.member_functions().first;
-        i != my_intholder_var.member_functions().second;
-        ++i)
-    {
-        std::cout << *i << '\n';
-    }
-
-    for(auto i = my_intholder_var.member_variables().first;
-        i != my_intholder_var.member_variables().second;
-        ++i)
-    {
-        std::cout << *i << '\n';
-    }
 
     auto my_float_var = myspace::static_create<float>(24.5f);
 
-    std::cout << my_float_var.type() << '\n';
+    std::cout << "\n\n\n";
+    std::cout << my_float_var.type() << ": " << my_float_var << '\n';
 }
