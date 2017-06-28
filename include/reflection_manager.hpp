@@ -33,6 +33,8 @@ public:
     template <class Derived>
     friend class get_object_type_policy;
 
+    friend class variable;
+
     typedef type_ type;
     typedef info_iterator_<const type_info, const type> const_type_iterator;
 
@@ -512,5 +514,14 @@ get_parameter_types_policy<Derived>::parameter_types() const
                                       param_type_index_buffer,
                                       manager->type_info_range_.first,
                                       manager));
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// DEFINITIONS for variable
+inline type_
+variable::type() const
+{
+    return manager_->type_by_index(type_index_);
 }
 }

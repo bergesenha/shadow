@@ -312,6 +312,9 @@ public:
     {
     }
 
+public:
+    type_ type() const;
+
 private:
     // holds type erased value
     any value_;
