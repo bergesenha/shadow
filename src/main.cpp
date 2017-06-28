@@ -19,11 +19,11 @@ class intholder
 public:
     intholder() = default;
 
-    explicit intholder(int i) : i_(i), d_(0.0)
+    explicit intholder(int i) : i_(i), d_(0.0), mem_var1(i), mem_var2(0.0)
     {
     }
 
-    intholder(int i, double d) : i_(i), d_(d)
+    intholder(int i, double d) : i_(i), d_(d), mem_var1(i), mem_var2(d)
     {
     }
 
@@ -215,7 +215,7 @@ main()
 
 
     std::cout << "\n\n\n";
-    std::cout << my_intholder_var.type() << ": " << my_intholder_var << '\n';
+    std::cout << my_intholder_var << '\n';
 
 
     auto my_float_var = myspace::static_create<float>(24.5f);
