@@ -158,6 +158,9 @@ public:
               const_string_serializer_iterator>
     string_serializers() const;
 
+    template <class TypeUniverseList, class T>
+    variable static_create(const T& value) const;
+
 private:
     // pairs hold iterators to beginning and end of arrays of information
     // generated at compile time
@@ -484,6 +487,17 @@ reflection_manager::string_serializers() const
                               string_serialization_info_range_.first, this),
                           const_string_serializer_iterator(
                               string_serialization_info_range_.second, this));
+}
+
+
+template <class TypeUniverseList, class T>
+inline variable
+reflection_manager::static_create(const T& value) const
+{
+    const auto type_index =
+        metamusil::t_list::index_of_type_v<TypeUniverseList, T>;
+
+    return variable(value, type_index, this);
 }
 }
 
