@@ -538,4 +538,21 @@ variable::type() const
 {
     return manager_->type_by_index(type_index_);
 }
+
+inline std::pair<variable::member_function_iterator,
+                 variable::member_function_iterator>
+variable::member_functions() const
+{
+    return std::make_pair(
+        member_function_iterator(
+            0,
+            manager_->member_function_info_indices_by_type_[type_index_].data(),
+            manager_->member_function_info_range_.first,
+            manager_),
+        member_function_iterator(
+            manager_->member_function_info_indices_by_type_[type_index_].size(),
+            manager_->member_function_info_indices_by_type_[type_index_].data(),
+            manager_->member_function_info_range_.first,
+            manager_));
+}
 }

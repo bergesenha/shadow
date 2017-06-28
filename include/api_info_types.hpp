@@ -301,6 +301,11 @@ typedef api_type_aggregator<string_serialization_info, get_type_policy>
 class variable
 {
 public:
+    typedef indexed_info_iterator_<const member_function_info,
+                                   const member_function_>
+        member_function_iterator;
+
+public:
     variable() : value_(), type_index_(0), manager_(nullptr)
     {
     }
@@ -314,6 +319,9 @@ public:
 
 public:
     type_ type() const;
+
+    std::pair<member_function_iterator, member_function_iterator>
+    member_functions() const;
 
 private:
     // holds type erased value

@@ -202,4 +202,33 @@ main()
     {
         std::cout << i->get_type() << '\n';
     }
+
+    auto my_int_var =
+        myspace::manager.static_create<myspace::type_universe>(10);
+
+    std::cout << "\n\n\n";
+    std::cout << my_int_var.type() << '\n';
+
+    for(auto i = my_int_var.member_functions().first;
+        i != my_int_var.member_functions().second;
+        ++i)
+    {
+        std::cout << *i << '\n';
+    }
+
+
+    auto my_intholder_var =
+        myspace::manager.static_create<myspace::type_universe>(
+            intholder(13, 13.4));
+
+
+    std::cout << "\n\n\n";
+    std::cout << my_intholder_var.type() << '\n';
+
+    for(auto i = my_intholder_var.member_functions().first;
+        i != my_intholder_var.member_functions().second;
+        ++i)
+    {
+        std::cout << *i << '\n';
+    }
 }
