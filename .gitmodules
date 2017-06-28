@@ -4,5 +4,4 @@
 [submodule "external/metamusil"]
 	path = external/metamusil
 	url = https://github.com/bergesenha/metamusil.git
-    ignore = all
 	branch = master
