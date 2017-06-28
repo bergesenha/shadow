@@ -555,4 +555,22 @@ variable::member_functions() const
             manager_->member_function_info_range_.first,
             manager_));
 }
+
+
+inline std::pair<variable::member_variable_iterator,
+                 variable::member_variable_iterator>
+variable::member_variables() const
+{
+    return std::make_pair(
+        member_variable_iterator(
+            0,
+            manager_->member_variable_info_indices_by_type_[type_index_].data(),
+            manager_->member_variable_info_range_.first,
+            manager_),
+        member_variable_iterator(
+            manager_->member_variable_info_indices_by_type_[type_index_].size(),
+            manager_->member_variable_info_indices_by_type_[type_index_].data(),
+            manager_->member_variable_info_range_.first,
+            manager_));
+}
 }

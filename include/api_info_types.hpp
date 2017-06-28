@@ -305,6 +305,10 @@ public:
                                    const member_function_>
         member_function_iterator;
 
+    typedef indexed_info_iterator_<const member_variable_info,
+                                   const member_variable_>
+        member_variable_iterator;
+
 public:
     variable() : value_(), type_index_(0), manager_(nullptr)
     {
@@ -322,6 +326,9 @@ public:
 
     std::pair<member_function_iterator, member_function_iterator>
     member_functions() const;
+
+    std::pair<member_variable_iterator, member_variable_iterator>
+    member_variables() const;
 
 private:
     // holds type erased value

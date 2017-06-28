@@ -232,6 +232,13 @@ main()
         std::cout << *i << '\n';
     }
 
+    for(auto i = my_intholder_var.member_variables().first;
+        i != my_intholder_var.member_variables().second;
+        ++i)
+    {
+        std::cout << *i << '\n';
+    }
+
     auto my_float_var = myspace::static_create<float>(24.5f);
 
     std::cout << my_float_var.type() << '\n';
