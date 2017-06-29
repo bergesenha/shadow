@@ -257,4 +257,6 @@ main()
 
     int_stream >> my_int_var;
     float_stream >> my_float_var;
+
+    std::cout << my_int_var << " " << my_float_var << "\n";
 }

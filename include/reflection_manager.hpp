@@ -639,6 +639,21 @@ operator>>(std::istream& in, variable& var)
     std::string instring;
     in >> instring;
 
+    auto ssi_pair = var.manager_->string_serialization_info_range_;
+
+    // attempt to find fundamental type string serializer
+    auto found =
+        std::find_if(ssi_pair.first, ssi_pair.second, [&var](const auto& ssi) {
+            return ssi.type_index == var.type_index_;
+        });
+
+    if(found != ssi_pair.second)
+    {
+        var.value_ = found->deserialize_bind_point(instring);
+    }
+    else
+    {
+    }
 
     return in;
 }
