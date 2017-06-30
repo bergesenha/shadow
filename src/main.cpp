@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <sstream>
 
 #include <compile_time.hpp>
 #include <algorithm>
@@ -19,11 +20,11 @@ class intholder
 public:
     intholder() = default;
 
-    explicit intholder(int i) : i_(i), d_(0.0)
+    explicit intholder(int i) : i_(i), d_(0.0), mem_var1(i), mem_var2(0.0)
     {
     }
 
-    intholder(int i, double d) : i_(i), d_(d)
+    intholder(int i, double d) : i_(i), d_(d), mem_var1(i), mem_var2(d)
     {
     }
 
@@ -61,6 +62,16 @@ private:
 };
 
 
+struct contains_intholder
+{
+    contains_intholder(float f, int i, double d) : f_(f), ih_(i, d)
+    {
+    }
+
+    float f_;
+    intholder ih_;
+};
+
 void
 free_function1(int i)
 {
@@ -97,6 +108,7 @@ namespace myspace
 REGISTER_TYPE_BEGIN()
 
 REGISTER_TYPE(intholder)
+REGISTER_TYPE(contains_intholder)
 REGISTER_TYPE_END()
 
 
@@ -105,6 +117,7 @@ REGISTER_CONSTRUCTOR_BEGIN()
 REGISTER_CONSTRUCTOR(intholder)
 REGISTER_CONSTRUCTOR(intholder, int)
 REGISTER_CONSTRUCTOR(intholder, int, double)
+REGISTER_CONSTRUCTOR(contains_intholder, float, int, double)
 
 REGISTER_CONSTRUCTOR_END()
 
@@ -137,6 +150,9 @@ REGISTER_MEMBER_VARIABLE_BEGIN()
 REGISTER_MEMBER_VARIABLE(intholder, mem_var1)
 REGISTER_MEMBER_VARIABLE(intholder, mem_var2)
 
+REGISTER_MEMBER_VARIABLE(contains_intholder, f_)
+REGISTER_MEMBER_VARIABLE(contains_intholder, ih_)
+
 REGISTER_MEMBER_VARIABLE_END()
 
 SHADOW_INIT()
@@ -151,55 +167,107 @@ typedef shadow::api_type_aggregator<shadow::type_info,
 int
 main()
 {
-    std::cout << "Types and Constructors:\n";
-    for(auto i = myspace::manager.types().first;
-        i != myspace::manager.types().second;
-        ++i)
+    auto an_intholder =
+        myspace::static_create<intholder>(intholder(100, 200.4));
+
+    std::cout << an_intholder << '\n';
+
+    auto mem_var_range = an_intholder.member_variables();
+
+    for(; mem_var_range.first != mem_var_range.second; ++mem_var_range.first)
     {
-        std::cout << i->name() << ":\n";
-        for(auto j = myspace::manager.constructors_by_type(*i).first;
-            j != myspace::manager.constructors_by_type(*i).second;
-            ++j)
-        {
-            std::cout << "\t" << *j << '\n';
-        }
-        for(auto j = myspace::manager.type_conversions_by_type(*i).first;
-            j != myspace::manager.type_conversions_by_type(*i).second;
-            ++j)
-        {
-            std::cout << '\t' << j->from_type() << " --> " << j->to_type()
-                      << '\n';
-        }
-        for(auto j = myspace::manager.member_functions_by_type(*i).first;
-            j != myspace::manager.member_functions_by_type(*i).second;
-            ++j)
-        {
-            std::cout << "\t" << *j << '\n';
-        }
-        for(auto j = myspace::manager.member_variables_by_type(*i).first;
-            j != myspace::manager.member_variables_by_type(*i).second;
-            ++j)
-        {
-            std::cout << "\t" << *j << '\n';
-        }
-        std::cout << '\n';
+        std::cout << *mem_var_range.first << " == ";
+        std::cout << an_intholder.get_member_variable(mem_var_range.first)
+                  << '\n';
     }
 
-
     std::cout << "\n\n\nFree Functions:\n";
-    for(auto i = myspace::manager.free_functions().first;
-        i != myspace::manager.free_functions().second;
+    auto free_function_range = myspace::manager.free_functions();
+    for(auto i = free_function_range.first; i != free_function_range.second;
         ++i)
     {
         std::cout << *i << '\n';
     }
 
+    // find free function 'hello'
+    auto find_hello = std::find_if(
+        free_function_range.first,
+        free_function_range.second,
+        [](const auto& ffi) { return ffi.name() == std::string("hello"); });
 
-    std::cout << "\n\n\nString Serializers:\n";
-    for(auto i = myspace::manager.string_serializers().first;
-        i != myspace::manager.string_serializers().second;
-        ++i)
+    if(find_hello != free_function_range.second)
     {
-        std::cout << i->get_type() << '\n';
+        auto hello = *find_hello;
+
+
+        std::cout << "\n\nCalling free function 'hello'\n";
+        auto return_value = hello();
+
+        std::cout << "returned value: " << return_value << '\n';
+    }
+
+    auto find_mult = std::find_if(
+        free_function_range.first,
+        free_function_range.second,
+        [](const auto& ffi) { return ffi.name() == std::string("mult"); });
+
+    if(find_mult != free_function_range.second)
+    {
+        auto mult = *find_mult;
+
+        std::cout << "\n\nCalling free function 'mult'\n";
+
+        std::vector<shadow::variable> args;
+        args.push_back(myspace::static_create<double>(34.2));
+        args.push_back(myspace::static_create<int>(3));
+
+        std::vector<shadow::variable> wrong_args;
+        wrong_args.push_back(myspace::static_create<float>(34.2f));
+        wrong_args.push_back(myspace::static_create<std::size_t>(3ul));
+
+        auto return_value = mult(args.begin(), args.end());
+        std::cout << "return value: " << return_value << '\n';
+
+        auto return_value2 = mult.call_unsafe(args.begin(), args.end());
+        std::cout << "return value: " << return_value2 << '\n';
+
+
+        auto return_value3 =
+            mult.call_with_conversion(wrong_args.begin(), wrong_args.end());
+        std::cout << "return value: " << return_value3 << '\n';
+    }
+
+    auto find_overload1_int = std::find_if(
+        free_function_range.first,
+        free_function_range.second,
+        [](const auto& ff) {
+
+            return ff.name() == std::string("overload1") &&
+                   ff.parameter_types().first->name() == std::string("int");
+        });
+
+    if(find_overload1_int != free_function_range.second)
+    {
+
+        std::cout << "\n\nCalling free function 'overload1(int)'\n";
+
+        auto return_value = find_overload1_int->call_static_unsafe(23);
+
+        std::cout << return_value << '\n';
+
+        try
+        {
+            find_overload1_int->call_static_safe<myspace::type_universe>(23,
+                                                                         30);
+        }
+        catch(const shadow::argument_error& exc)
+        {
+            std::cout << "caught argument_error: " << exc.what() << '\n';
+        }
+
+        auto return_value2 =
+            find_overload1_int->call_static_safe<myspace::type_universe>(50);
+
+        std::cout << return_value2 << '\n';
     }
 }
