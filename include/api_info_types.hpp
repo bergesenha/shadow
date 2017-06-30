@@ -3,9 +3,12 @@
 #include <string>
 #include <utility>
 #include <ostream>
+#include <vector>
+#include <algorithm>
 
 #include "reflection_info.hpp"
 #include "info_iterator.hpp"
+#include "exceptions.hpp"
 
 namespace shadow
 {
@@ -201,35 +204,6 @@ public:
     }
 };
 
-typedef api_type_aggregator<free_function_info,
-                            get_name_policy,
-                            get_num_parameters_policy,
-                            get_parameter_types_policy,
-                            get_return_type_policy>
-    free_function_;
-
-inline std::ostream&
-operator<<(std::ostream& out, const free_function_& ff)
-{
-    out << ff.return_type() << " (";
-
-    if(ff.num_parameters() > 0)
-    {
-        auto param_pair = ff.parameter_types();
-        out << *param_pair.first;
-
-        for(++param_pair.first; param_pair.first != param_pair.second;
-            ++param_pair.first)
-        {
-            out << ", " << *param_pair.first;
-        }
-    }
-
-    out << ')';
-
-    return out;
-}
-
 
 template <class Derived>
 class get_object_type_policy
@@ -305,6 +279,9 @@ class variable
     friend std::ostream& operator<<(std::ostream&, const variable&);
     friend std::istream& operator>>(std::istream&, variable&);
 
+    template <class Derived>
+    friend class call_free_function_safe;
+
 public:
     typedef indexed_info_iterator_<const member_function_info,
                                    const member_function_>
@@ -360,4 +337,79 @@ private:
     std::size_t type_index_;
     const reflection_manager* manager_;
 };
+
+
+template <class Derived>
+class call_free_function_safe
+{
+public:
+    template <class Iterator>
+    variable
+    operator()(Iterator arg_begin, Iterator arg_end) const
+    {
+
+        const auto info = static_cast<const Derived*>(this)->info_;
+
+
+        // construct argument buffer
+        std::vector<any> arg_buffer;
+        arg_buffer.reserve(info->num_parameters);
+
+        std::transform(arg_begin,
+                       arg_end,
+                       std::back_inserter(arg_buffer),
+                       [](const variable& var) { return var.value_; });
+
+        // check arguments
+        if(arg_buffer.size() != info->num_parameters)
+        {
+            throw argument_error("wrong number of arguments provided");
+        }
+
+        for(auto i = 0ul; i < info->num_parameters; ++i)
+        {
+            if(info->parameter_type_indices[i] != arg_begin->type_index_)
+            {
+                throw argument_error("wrong argument type");
+            }
+
+            ++arg_begin;
+        }
+
+        return variable(info->bind_point(arg_buffer.data()),
+                        info->return_type_index,
+                        static_cast<const Derived*>(this)->manager_);
+    }
+};
+
+
+typedef api_type_aggregator<free_function_info,
+                            get_name_policy,
+                            get_num_parameters_policy,
+                            get_parameter_types_policy,
+                            get_return_type_policy,
+                            call_free_function_safe>
+    free_function_;
+
+inline std::ostream&
+operator<<(std::ostream& out, const free_function_& ff)
+{
+    out << ff.return_type() << ' ' << ff.name() << '(';
+
+    if(ff.num_parameters() > 0)
+    {
+        auto param_pair = ff.parameter_types();
+        out << *param_pair.first;
+
+        for(++param_pair.first; param_pair.first != param_pair.second;
+            ++param_pair.first)
+        {
+            out << ", " << *param_pair.first;
+        }
+    }
+
+    out << ')';
+
+    return out;
+}
 }

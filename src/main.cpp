@@ -180,4 +180,49 @@ main()
         std::cout << an_intholder.get_member_variable(mem_var_range.first)
                   << '\n';
     }
+
+    std::cout << "\n\n\nFree Functions:\n";
+    auto free_function_range = myspace::manager.free_functions();
+    for(auto i = free_function_range.first; i != free_function_range.second;
+        ++i)
+    {
+        std::cout << *i << '\n';
+    }
+
+    // find free function 'hello'
+    auto find_hello = std::find_if(
+        free_function_range.first,
+        free_function_range.second,
+        [](const auto& ffi) { return ffi.name() == std::string("hello"); });
+
+    if(find_hello != free_function_range.second)
+    {
+        auto hello = *find_hello;
+
+        shadow::variable void_var;
+
+        std::cout << "\n\nCalling free function 'hello'\n";
+        auto return_value = hello(&void_var, &void_var);
+
+        std::cout << "returned value: " << return_value << '\n';
+    }
+
+    auto find_mult = std::find_if(
+        free_function_range.first,
+        free_function_range.second,
+        [](const auto& ffi) { return ffi.name() == std::string("mult"); });
+
+    if(find_mult != free_function_range.second)
+    {
+        auto mult = *find_mult;
+
+        std::cout << "\n\nCalling free function 'mult'\n";
+        std::vector<shadow::variable> args;
+
+        args.push_back(myspace::static_create<double>(34.2));
+        args.push_back(myspace::static_create<int>(3));
+
+        auto return_value = mult(args.begin(), args.end());
+        std::cout << "return value: " << return_value << '\n';
+    }
 }
