@@ -242,5 +242,20 @@ main()
         auto return_value = find_overload1_int->call_static_unsafe(23);
 
         std::cout << return_value << '\n';
+
+        try
+        {
+            find_overload1_int->call_static_safe<myspace::type_universe>(23,
+                                                                         30);
+        }
+        catch(const shadow::argument_error& exc)
+        {
+            std::cout << "caught argument_error: " << exc.what() << '\n';
+        }
+
+        auto return_value2 =
+            find_overload1_int->call_static_safe<myspace::type_universe>(50);
+
+        std::cout << return_value2 << '\n';
     }
 }

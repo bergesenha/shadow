@@ -6,6 +6,9 @@
 #include <vector>
 #include <algorithm>
 
+
+#include <integer_sequence.hpp>
+
 #include "reflection_info.hpp"
 #include "info_iterator.hpp"
 #include "exceptions.hpp"
@@ -408,6 +411,42 @@ public:
     call_static_unsafe(Args... args) const
     {
         const auto info = static_cast<const Derived*>(this)->info_;
+
+        any arg_array[] = {args...};
+
+        return variable(info->bind_point(arg_array),
+                        info->return_type_index,
+                        static_cast<const Derived*>(this)->manager_);
+    }
+
+    template <class TypeUniverseList, class... Args>
+    variable
+    call_static_safe(Args... args) const
+    {
+        const auto info = static_cast<const Derived*>(this)->info_;
+
+        typedef metamusil::t_list::type_list<Args...> given_types;
+        typedef metamusil::t_list::order_t<given_types, TypeUniverseList>
+            given_types_indices;
+        typedef metamusil::int_seq::integer_sequence_to_array<
+            given_types_indices>
+            given_types_index_array_holder;
+
+        if(std::extent<decltype(
+               given_types_index_array_holder::value)>::value !=
+           info->num_parameters)
+        {
+            throw argument_error("wrong number of arguments");
+        }
+
+        for(auto i = 0; i < info->num_parameters; ++i)
+        {
+            if(given_types_index_array_holder::value[i] !=
+               info->parameter_type_indices[i])
+            {
+                throw argument_error("wrong argument type");
+            }
+        }
 
         any arg_array[] = {args...};
 
