@@ -216,16 +216,25 @@ main()
         auto mult = *find_mult;
 
         std::cout << "\n\nCalling free function 'mult'\n";
-        std::vector<shadow::variable> args;
 
+        std::vector<shadow::variable> args;
         args.push_back(myspace::static_create<double>(34.2));
         args.push_back(myspace::static_create<int>(3));
+
+        std::vector<shadow::variable> wrong_args;
+        wrong_args.push_back(myspace::static_create<float>(34.2f));
+        wrong_args.push_back(myspace::static_create<std::size_t>(3ul));
 
         auto return_value = mult(args.begin(), args.end());
         std::cout << "return value: " << return_value << '\n';
 
         auto return_value2 = mult.call_unsafe(args.begin(), args.end());
         std::cout << "return value: " << return_value2 << '\n';
+
+
+        auto return_value3 =
+            mult.call_with_conversion(wrong_args.begin(), wrong_args.end());
+        std::cout << "return value: " << return_value3 << '\n';
     }
 
     auto find_overload1_int = std::find_if(

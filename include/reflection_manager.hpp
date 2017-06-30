@@ -35,6 +35,9 @@ public:
     template <class Derived>
     friend class get_object_type_policy;
 
+    template <class Derived>
+    friend class call_free_function;
+
     friend class variable;
 
     friend std::ostream& operator<<(std::ostream&, const variable&);
@@ -583,6 +586,11 @@ variable::member_variables() const
 inline std::ostream&
 operator<<(std::ostream& out, const variable& var)
 {
+    if(!var.manager_)
+    {
+        out << "empty";
+        return out;
+    }
     // try to find a string serializer in the reflection_manager of var
     auto ssi_range = var.manager_->string_serialization_info_range_;
     auto found = std::find_if(

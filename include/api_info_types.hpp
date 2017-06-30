@@ -466,6 +466,61 @@ public:
                         info->return_type_index,
                         static_cast<const Derived*>(this)->manager_);
     }
+
+    template <class Iterator>
+    variable
+    call_with_conversion(Iterator arg_begin, Iterator arg_end) const
+    {
+        const auto info = static_cast<const Derived*>(this)->info_;
+        const auto manager = static_cast<const Derived*>(this)->manager_;
+
+        const auto num_params = info->num_parameters;
+
+        if(num_params != std::distance(arg_begin, arg_end))
+        {
+            throw argument_error("wrong number of arguments provided");
+        }
+
+        std::vector<any> arg_buffer;
+        arg_buffer.reserve(num_params);
+
+        std::transform(
+            arg_begin,
+            arg_end,
+            info->parameter_type_indices,
+            std::back_inserter(arg_buffer),
+            [manager](const auto& var, const auto to_index) {
+                const auto from_index = var.type_index_;
+
+                // TODO: implement convert_to in class 'variable'
+                auto found = std::find_if(
+                    manager->conversion_info_indices_by_type_[from_index]
+                        .begin(),
+                    manager->conversion_info_indices_by_type_[from_index].end(),
+                    [to_index, manager](auto converter_index) {
+                        return manager->conversion_info_range_
+                                   .first[converter_index]
+                                   .to_type_index == to_index;
+                    });
+
+                if(found ==
+                   manager->conversion_info_indices_by_type_[from_index].end())
+                {
+                    throw argument_error("conversion of argument not possible");
+                }
+
+                const auto found_conversion_index = *found;
+
+                return manager->conversion_info_range_
+                    .first[found_conversion_index]
+                    .bind_point(var.value_);
+
+            });
+
+        return variable(info->bind_point(arg_buffer.data()),
+                        info->return_type_index,
+                        manager);
+    }
 };
 
 
