@@ -167,96 +167,17 @@ typedef shadow::api_type_aggregator<shadow::type_info,
 int
 main()
 {
-    std::cout << "Types and Constructors:\n";
-    for(auto i = myspace::manager.types().first;
-        i != myspace::manager.types().second;
-        ++i)
+    auto an_intholder =
+        myspace::static_create<intholder>(intholder(100, 200.4));
+
+    std::cout << an_intholder << '\n';
+
+    auto mem_var_range = an_intholder.member_variables();
+
+    for(; mem_var_range.first != mem_var_range.second; ++mem_var_range.first)
     {
-        std::cout << i->name() << ":\n";
-        for(auto j = myspace::manager.constructors_by_type(*i).first;
-            j != myspace::manager.constructors_by_type(*i).second;
-            ++j)
-        {
-            std::cout << "\t" << *j << '\n';
-        }
-        for(auto j = myspace::manager.type_conversions_by_type(*i).first;
-            j != myspace::manager.type_conversions_by_type(*i).second;
-            ++j)
-        {
-            std::cout << '\t' << j->from_type() << " --> " << j->to_type()
-                      << '\n';
-        }
-        for(auto j = myspace::manager.member_functions_by_type(*i).first;
-            j != myspace::manager.member_functions_by_type(*i).second;
-            ++j)
-        {
-            std::cout << "\t" << *j << '\n';
-        }
-        for(auto j = myspace::manager.member_variables_by_type(*i).first;
-            j != myspace::manager.member_variables_by_type(*i).second;
-            ++j)
-        {
-            std::cout << "\t" << *j << '\n';
-        }
-        std::cout << '\n';
+        std::cout << *mem_var_range.first << " == ";
+        std::cout << an_intholder.get_member_variable(mem_var_range.first)
+                  << '\n';
     }
-
-
-    std::cout << "\n\n\nFree Functions:\n";
-    for(auto i = myspace::manager.free_functions().first;
-        i != myspace::manager.free_functions().second;
-        ++i)
-    {
-        std::cout << *i << '\n';
-    }
-
-
-    std::cout << "\n\n\nString Serializers:\n";
-    for(auto i = myspace::manager.string_serializers().first;
-        i != myspace::manager.string_serializers().second;
-        ++i)
-    {
-        std::cout << i->get_type() << '\n';
-    }
-
-    auto my_int_var =
-        myspace::manager.static_create<myspace::type_universe>(10);
-
-    std::cout << "\n\n\n";
-    std::cout << my_int_var.type() << ":\n" << my_int_var << '\n';
-
-    auto my_intholder_var =
-        myspace::manager.static_create<myspace::type_universe>(
-            intholder(13, 13.4));
-
-
-    std::cout << "\n\n\n";
-    std::cout << my_intholder_var << '\n';
-
-
-    auto my_float_var = myspace::static_create<float>(24.5f);
-
-    std::cout << "\n\n\n";
-    std::cout << my_float_var.type() << ":\n" << my_float_var << '\n';
-
-
-    auto my_contains_intholder_var = myspace::static_create<contains_intholder>(
-        contains_intholder(3.4f, 3, 100.25));
-
-    std::cout << "\n\n\n";
-    std::cout << my_contains_intholder_var.type() << ":\n"
-              << my_contains_intholder_var << '\n';
-
-    std::cout << "\n\n\n";
-
-    std::string intstring("123");
-    std::string floatstring("123.5");
-    std::istringstream int_stream(intstring);
-    std::istringstream float_stream(floatstring);
-
-
-    int_stream >> my_int_var;
-    float_stream >> my_float_var;
-
-    std::cout << my_int_var << " " << my_float_var << "\n";
 }

@@ -3,6 +3,8 @@
 #include <utility>
 #include <vector>
 #include <algorithm>
+#include <ostream>
+#include <istream>
 
 #include "reflection_info.hpp"
 #include "info_iterator.hpp"

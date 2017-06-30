@@ -16,6 +16,8 @@ template <class InfoType, template <class> class... Policies>
 class api_type_aggregator
     : public Policies<api_type_aggregator<InfoType, Policies...>>...
 {
+    friend class variable;
+
 public:
     api_type_aggregator() : info_(nullptr), manager_(nullptr)
     {
@@ -308,8 +310,9 @@ public:
                                    const member_function_>
         member_function_iterator;
 
+    typedef member_variable_ member_variable;
     typedef indexed_info_iterator_<const member_variable_info,
-                                   const member_variable_>
+                                   const member_variable>
         member_variable_iterator;
 
 public:
@@ -324,6 +327,7 @@ public:
     {
     }
 
+
 public:
     type_ type() const;
 
@@ -332,6 +336,22 @@ public:
 
     std::pair<member_variable_iterator, member_variable_iterator>
     member_variables() const;
+
+    variable
+    get_member_variable(const member_variable& mv) const
+    {
+        auto bind_point = mv.info_->get_bind_point;
+
+        return variable(bind_point(value_), mv.info_->type_index, manager_);
+    }
+
+    variable
+    get_member_variable(member_variable_iterator mv_it) const
+    {
+        auto bind_point = mv_it->info_->get_bind_point;
+
+        return variable(bind_point(value_), mv_it->info_->type_index, manager_);
+    }
 
 private:
     // holds type erased value
