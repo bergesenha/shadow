@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <sstream>
 
 #include <compile_time.hpp>
 #include <algorithm>
@@ -245,4 +246,17 @@ main()
     std::cout << "\n\n\n";
     std::cout << my_contains_intholder_var.type() << ":\n"
               << my_contains_intholder_var << '\n';
+
+    std::cout << "\n\n\n";
+
+    std::string intstring("123");
+    std::string floatstring("123.5");
+    std::istringstream int_stream(intstring);
+    std::istringstream float_stream(floatstring);
+
+
+    int_stream >> my_int_var;
+    float_stream >> my_float_var;
+
+    std::cout << my_int_var << " " << my_float_var << "\n";
 }

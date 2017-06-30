@@ -36,6 +36,7 @@ public:
     friend class variable;
 
     friend std::ostream& operator<<(std::ostream&, const variable&);
+    friend std::istream& operator>>(std::istream&, variable&);
 
     typedef type_ type;
     typedef info_iterator_<const type_info, const type> const_type_iterator;
@@ -601,21 +602,60 @@ operator<<(std::ostream& out, const variable& var)
 
         out << "{ ";
 
-        std::for_each(mem_var_info_indices.cbegin(),
-                      mem_var_info_indices.cend(),
-                      [&out, mem_var_info_buffer, &var](const auto index) {
-                          out << " " << mem_var_info_buffer[index].name << ": ";
-                          out << variable(
-                                     mem_var_info_buffer[index].get_bind_point(
-                                         var.value_),
-                                     mem_var_info_buffer[index].type_index,
-                                     var.manager_)
-                              << " ";
-                      });
+        if(mem_var_info_indices.size() > 0)
+        {
 
+            auto index_begin = mem_var_info_indices.cbegin();
+            auto index_end = mem_var_info_indices.cend();
+
+            out << "\"" << mem_var_info_buffer[*index_begin].name << "\":"
+                << variable(mem_var_info_buffer[*index_begin].get_bind_point(
+                                var.value_),
+                            mem_var_info_buffer[*index_begin].type_index,
+                            var.manager_);
+
+            ++index_begin;
+
+            std::for_each(
+                index_begin,
+                index_end,
+                [&out, mem_var_info_buffer, &var](const auto index) {
+                    out << ", \"" << mem_var_info_buffer[index].name << "\":";
+                    out << variable(
+                        mem_var_info_buffer[index].get_bind_point(var.value_),
+                        mem_var_info_buffer[index].type_index,
+                        var.manager_);
+                });
+        }
         out << " }";
     }
 
     return out;
+}
+
+inline std::istream&
+operator>>(std::istream& in, variable& var)
+{
+
+    auto ssi_pair = var.manager_->string_serialization_info_range_;
+
+    // attempt to find fundamental type string serializer
+    auto found =
+        std::find_if(ssi_pair.first, ssi_pair.second, [&var](const auto& ssi) {
+            return ssi.type_index == var.type_index_;
+        });
+
+    if(found != ssi_pair.second)
+    {
+        std::string instring;
+        in >> instring;
+
+        var.value_ = found->deserialize_bind_point(instring);
+    }
+    else
+    {
+    }
+
+    return in;
 }
 }
