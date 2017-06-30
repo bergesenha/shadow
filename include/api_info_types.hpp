@@ -201,35 +201,6 @@ public:
     }
 };
 
-typedef api_type_aggregator<free_function_info,
-                            get_name_policy,
-                            get_num_parameters_policy,
-                            get_parameter_types_policy,
-                            get_return_type_policy>
-    free_function_;
-
-inline std::ostream&
-operator<<(std::ostream& out, const free_function_& ff)
-{
-    out << ff.return_type() << " (";
-
-    if(ff.num_parameters() > 0)
-    {
-        auto param_pair = ff.parameter_types();
-        out << *param_pair.first;
-
-        for(++param_pair.first; param_pair.first != param_pair.second;
-            ++param_pair.first)
-        {
-            out << ", " << *param_pair.first;
-        }
-    }
-
-    out << ')';
-
-    return out;
-}
-
 
 template <class Derived>
 class get_object_type_policy
@@ -360,4 +331,34 @@ private:
     std::size_t type_index_;
     const reflection_manager* manager_;
 };
+
+typedef api_type_aggregator<free_function_info,
+                            get_name_policy,
+                            get_num_parameters_policy,
+                            get_parameter_types_policy,
+                            get_return_type_policy,
+                            call_free_function_safe>
+    free_function_;
+
+inline std::ostream&
+operator<<(std::ostream& out, const free_function_& ff)
+{
+    out << ff.return_type() << ' ' << ff.name() << '(';
+
+    if(ff.num_parameters() > 0)
+    {
+        auto param_pair = ff.parameter_types();
+        out << *param_pair.first;
+
+        for(++param_pair.first; param_pair.first != param_pair.second;
+            ++param_pair.first)
+        {
+            out << ", " << *param_pair.first;
+        }
+    }
+
+    out << ')';
+
+    return out;
+}
 }
