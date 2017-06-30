@@ -399,12 +399,32 @@ public:
 };
 
 
+template <class Derived>
+class call_free_function_static
+{
+public:
+    template <class... Args>
+    variable
+    call_static_unsafe(Args... args) const
+    {
+        const auto info = static_cast<const Derived*>(this)->info_;
+
+        any arg_array[] = {args...};
+
+        return variable(info->bind_point(arg_array),
+                        info->return_type_index,
+                        static_cast<const Derived*>(this)->manager_);
+    }
+};
+
+
 typedef api_type_aggregator<free_function_info,
                             get_name_policy,
                             get_num_parameters_policy,
                             get_parameter_types_policy,
                             get_return_type_policy,
-                            call_free_function_safe>
+                            call_free_function_safe,
+                            call_free_function_static>
     free_function_;
 
 inline std::ostream&

@@ -224,4 +224,23 @@ main()
         auto return_value = mult(args.begin(), args.end());
         std::cout << "return value: " << return_value << '\n';
     }
+
+    auto find_overload1_int = std::find_if(
+        free_function_range.first,
+        free_function_range.second,
+        [](const auto& ff) {
+
+            return ff.name() == std::string("overload1") &&
+                   ff.parameter_types().first->name() == std::string("int");
+        });
+
+    if(find_overload1_int != free_function_range.second)
+    {
+
+        std::cout << "\n\nCalling free function 'overload1(int)'\n";
+
+        auto return_value = find_overload1_int->call_static_unsafe(23);
+
+        std::cout << return_value << '\n';
+    }
 }
