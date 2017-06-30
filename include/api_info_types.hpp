@@ -283,7 +283,7 @@ class variable
     friend std::istream& operator>>(std::istream&, variable&);
 
     template <class Derived>
-    friend class call_free_function_safe;
+    friend class call_free_function;
 
 public:
     typedef indexed_info_iterator_<const member_function_info,
@@ -343,9 +343,59 @@ private:
 
 
 template <class Derived>
-class call_free_function_safe
+class call_free_function
 {
 public:
+    template <class... Args>
+    variable
+    call_static_unsafe(Args... args) const
+    {
+        const auto info = static_cast<const Derived*>(this)->info_;
+
+        any arg_array[] = {args...};
+
+        return variable(info->bind_point(arg_array),
+                        info->return_type_index,
+                        static_cast<const Derived*>(this)->manager_);
+    }
+
+    template <class TypeUniverseList, class... Args>
+    variable
+    call_static_safe(Args... args) const
+    {
+        const auto info = static_cast<const Derived*>(this)->info_;
+
+        typedef metamusil::t_list::type_list<Args...> given_types;
+        typedef metamusil::t_list::order_t<given_types, TypeUniverseList>
+            given_types_indices;
+        typedef metamusil::int_seq::integer_sequence_to_array<
+            given_types_indices>
+            given_types_index_array_holder;
+
+        if(std::extent<decltype(
+               given_types_index_array_holder::value)>::value !=
+           info->num_parameters)
+        {
+            throw argument_error("wrong number of arguments");
+        }
+
+        for(auto i = 0; i < info->num_parameters; ++i)
+        {
+            if(given_types_index_array_holder::value[i] !=
+               info->parameter_type_indices[i])
+            {
+                throw argument_error("wrong argument type");
+            }
+        }
+
+        any arg_array[] = {args...};
+
+        return variable(info->bind_point(arg_array),
+                        info->return_type_index,
+                        static_cast<const Derived*>(this)->manager_);
+    }
+
+
     template <class Iterator>
     variable
     operator()(Iterator arg_begin, Iterator arg_end) const
@@ -402,68 +452,12 @@ public:
 };
 
 
-template <class Derived>
-class call_free_function_static
-{
-public:
-    template <class... Args>
-    variable
-    call_static_unsafe(Args... args) const
-    {
-        const auto info = static_cast<const Derived*>(this)->info_;
-
-        any arg_array[] = {args...};
-
-        return variable(info->bind_point(arg_array),
-                        info->return_type_index,
-                        static_cast<const Derived*>(this)->manager_);
-    }
-
-    template <class TypeUniverseList, class... Args>
-    variable
-    call_static_safe(Args... args) const
-    {
-        const auto info = static_cast<const Derived*>(this)->info_;
-
-        typedef metamusil::t_list::type_list<Args...> given_types;
-        typedef metamusil::t_list::order_t<given_types, TypeUniverseList>
-            given_types_indices;
-        typedef metamusil::int_seq::integer_sequence_to_array<
-            given_types_indices>
-            given_types_index_array_holder;
-
-        if(std::extent<decltype(
-               given_types_index_array_holder::value)>::value !=
-           info->num_parameters)
-        {
-            throw argument_error("wrong number of arguments");
-        }
-
-        for(auto i = 0; i < info->num_parameters; ++i)
-        {
-            if(given_types_index_array_holder::value[i] !=
-               info->parameter_type_indices[i])
-            {
-                throw argument_error("wrong argument type");
-            }
-        }
-
-        any arg_array[] = {args...};
-
-        return variable(info->bind_point(arg_array),
-                        info->return_type_index,
-                        static_cast<const Derived*>(this)->manager_);
-    }
-};
-
-
 typedef api_type_aggregator<free_function_info,
                             get_name_policy,
                             get_num_parameters_policy,
                             get_parameter_types_policy,
                             get_return_type_policy,
-                            call_free_function_safe,
-                            call_free_function_static>
+                            call_free_function>
     free_function_;
 
 inline std::ostream&
