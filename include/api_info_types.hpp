@@ -3,6 +3,8 @@
 #include <string>
 #include <utility>
 #include <ostream>
+#include <vector>
+#include <algorithm>
 
 #include "reflection_info.hpp"
 #include "info_iterator.hpp"
@@ -276,6 +278,9 @@ class variable
     friend std::ostream& operator<<(std::ostream&, const variable&);
     friend std::istream& operator>>(std::istream&, variable&);
 
+    template <class Derived>
+    friend class call_free_function_safe;
+
 public:
     typedef indexed_info_iterator_<const member_function_info,
                                    const member_function_>
@@ -331,6 +336,34 @@ private:
     std::size_t type_index_;
     const reflection_manager* manager_;
 };
+
+
+template <class Derived>
+class call_free_function_safe
+{
+public:
+    template <class Iterator>
+    variable
+    operator()(Iterator arg_begin, Iterator arg_end) const
+    {
+
+        const auto info = static_cast<const Derived*>(this)->info_;
+
+        // construct argument buffer
+        std::vector<any> arg_buffer;
+        arg_buffer.reserve(info->num_parameters);
+
+        std::transform(arg_begin,
+                       arg_end,
+                       std::back_inserter(arg_buffer),
+                       [](const variable& var) { return var.value_; });
+
+        return variable(info->bind_point(arg_buffer.data()),
+                        info->return_type_index,
+                        static_cast<const Derived*>(this)->manager_);
+    }
+};
+
 
 typedef api_type_aggregator<free_function_info,
                             get_name_policy,
