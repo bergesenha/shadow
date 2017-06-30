@@ -199,10 +199,9 @@ main()
     {
         auto hello = *find_hello;
 
-        shadow::variable void_var;
 
         std::cout << "\n\nCalling free function 'hello'\n";
-        auto return_value = hello(&void_var, &void_var);
+        auto return_value = hello();
 
         std::cout << "returned value: " << return_value << '\n';
     }

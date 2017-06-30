@@ -380,6 +380,22 @@ public:
                         info->return_type_index,
                         static_cast<const Derived*>(this)->manager_);
     }
+
+    variable
+    operator()() const
+    {
+        const auto info = static_cast<const Derived*>(this)->info_;
+
+        // check that function in fact takes no arguments
+        if(info->num_parameters != 0)
+        {
+            throw argument_error("wrong number of arguments provided");
+        }
+
+        return variable(info->bind_point(nullptr),
+                        info->return_type_index,
+                        static_cast<const Derived*>(this)->manager_);
+    }
 };
 
 
