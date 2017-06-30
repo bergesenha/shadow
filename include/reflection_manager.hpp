@@ -636,8 +636,6 @@ operator<<(std::ostream& out, const variable& var)
 inline std::istream&
 operator>>(std::istream& in, variable& var)
 {
-    std::string instring;
-    in >> instring;
 
     auto ssi_pair = var.manager_->string_serialization_info_range_;
 
@@ -649,6 +647,9 @@ operator>>(std::istream& in, variable& var)
 
     if(found != ssi_pair.second)
     {
+        std::string instring;
+        in >> instring;
+
         var.value_ = found->deserialize_bind_point(instring);
     }
     else
