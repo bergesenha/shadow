@@ -472,7 +472,6 @@ public:
     call_with_conversion(Iterator arg_begin, Iterator arg_end) const
     {
         const auto info = static_cast<const Derived*>(this)->info_;
-        const auto manager = static_cast<const Derived*>(this)->manager_;
 
         const auto num_params = info->num_parameters;
 
@@ -489,10 +488,10 @@ public:
             arg_end,
             info->parameter_type_indices,
             std::back_inserter(arg_buffer),
-            [manager](const auto& var, const auto to_index) {
+            [](const auto& var, const auto to_index) {
                 const auto from_index = var.type_index_;
+                const auto manager = var.manager_;
 
-                // TODO: implement convert_to in class 'variable'
                 auto found = std::find_if(
                     manager->conversion_info_indices_by_type_[from_index]
                         .begin(),
@@ -519,7 +518,7 @@ public:
 
         return variable(info->bind_point(arg_buffer.data()),
                         info->return_type_index,
-                        manager);
+                        static_cast<const Derived*>(this)->manager_);
     }
 };
 
