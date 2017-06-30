@@ -283,7 +283,7 @@ class variable
     friend std::istream& operator>>(std::istream&, variable&);
 
     template <class Derived>
-    friend class call_free_function_safe;
+    friend class call_free_function;
 
 public:
     typedef indexed_info_iterator_<const member_function_info,
@@ -343,9 +343,59 @@ private:
 
 
 template <class Derived>
-class call_free_function_safe
+class call_free_function
 {
 public:
+    template <class... Args>
+    variable
+    call_static_unsafe(Args... args) const
+    {
+        const auto info = static_cast<const Derived*>(this)->info_;
+
+        any arg_array[] = {args...};
+
+        return variable(info->bind_point(arg_array),
+                        info->return_type_index,
+                        static_cast<const Derived*>(this)->manager_);
+    }
+
+    template <class TypeUniverseList, class... Args>
+    variable
+    call_static_safe(Args... args) const
+    {
+        const auto info = static_cast<const Derived*>(this)->info_;
+
+        typedef metamusil::t_list::type_list<Args...> given_types;
+        typedef metamusil::t_list::order_t<given_types, TypeUniverseList>
+            given_types_indices;
+        typedef metamusil::int_seq::integer_sequence_to_array<
+            given_types_indices>
+            given_types_index_array_holder;
+
+        if(std::extent<decltype(
+               given_types_index_array_holder::value)>::value !=
+           info->num_parameters)
+        {
+            throw argument_error("wrong number of arguments");
+        }
+
+        for(auto i = 0; i < info->num_parameters; ++i)
+        {
+            if(given_types_index_array_holder::value[i] !=
+               info->parameter_type_indices[i])
+            {
+                throw argument_error("wrong argument type");
+            }
+        }
+
+        any arg_array[] = {args...};
+
+        return variable(info->bind_point(arg_array),
+                        info->return_type_index,
+                        static_cast<const Derived*>(this)->manager_);
+    }
+
+
     template <class Iterator>
     variable
     operator()(Iterator arg_begin, Iterator arg_end) const
@@ -399,58 +449,74 @@ public:
                         info->return_type_index,
                         static_cast<const Derived*>(this)->manager_);
     }
-};
 
-
-template <class Derived>
-class call_free_function_static
-{
-public:
-    template <class... Args>
+    template <class Iterator>
     variable
-    call_static_unsafe(Args... args) const
+    call_unsafe(Iterator arg_begin, Iterator arg_end) const
     {
         const auto info = static_cast<const Derived*>(this)->info_;
+        std::vector<any> arg_buffer;
+        arg_buffer.reserve(info->num_parameters);
+        std::transform(arg_begin,
+                       arg_end,
+                       std::back_inserter(arg_buffer),
+                       [](const variable& var) { return var.value_; });
 
-        any arg_array[] = {args...};
-
-        return variable(info->bind_point(arg_array),
+        return variable(info->bind_point(arg_buffer.data()),
                         info->return_type_index,
                         static_cast<const Derived*>(this)->manager_);
     }
 
-    template <class TypeUniverseList, class... Args>
+    template <class Iterator>
     variable
-    call_static_safe(Args... args) const
+    call_with_conversion(Iterator arg_begin, Iterator arg_end) const
     {
         const auto info = static_cast<const Derived*>(this)->info_;
 
-        typedef metamusil::t_list::type_list<Args...> given_types;
-        typedef metamusil::t_list::order_t<given_types, TypeUniverseList>
-            given_types_indices;
-        typedef metamusil::int_seq::integer_sequence_to_array<
-            given_types_indices>
-            given_types_index_array_holder;
+        const auto num_params = info->num_parameters;
 
-        if(std::extent<decltype(
-               given_types_index_array_holder::value)>::value !=
-           info->num_parameters)
+        if(num_params != std::distance(arg_begin, arg_end))
         {
-            throw argument_error("wrong number of arguments");
+            throw argument_error("wrong number of arguments provided");
         }
 
-        for(auto i = 0; i < info->num_parameters; ++i)
-        {
-            if(given_types_index_array_holder::value[i] !=
-               info->parameter_type_indices[i])
-            {
-                throw argument_error("wrong argument type");
-            }
-        }
+        std::vector<any> arg_buffer;
+        arg_buffer.reserve(num_params);
 
-        any arg_array[] = {args...};
+        std::transform(
+            arg_begin,
+            arg_end,
+            info->parameter_type_indices,
+            std::back_inserter(arg_buffer),
+            [](const auto& var, const auto to_index) {
+                const auto from_index = var.type_index_;
+                const auto manager = var.manager_;
 
-        return variable(info->bind_point(arg_array),
+                auto found = std::find_if(
+                    manager->conversion_info_indices_by_type_[from_index]
+                        .begin(),
+                    manager->conversion_info_indices_by_type_[from_index].end(),
+                    [to_index, manager](auto converter_index) {
+                        return manager->conversion_info_range_
+                                   .first[converter_index]
+                                   .to_type_index == to_index;
+                    });
+
+                if(found ==
+                   manager->conversion_info_indices_by_type_[from_index].end())
+                {
+                    throw argument_error("conversion of argument not possible");
+                }
+
+                const auto found_conversion_index = *found;
+
+                return manager->conversion_info_range_
+                    .first[found_conversion_index]
+                    .bind_point(var.value_);
+
+            });
+
+        return variable(info->bind_point(arg_buffer.data()),
                         info->return_type_index,
                         static_cast<const Derived*>(this)->manager_);
     }
@@ -462,8 +528,7 @@ typedef api_type_aggregator<free_function_info,
                             get_num_parameters_policy,
                             get_parameter_types_policy,
                             get_return_type_policy,
-                            call_free_function_safe,
-                            call_free_function_static>
+                            call_free_function>
     free_function_;
 
 inline std::ostream&
