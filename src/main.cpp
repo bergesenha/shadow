@@ -223,6 +223,9 @@ main()
 
         auto return_value = mult(args.begin(), args.end());
         std::cout << "return value: " << return_value << '\n';
+
+        auto return_value2 = mult.call_unsafe(args.begin(), args.end());
+        std::cout << "return value: " << return_value2 << '\n';
     }
 
     auto find_overload1_int = std::find_if(

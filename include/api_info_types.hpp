@@ -449,6 +449,23 @@ public:
                         info->return_type_index,
                         static_cast<const Derived*>(this)->manager_);
     }
+
+    template <class Iterator>
+    variable
+    call_unsafe(Iterator arg_begin, Iterator arg_end) const
+    {
+        const auto info = static_cast<const Derived*>(this)->info_;
+        std::vector<any> arg_buffer;
+        arg_buffer.reserve(info->num_parameters);
+        std::transform(arg_begin,
+                       arg_end,
+                       std::back_inserter(arg_buffer),
+                       [](const variable& var) { return var.value_; });
+
+        return variable(info->bind_point(arg_buffer.data()),
+                        info->return_type_index,
+                        static_cast<const Derived*>(this)->manager_);
+    }
 };
 
 
