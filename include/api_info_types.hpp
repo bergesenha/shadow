@@ -327,6 +327,14 @@ public:
     {
     }
 
+    variable
+    get_member_variable(member_variable mv) const
+    {
+        auto bind_point = mv.info_->get_bind_point;
+
+        return variable(bind_point(value_), mv.info_->type_index, manager_);
+    }
+
 public:
     type_ type() const;
 
