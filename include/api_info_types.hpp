@@ -16,6 +16,8 @@ template <class InfoType, template <class> class... Policies>
 class api_type_aggregator
     : public Policies<api_type_aggregator<InfoType, Policies...>>...
 {
+    friend class variable;
+
 public:
     api_type_aggregator() : info_(nullptr), manager_(nullptr)
     {
@@ -308,8 +310,9 @@ public:
                                    const member_function_>
         member_function_iterator;
 
+    typedef member_variable_ member_variable;
     typedef indexed_info_iterator_<const member_variable_info,
-                                   const member_variable_>
+                                   const member_variable>
         member_variable_iterator;
 
 public:
