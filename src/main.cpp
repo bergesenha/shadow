@@ -177,7 +177,7 @@ main()
     for(; mem_var_range.first != mem_var_range.second; ++mem_var_range.first)
     {
         std::cout << *mem_var_range.first << " == ";
-        std::cout << an_intholder.get_member_variable(*mem_var_range.first)
+        std::cout << an_intholder.get_member_variable(mem_var_range.first)
                   << '\n';
     }
 }
