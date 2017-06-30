@@ -8,6 +8,7 @@
 
 #include "reflection_info.hpp"
 #include "info_iterator.hpp"
+#include "exceptions.hpp"
 
 namespace shadow
 {
@@ -349,6 +350,7 @@ public:
 
         const auto info = static_cast<const Derived*>(this)->info_;
 
+
         // construct argument buffer
         std::vector<any> arg_buffer;
         arg_buffer.reserve(info->num_parameters);
@@ -357,6 +359,22 @@ public:
                        arg_end,
                        std::back_inserter(arg_buffer),
                        [](const variable& var) { return var.value_; });
+
+        // check arguments
+        if(arg_buffer.size() != info->num_parameters)
+        {
+            throw argument_error("wrong number of arguments provided");
+        }
+
+        for(auto i = 0ul; i < info->num_parameters; ++i)
+        {
+            if(info->parameter_type_indices[i] != arg_begin->type_index_)
+            {
+                throw argument_error("wrong argument type");
+            }
+
+            ++arg_begin;
+        }
 
         return variable(info->bind_point(arg_buffer.data()),
                         info->return_type_index,
