@@ -14,6 +14,7 @@ namespace shadow
 {
 
 
+// class providing the main point of interaction with the reflection system
 class reflection_manager
 {
 public:
@@ -84,6 +85,8 @@ public:
 public:
     reflection_manager();
 
+    // templated complete constructor, typically invoked in macros of the
+    // reflection system
     template <class TypeInfoArrayHolder,
               class ConstructorInfoArrayHolder,
               class ConversionInfoArrayHolder,
@@ -100,6 +103,7 @@ public:
                        StringSerializationInfoArrayHolder);
 
 private:
+    // private member functions used during initialization
     template <class ArrayHolderType>
     std::pair<const typename ArrayHolderType::type*,
               const typename ArrayHolderType::type*>
@@ -129,43 +133,59 @@ private:
 public:
     ////////////////////////////////////////////////////////////////////////////
     // main api interface for interacting with the reflection system
+
+    // returns pair of iterators to all types registered
     std::pair<const_type_iterator, const_type_iterator> types() const;
 
+    // returns pair of iterators to all constructors registered
     std::pair<const_constructor_iterator, const_constructor_iterator>
     constructors() const;
 
+    // returns pair of iterators to all constructors for the given type tp
     std::pair<const_indexed_constructor_iterator,
               const_indexed_constructor_iterator>
     constructors_by_type(const type& tp) const;
 
+    // returns pair of iterators to all implicit conversions registered
     std::pair<const_conversion_iterator, const_conversion_iterator>
     type_conversions() const;
 
+    // returns pair of iterators to all implicit conversions available from the
+    // given type tp
     std::pair<const_indexed_conversion_iterator,
               const_indexed_conversion_iterator>
     type_conversions_by_type(const type& tp) const;
 
+    // returns pair of iterators to all free functions registered
     std::pair<const_free_function_iterator, const_free_function_iterator>
     free_functions() const;
 
+    // returns pair of iterators to all member functions of all types registered
     std::pair<const_member_function_iterator, const_member_function_iterator>
     member_functions() const;
 
+    // returns pair of iterators to all member functions belinging to the given
+    // type tp
     std::pair<const_indexed_member_function_iterator,
               const_indexed_member_function_iterator>
     member_functions_by_type(const type& tp) const;
 
+    // returns pair of iterators to all member variables registered
     std::pair<const_member_variable_iterator, const_member_variable_iterator>
     member_variables() const;
 
+    // returns pair of iterators to all member variables belonging to the given
+    // type tp
     std::pair<const_indexed_member_variable_iterator,
               const_indexed_member_variable_iterator>
     member_variables_by_type(const type& tp) const;
 
+    // returns all available string serializers
     std::pair<const_string_serializer_iterator,
               const_string_serializer_iterator>
     string_serializers() const;
 
+    // create variable specified at compile time
     template <class TypeUniverseList, class T>
     variable static_create(const T& value) const;
 
