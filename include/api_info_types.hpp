@@ -15,9 +15,12 @@
 
 namespace shadow
 {
+// forward declaration
 class reflection_manager;
 
 
+// class template for aggregating reflection information types from policies
+// using CRTP
 template <class InfoType, template <class> class... Policies>
 class api_type_aggregator
     : public Policies<api_type_aggregator<InfoType, Policies...>>...
@@ -50,6 +53,8 @@ public:
 };
 
 
+// adds member function name, returning name of the information type where
+// relevant
 template <class Derived>
 class get_name_policy
 {
@@ -62,6 +67,7 @@ public:
 };
 
 
+// adds member function size, returning size of a type
 template <class Derived>
 class get_size_policy
 {
@@ -74,6 +80,7 @@ public:
 };
 
 
+// aggregate type representing type information
 typedef api_type_aggregator<type_info, get_name_policy, get_size_policy> type_;
 
 inline std::ostream&
@@ -83,6 +90,9 @@ operator<<(std::ostream& out, const type_& tp)
     return out;
 }
 
+
+// adds member function get_type, returning type of an information object where
+// relevant
 template <class Derived>
 class get_type_policy
 {
@@ -100,6 +110,8 @@ public:
 };
 
 
+// adds num_parameters member function, returning the number of parameters of a
+// function, member_function, constructor etc...
 template <class Derived>
 class get_num_parameters_policy
 {
@@ -112,6 +124,9 @@ public:
 };
 
 
+// adds member function parameter_types, returning pair of iterators to type
+// information objects representing the types of the parameters of a function,
+// member function, constructor or other.
 template <class Derived>
 class get_parameter_types_policy
 {
@@ -124,11 +139,14 @@ public:
     parameter_types() const;
 };
 
+
+// aggregate type representing a constructor for a type.
 typedef api_type_aggregator<constructor_info,
                             get_type_policy,
                             get_num_parameters_policy,
                             get_parameter_types_policy>
     constructor_;
+
 
 inline std::ostream&
 operator<<(std::ostream& out, const constructor_& con)
@@ -155,6 +173,7 @@ operator<<(std::ostream& out, const constructor_& con)
 }
 
 
+// adds member function from_type, returning a type information object
 template <class Derived>
 class get_from_type_policy
 {
@@ -171,6 +190,7 @@ public:
 };
 
 
+// adds member function to_type, returning a type information object
 template <class Derived>
 class get_to_type_policy
 {
@@ -187,12 +207,15 @@ public:
 };
 
 
+// aggregate type representing implicit conversions
 typedef api_type_aggregator<conversion_info,
                             get_from_type_policy,
                             get_to_type_policy>
     type_conversion_;
 
 
+// adds member function return_type, returning a type information object
+// representing the return type of a function, member_function etc.
 template <class Derived>
 class get_return_type_policy
 {
@@ -208,6 +231,8 @@ public:
 };
 
 
+// adds member function object_type, returning a type information object
+// representing the object owning the member variable, member function etc...
 template <class Derived>
 class get_object_type_policy
 {
@@ -224,6 +249,7 @@ public:
 };
 
 
+// aggregate type representing a member function
 typedef api_type_aggregator<member_function_info,
                             get_name_policy,
                             get_num_parameters_policy,
@@ -256,6 +282,7 @@ operator<<(std::ostream& out, const member_function_& mf)
 }
 
 
+// aggregate type representing a member variable
 typedef api_type_aggregator<member_variable_info,
                             get_name_policy,
                             get_object_type_policy,
@@ -272,6 +299,7 @@ operator<<(std::ostream& out, const member_variable_& mv)
 }
 
 
+// aggregate type representing a string serializer
 typedef api_type_aggregator<string_serialization_info, get_type_policy>
     string_serializer_;
 
@@ -354,10 +382,12 @@ private:
 };
 
 
+// adds member functions for invoking a free function.
 template <class Derived>
 class call_free_function
 {
 public:
+    // call specified at compile time, no checking of the arguments
     template <class... Args>
     variable
     call_static_unsafe(Args... args) const
@@ -371,6 +401,8 @@ public:
                         static_cast<const Derived*>(this)->manager_);
     }
 
+    // call specified at compile time, arguments checked for correctness,
+    // argument_error thrown if not correct
     template <class TypeUniverseList, class... Args>
     variable
     call_static_safe(Args... args) const
@@ -408,6 +440,8 @@ public:
     }
 
 
+    // call specified at runtime, arguments checked for correctness,
+    // argument_error thrown if not correct
     template <class Iterator>
     variable
     operator()(Iterator arg_begin, Iterator arg_end) const
@@ -446,6 +480,8 @@ public:
                         static_cast<const Derived*>(this)->manager_);
     }
 
+    // overload for no parameters, if the function called does take parameters,
+    // argument_error thrown
     variable
     operator()() const
     {
@@ -462,6 +498,8 @@ public:
                         static_cast<const Derived*>(this)->manager_);
     }
 
+    // call specified at runtime, no checking of arguments. If arguments are
+    // incorrect, may result in a segfault.
     template <class Iterator>
     variable
     call_unsafe(Iterator arg_begin, Iterator arg_end) const
@@ -479,6 +517,9 @@ public:
                         static_cast<const Derived*>(this)->manager_);
     }
 
+    // call specified at runtime, will attempt to convert arguments by implicit
+    // conversion matching the parameters of the function. Throws argument_error
+    // if unable to convert or wrong number of arguments.
     template <class Iterator>
     variable
     call_with_conversion(Iterator arg_begin, Iterator arg_end) const
@@ -535,6 +576,7 @@ public:
 };
 
 
+// aggregate type representing a free function
 typedef api_type_aggregator<free_function_info,
                             get_name_policy,
                             get_num_parameters_policy,
