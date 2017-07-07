@@ -296,10 +296,14 @@ public:
         member_variable_iterator;
 
 public:
+    // default constructor, constructs an empty variable of type index 0
+    // corresponding to a type of 'void'
     variable() : value_(), type_index_(0), manager_(nullptr)
     {
     }
 
+    // full constructor, typically invoked by reflection_manager or
+    // static_create function template
     variable(const any& value,
              std::size_t type_index,
              const reflection_manager* manager)
@@ -309,14 +313,20 @@ public:
 
 
 public:
+    // returns the type of the value held by the variable
     type_ type() const;
 
+    // returns pair of iterators to all member functions of the type of value
+    // held by variable
     std::pair<member_function_iterator, member_function_iterator>
     member_functions() const;
 
+    // returns pair of iterators to all member variables of the type of value
+    // held by the variable
     std::pair<member_variable_iterator, member_variable_iterator>
     member_variables() const;
 
+    // return value of member variable represented by mv
     variable
     get_member_variable(const member_variable& mv) const
     {
@@ -325,6 +335,8 @@ public:
         return variable(bind_point(value_), mv.info_->type_index, manager_);
     }
 
+    // overload returns member variable represented by mv_it, an iterator to a
+    // member_variable
     variable
     get_member_variable(member_variable_iterator mv_it) const
     {
