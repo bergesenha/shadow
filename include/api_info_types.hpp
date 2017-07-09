@@ -79,9 +79,24 @@ public:
     }
 };
 
+template <class Derived>
+class compare_policy
+{
+public:
+    bool
+    operator==(const Derived& other) const
+    {
+        return static_cast<const Derived*>(this)->info_ == other.info_;
+    }
+};
+
 
 // aggregate type representing type information
-typedef api_type_aggregator<type_info, get_name_policy, get_size_policy> type_;
+typedef api_type_aggregator<type_info,
+                            get_name_policy,
+                            get_size_policy,
+                            compare_policy>
+    type_;
 
 inline std::ostream&
 operator<<(std::ostream& out, const type_& tp)

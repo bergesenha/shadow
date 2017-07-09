@@ -172,10 +172,18 @@ main()
 
     std::cout << an_intholder << '\n';
 
+
     auto mem_var_range = an_intholder.member_variables();
+
+    auto an_int = myspace::static_create<int>(44);
 
     for(; mem_var_range.first != mem_var_range.second; ++mem_var_range.first)
     {
+        if(mem_var_range.first->get_type() == an_int.type())
+        {
+            std::cout << "found an int member variable\n";
+        }
+
         std::cout << *mem_var_range.first << " == ";
         std::cout << an_intholder.get_member_variable(mem_var_range.first)
                   << '\n';
