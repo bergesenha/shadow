@@ -388,6 +388,15 @@ public:
         return variable(bind_point(value_), mv_it->info_->type_index, manager_);
     }
 
+    // set the value of member variable referred to by mv to val
+    void
+    set_member_variable(const member_variable& mv, const variable& val)
+    {
+        auto bind_point = mv.info_->set_bind_point;
+
+        bind_point(value_, val.value_);
+    }
+
 private:
     // holds type erased value
     any value_;

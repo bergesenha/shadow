@@ -181,7 +181,8 @@ main()
     {
         if(mem_var_range.first->get_type() == an_int.type())
         {
-            std::cout << "found an int member variable\n";
+            std::cout << "found an int member variable, modifying to 44\n";
+            an_intholder.set_member_variable(*mem_var_range.first, an_int);
         }
 
         std::cout << *mem_var_range.first << " == ";
