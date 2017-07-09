@@ -387,7 +387,8 @@ template <class Derived>
 class call_free_function
 {
 public:
-    // call specified at compile time, no checking of the arguments
+    // call specified at compile time with arguments as c++ types, no checking
+    // of the arguments
     template <class... Args>
     variable
     call_static_unsafe(Args... args) const
@@ -401,7 +402,8 @@ public:
                         static_cast<const Derived*>(this)->manager_);
     }
 
-    // call specified at compile time, arguments checked for correctness,
+    // call specified at compile time with arguments as c++ types, arguments
+    // checked for correctness,
     // argument_error thrown if not correct
     template <class TypeUniverseList, class... Args>
     variable
@@ -441,6 +443,7 @@ public:
 
 
     // call specified at runtime, arguments checked for correctness,
+    // arguments given by iterators to variable
     // argument_error thrown if not correct
     template <class Iterator>
     variable
@@ -499,6 +502,7 @@ public:
     }
 
     // call specified at runtime, no checking of arguments. If arguments are
+    // arguments given by iterators to variable
     // incorrect, may result in a segfault.
     template <class Iterator>
     variable
@@ -518,6 +522,7 @@ public:
     }
 
     // call specified at runtime, will attempt to convert arguments by implicit
+    // arguments given by iterators to variable
     // conversion matching the parameters of the function. Throws argument_error
     // if unable to convert or wrong number of arguments.
     template <class Iterator>
