@@ -663,6 +663,11 @@ variable::get_member_variable(member_variable_iterator mv_it) const
 inline void
 variable::set_member_variable(const member_variable& mv, const variable& val)
 {
+    if(val.type_index_ != mv.info_->type_index)
+    {
+        throw argument_error("wrong type setting member variable");
+    }
+
     auto bind_point = mv.info_->set_bind_point;
 
     bind_point(value_, val.value_);
