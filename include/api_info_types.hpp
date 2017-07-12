@@ -375,10 +375,14 @@ public:
     // set the value of member variable referred to by mv to val
     void set_member_variable(const member_variable& mv, const variable& val);
 
+    // call member function identified by mf
     template <class Iterator>
     variable call_member_function(const member_function& mf,
                                   Iterator arg_begin,
                                   Iterator arg_end);
+
+    // overload for member function taking no parameters
+    variable call_member_function(const member_function& mf);
 
 private:
     // holds type erased value
@@ -699,5 +703,19 @@ variable::call_member_function(const member_function& mf,
     return variable(bind_point(value_, arg_buffer.data()),
                     mf.info_->return_type_index,
                     manager_);
+}
+
+inline variable
+variable::call_member_function(const member_function& mf)
+{
+    if(mf.info_->num_parameters)
+    {
+        throw argument_error("wrong number of arguments");
+    }
+
+    auto bind_point = mf.info_->bind_point;
+
+    return variable(
+        bind_point(value_, nullptr), mf.info_->return_type_index, manager_);
 }
 }
