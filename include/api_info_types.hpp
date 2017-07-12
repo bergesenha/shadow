@@ -348,10 +348,7 @@ public:
     // static_create function template
     variable(const any& value,
              std::size_t type_index,
-             const reflection_manager* manager)
-        : value_(value), type_index_(type_index), manager_(manager)
-    {
-    }
+             const reflection_manager* manager);
 
 
 public:
@@ -369,33 +366,14 @@ public:
     member_variables() const;
 
     // return value of member variable represented by mv
-    variable
-    get_member_variable(const member_variable& mv) const
-    {
-        auto bind_point = mv.info_->get_bind_point;
-
-        return variable(bind_point(value_), mv.info_->type_index, manager_);
-    }
+    variable get_member_variable(const member_variable& mv) const;
 
     // overload returns member variable represented by mv_it, an iterator to a
     // member_variable
-    variable
-    get_member_variable(member_variable_iterator mv_it) const
-    {
-        auto bind_point = mv_it->info_->get_bind_point;
-
-        return variable(bind_point(value_), mv_it->info_->type_index, manager_);
-    }
+    variable get_member_variable(member_variable_iterator mv_it) const;
 
     // set the value of member variable referred to by mv to val
-    void
-    set_member_variable(const member_variable& mv, const variable& val)
-    {
-        auto bind_point = mv.info_->set_bind_point;
-
-        bind_point(value_, val.value_);
-    }
-
+    void set_member_variable(const member_variable& mv, const variable& val);
 
     template <class Iterator>
     variable
@@ -680,5 +658,40 @@ namespace shadow
 {
 inline variable::variable() : value_(), type_index_(0), manager_(nullptr)
 {
+}
+
+
+inline variable::variable(const any& value,
+                          std::size_t type_index,
+                          const reflection_manager* manager)
+    : value_(value), type_index_(type_index), manager_(manager)
+{
+}
+
+
+inline variable
+variable::get_member_variable(const member_variable& mv) const
+{
+    auto bind_point = mv.info_->get_bind_point;
+
+    return variable(bind_point(value_), mv.info_->type_index, manager_);
+}
+
+
+inline variable
+variable::get_member_variable(member_variable_iterator mv_it) const
+{
+    auto bind_point = mv_it->info_->get_bind_point;
+
+    return variable(bind_point(value_), mv_it->info_->type_index, manager_);
+}
+
+
+inline void
+variable::set_member_variable(const member_variable& mv, const variable& val)
+{
+    auto bind_point = mv.info_->set_bind_point;
+
+    bind_point(value_, val.value_);
 }
 }
