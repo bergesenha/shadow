@@ -329,8 +329,9 @@ class variable
     friend class call_free_function;
 
 public:
+    typedef member_function_ member_function;
     typedef indexed_info_iterator_<const member_function_info,
-                                   const member_function_>
+                                   const member_function>
         member_function_iterator;
 
     typedef member_variable_ member_variable;
@@ -395,6 +396,44 @@ public:
         auto bind_point = mv.info_->set_bind_point;
 
         bind_point(value_, val.value_);
+    }
+
+
+    template <class Iterator>
+    variable
+    call_member_function(const member_function& mf,
+                         Iterator arg_begin,
+                         Iterator arg_end)
+    {
+        auto bind_point = mf.info_->bind_point;
+
+        // construct arg buffer
+        std::vector<any> arg_buffer;
+        arg_buffer.reserve(mf.info_->num_parameters);
+
+        std::transform(arg_begin,
+                       arg_end,
+                       std::back_inserter(arg_buffer),
+                       [](const variable& var) { return var.value_; });
+
+        if(arg_buffer.size() != mf.info_->num_parameters)
+        {
+            throw argument_error("wrong number of arguments provided");
+        }
+
+        for(auto i = 0ul; i < mf.info_->num_parameters; ++i)
+        {
+            if(mf.info_->parameter_type_indices[i] != arg_begin->type_index_)
+            {
+                throw argument_error("wrong argument type");
+            }
+
+            ++arg_begin;
+        }
+
+        return variable(bind_point(value_, arg_buffer.data()),
+                        mf.info_->return_type_index,
+                        manager_);
     }
 
 private:
