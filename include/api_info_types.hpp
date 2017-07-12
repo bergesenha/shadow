@@ -375,6 +375,11 @@ public:
     // set the value of member variable referred to by mv to val
     void set_member_variable(const member_variable& mv, const variable& val);
 
+    // overload sets the member variable referred to by mv_it, an iterator to a
+    // member_variable
+    void set_member_variable(member_variable_iterator mv_it,
+                             const variable& val);
+
     // call member function identified by mf
     template <class Iterator>
     variable call_member_function(const member_function& mf,
@@ -574,7 +579,8 @@ public:
                 if(found ==
                    manager->conversion_info_indices_by_type_[from_index].end())
                 {
-                    throw argument_error("conversion of argument not possible");
+                    throw type_conversion_error(
+                        "conversion of argument not possible");
                 }
 
                 const auto found_conversion_index = *found;
@@ -662,7 +668,27 @@ variable::get_member_variable(member_variable_iterator mv_it) const
 inline void
 variable::set_member_variable(const member_variable& mv, const variable& val)
 {
+    if(val.type_index_ != mv.info_->type_index)
+    {
+        throw argument_error("wrong type setting member variable");
+    }
+
     auto bind_point = mv.info_->set_bind_point;
+
+    bind_point(value_, val.value_);
+}
+
+
+inline void
+variable::set_member_variable(member_variable_iterator mv_it,
+                              const variable& val)
+{
+    if(val.type_index_ != mv_it->info_->type_index)
+    {
+        throw argument_error("wrong type setting member variable");
+    }
+
+    auto bind_point = mv_it->info_->set_bind_point;
 
     bind_point(value_, val.value_);
 }
