@@ -212,6 +212,20 @@ main()
                   << '\n';
     }
 
+    auto found_mem_fun_1 = std::find_if(
+        mem_fun_range.first, mem_fun_range.second, [](const auto& mf) {
+            return mf.name() == std::string("member_function1");
+        });
+
+    if(found_mem_fun_1 != mem_fun_range.second)
+    {
+        std::cout << "found member function 1\n";
+
+        auto mf1res = an_intholder.call_member_function(*found_mem_fun_1);
+
+        std::cout << "return value of member function 1: " << mf1res << '\n';
+    }
+
     std::cout << "\n\n\nFree Functions:\n";
     auto free_function_range = myspace::manager.free_functions();
     for(auto i = free_function_range.first; i != free_function_range.second;
