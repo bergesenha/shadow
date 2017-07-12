@@ -342,18 +342,13 @@ public:
 public:
     // default constructor, constructs an empty variable of type index 0
     // corresponding to a type of 'void'
-    variable() : value_(), type_index_(0), manager_(nullptr)
-    {
-    }
+    variable();
 
     // full constructor, typically invoked by reflection_manager or
     // static_create function template
     variable(const any& value,
              std::size_t type_index,
-             const reflection_manager* manager)
-        : value_(value), type_index_(type_index), manager_(manager)
-    {
-    }
+             const reflection_manager* manager);
 
 
 public:
@@ -371,70 +366,23 @@ public:
     member_variables() const;
 
     // return value of member variable represented by mv
-    variable
-    get_member_variable(const member_variable& mv) const
-    {
-        auto bind_point = mv.info_->get_bind_point;
-
-        return variable(bind_point(value_), mv.info_->type_index, manager_);
-    }
+    variable get_member_variable(const member_variable& mv) const;
 
     // overload returns member variable represented by mv_it, an iterator to a
     // member_variable
-    variable
-    get_member_variable(member_variable_iterator mv_it) const
-    {
-        auto bind_point = mv_it->info_->get_bind_point;
-
-        return variable(bind_point(value_), mv_it->info_->type_index, manager_);
-    }
+    variable get_member_variable(member_variable_iterator mv_it) const;
 
     // set the value of member variable referred to by mv to val
-    void
-    set_member_variable(const member_variable& mv, const variable& val)
-    {
-        auto bind_point = mv.info_->set_bind_point;
+    void set_member_variable(const member_variable& mv, const variable& val);
 
-        bind_point(value_, val.value_);
-    }
-
-
+    // call member function identified by mf
     template <class Iterator>
-    variable
-    call_member_function(const member_function& mf,
-                         Iterator arg_begin,
-                         Iterator arg_end)
-    {
-        auto bind_point = mf.info_->bind_point;
+    variable call_member_function(const member_function& mf,
+                                  Iterator arg_begin,
+                                  Iterator arg_end);
 
-        // construct arg buffer
-        std::vector<any> arg_buffer;
-        arg_buffer.reserve(mf.info_->num_parameters);
-
-        std::transform(arg_begin,
-                       arg_end,
-                       std::back_inserter(arg_buffer),
-                       [](const variable& var) { return var.value_; });
-
-        if(arg_buffer.size() != mf.info_->num_parameters)
-        {
-            throw argument_error("wrong number of arguments provided");
-        }
-
-        for(auto i = 0ul; i < mf.info_->num_parameters; ++i)
-        {
-            if(mf.info_->parameter_type_indices[i] != arg_begin->type_index_)
-            {
-                throw argument_error("wrong argument type");
-            }
-
-            ++arg_begin;
-        }
-
-        return variable(bind_point(value_, arg_buffer.data()),
-                        mf.info_->return_type_index,
-                        manager_);
-    }
+    // overload for member function taking no parameters
+    variable call_member_function(const member_function& mf);
 
 private:
     // holds type erased value
@@ -673,5 +621,101 @@ operator<<(std::ostream& out, const free_function_& ff)
     out << ')';
 
     return out;
+}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// DEFINITIONS
+namespace shadow
+{
+inline variable::variable() : value_(), type_index_(0), manager_(nullptr)
+{
+}
+
+
+inline variable::variable(const any& value,
+                          std::size_t type_index,
+                          const reflection_manager* manager)
+    : value_(value), type_index_(type_index), manager_(manager)
+{
+}
+
+
+inline variable
+variable::get_member_variable(const member_variable& mv) const
+{
+    auto bind_point = mv.info_->get_bind_point;
+
+    return variable(bind_point(value_), mv.info_->type_index, manager_);
+}
+
+
+inline variable
+variable::get_member_variable(member_variable_iterator mv_it) const
+{
+    auto bind_point = mv_it->info_->get_bind_point;
+
+    return variable(bind_point(value_), mv_it->info_->type_index, manager_);
+}
+
+
+inline void
+variable::set_member_variable(const member_variable& mv, const variable& val)
+{
+    auto bind_point = mv.info_->set_bind_point;
+
+    bind_point(value_, val.value_);
+}
+
+
+template <class Iterator>
+inline variable
+variable::call_member_function(const member_function& mf,
+                               Iterator arg_begin,
+                               Iterator arg_end)
+{
+    auto bind_point = mf.info_->bind_point;
+
+    // construct arg buffer
+    std::vector<any> arg_buffer;
+    arg_buffer.reserve(mf.info_->num_parameters);
+
+    std::transform(arg_begin,
+                   arg_end,
+                   std::back_inserter(arg_buffer),
+                   [](const variable& var) { return var.value_; });
+
+    if(arg_buffer.size() != mf.info_->num_parameters)
+    {
+        throw argument_error("wrong number of arguments provided");
+    }
+
+    for(auto i = 0ul; i < mf.info_->num_parameters; ++i)
+    {
+        if(mf.info_->parameter_type_indices[i] != arg_begin->type_index_)
+        {
+            throw argument_error("wrong argument type");
+        }
+
+        ++arg_begin;
+    }
+
+    return variable(bind_point(value_, arg_buffer.data()),
+                    mf.info_->return_type_index,
+                    manager_);
+}
+
+inline variable
+variable::call_member_function(const member_function& mf)
+{
+    if(mf.info_->num_parameters)
+    {
+        throw argument_error("wrong number of arguments");
+    }
+
+    auto bind_point = mf.info_->bind_point;
+
+    return variable(
+        bind_point(value_, nullptr), mf.info_->return_type_index, manager_);
 }
 }
