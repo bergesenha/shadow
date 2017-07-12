@@ -190,6 +190,28 @@ main()
                   << '\n';
     }
 
+    std::cout << "\n\n\nMember Functions of intholder\n";
+
+    auto mem_fun_range = an_intholder.member_functions();
+
+    auto found_mem_fun_2 = std::find_if(
+        mem_fun_range.first, mem_fun_range.second, [](const auto& mf) {
+            return mf.name() == std::string("member_function2");
+        });
+
+    if(found_mem_fun_2 != mem_fun_range.second)
+    {
+        std::cout << "found member function member_function2\n";
+        shadow::variable mf2args[] = {myspace::static_create<int>(2),
+                                      myspace::static_create<char>('a')};
+
+        auto mf2res = an_intholder.call_member_function(
+            *found_mem_fun_2, std::begin(mf2args), std::end(mf2args));
+
+        std::cout << "calling member_function2 with 2 and a: " << mf2res
+                  << '\n';
+    }
+
     std::cout << "\n\n\nFree Functions:\n";
     auto free_function_range = myspace::manager.free_functions();
     for(auto i = free_function_range.first; i != free_function_range.second;
