@@ -342,9 +342,7 @@ public:
 public:
     // default constructor, constructs an empty variable of type index 0
     // corresponding to a type of 'void'
-    variable() : value_(), type_index_(0), manager_(nullptr)
-    {
-    }
+    variable();
 
     // full constructor, typically invoked by reflection_manager or
     // static_create function template
@@ -673,5 +671,14 @@ operator<<(std::ostream& out, const free_function_& ff)
     out << ')';
 
     return out;
+}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// DEFINITIONS
+namespace shadow
+{
+inline variable::variable() : value_(), type_index_(0), manager_(nullptr)
+{
 }
 }
