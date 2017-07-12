@@ -574,7 +574,8 @@ public:
                 if(found ==
                    manager->conversion_info_indices_by_type_[from_index].end())
                 {
-                    throw argument_error("conversion of argument not possible");
+                    throw type_conversion_error(
+                        "conversion of argument not possible");
                 }
 
                 const auto found_conversion_index = *found;
