@@ -389,6 +389,12 @@ public:
     // overload for member function taking no parameters
     variable call_member_function(const member_function& mf);
 
+    // overload taking member_function_iterator as identifier
+    template <class Iterator>
+    variable call_member_function(member_function_iterator mf_it,
+                                  Iterator arg_begin,
+                                  Iterator arg_end);
+
 private:
     // holds type erased value
     any value_;
@@ -743,5 +749,15 @@ variable::call_member_function(const member_function& mf)
 
     return variable(
         bind_point(value_, nullptr), mf.info_->return_type_index, manager_);
+}
+
+
+template <class Iterator>
+inline variable
+variable::call_member_function(member_function_iterator mf_it,
+                               Iterator arg_begin,
+                               Iterator arg_end)
+{
+    return call_member_function(*mf_it, arg_begin, arg_end);
 }
 }

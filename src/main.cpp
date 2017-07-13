@@ -206,7 +206,7 @@ main()
                                       myspace::static_create<char>('a')};
 
         auto mf2res = an_intholder.call_member_function(
-            *found_mem_fun_2, std::begin(mf2args), std::end(mf2args));
+            found_mem_fun_2, std::begin(mf2args), std::end(mf2args));
 
         std::cout << "calling member_function2 with 2 and a: " << mf2res
                   << '\n';
