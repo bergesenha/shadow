@@ -221,7 +221,7 @@ main()
     {
         std::cout << "found member function 1\n";
 
-        auto mf1res = an_intholder.call_member_function(*found_mem_fun_1);
+        auto mf1res = an_intholder.call_member_function(found_mem_fun_1);
 
         std::cout << "return value of member function 1: " << mf1res << '\n';
     }

@@ -395,6 +395,10 @@ public:
                                   Iterator arg_begin,
                                   Iterator arg_end);
 
+    // overload taking member_function_iterator as identifier and calling member
+    // function with no arguments
+    variable call_member_function(member_function_iterator mf_it);
+
 private:
     // holds type erased value
     any value_;
@@ -759,5 +763,11 @@ variable::call_member_function(member_function_iterator mf_it,
                                Iterator arg_end)
 {
     return call_member_function(*mf_it, arg_begin, arg_end);
+}
+
+inline variable
+variable::call_member_function(member_function_iterator mf_it)
+{
+    return call_member_function(*mf_it);
 }
 }
