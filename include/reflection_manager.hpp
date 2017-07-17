@@ -195,6 +195,9 @@ public:
                        Iterator arg_begin,
                        Iterator arg_end) const;
 
+    // overload for default constructors
+    variable construct(const constructor& ctr) const;
+
 private:
     // pairs hold iterators to beginning and end of arrays of information
     // generated at compile time
@@ -574,6 +577,19 @@ reflection_manager::construct(const constructor& ctr,
 
     return variable(
         ctr.info_->bind_point(arg_buffer.data()), ctr.info_->type_index, this);
+}
+
+
+inline variable
+reflection_manager::construct(const constructor& ctr) const
+{
+    if(ctr.num_parameters() != 0)
+    {
+        throw argument_error("wrong number of arguments provided");
+    }
+
+    return variable(
+        ctr.info_->bind_point(nullptr), ctr.info_->type_index, this);
 }
 }
 

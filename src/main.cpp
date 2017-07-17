@@ -201,7 +201,7 @@ main()
 
     // construct arguments
     shadow::variable args[] = {myspace::static_create<int>(23),
-                               myspace::static_create<float>(2.534)};
+                               myspace::static_create<double>(2.534)};
 
     // construct an intholder variable
     try
@@ -214,5 +214,29 @@ main()
     catch(const shadow::argument_error& err)
     {
         std::cerr << "construction failed with: " << err.what() << '\n';
+    }
+
+
+    // find default constructor
+    auto found_default_ctor =
+        std::find_if(constructors_pair.first,
+                     constructors_pair.second,
+                     [](const auto& ctr) { return ctr.num_parameters() == 0; });
+
+    if(found_default_ctor == constructors_pair.second)
+    {
+        std::cerr << "default constructor not found\n";
+        exit(EXIT_FAILURE);
+    }
+
+    try
+    {
+        auto intholder_variable =
+            myspace::manager.construct(*found_default_ctor);
+        std::cout << intholder_variable << '\n';
+    }
+    catch(const shadow::argument_error& err)
+    {
+        std::cerr << "constructor failed with: " << err.what() << '\n';
     }
 }
