@@ -163,5 +163,50 @@ typedef shadow::api_type_aggregator<shadow::type_info,
 int
 main()
 {
-    // create an intholder
+    // find type of intholder
+    auto types_pair = myspace::manager.types();
+
+    auto found_intholder =
+        std::find_if(types_pair.first, types_pair.second, [](const auto& tp) {
+            return tp.name() == std::string("intholder");
+        });
+
+    if(found_intholder == types_pair.second)
+    {
+        std::cerr << "unable to find intholder type\n";
+        exit(EXIT_FAILURE);
+    }
+
+
+    // get constructors for intholder
+    auto constructors_pair =
+        myspace::manager.constructors_by_type(*found_intholder);
+
+    std::cout << std::distance(constructors_pair.first,
+                               constructors_pair.second)
+              << " constructors found for: " << *found_intholder << '\n';
+
+    // find constructor taking two arguments
+    auto found_constructor =
+        std::find_if(constructors_pair.first,
+                     constructors_pair.second,
+                     [](const auto& ctr) { return ctr.num_parameters() == 2; });
+
+    if(found_constructor == constructors_pair.second)
+    {
+        std::cerr << "constructor taking two arguments not found\n";
+        exit(EXIT_FAILURE);
+    }
+
+
+    // construct arguments
+    shadow::variable args[] = {myspace::static_create<int>(23),
+                               myspace::static_create<double>(2.534)};
+
+    // construct an intholder variable
+    auto intholder_variable = myspace::manager.construct(
+        *found_constructor, std::begin(args), std::end(args));
+
+
+    std::cout << intholder_variable << '\n';
 }

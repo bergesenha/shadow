@@ -189,6 +189,12 @@ public:
     template <class TypeUniverseList, class T>
     variable static_create(const T& value) const;
 
+    // call constructor to create variable
+    template <class Iterator>
+    variable construct(const constructor& ctr,
+                       Iterator arg_begin,
+                       Iterator arg_end) const;
+
 private:
     // pairs hold iterators to beginning and end of arrays of information
     // generated at compile time
@@ -526,6 +532,33 @@ reflection_manager::static_create(const T& value) const
         metamusil::t_list::index_of_type_v<TypeUniverseList, T>;
 
     return variable(value, type_index, this);
+}
+
+
+template <class Iterator>
+inline variable
+reflection_manager::construct(const constructor& ctr,
+                              Iterator arg_begin,
+                              Iterator arg_end) const
+{
+    auto bind_point = ctr.info_->bind_point;
+
+    std::vector<any> arg_buffer;
+    arg_buffer.reserve(ctr.num_parameters());
+
+    std::transform(arg_begin,
+                   arg_end,
+                   std::back_inserter(arg_buffer),
+                   [](const variable& var) { return var.value_; });
+
+    if(arg_buffer.size() != ctr.num_parameters())
+    {
+        throw argument_error("wrong number of arguments provided");
+    }
+
+    // TODO: check argument types
+
+    return variable(bind_point(arg_buffer.data()), ctr.info_->type_index, this);
 }
 }
 
