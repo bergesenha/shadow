@@ -201,12 +201,18 @@ main()
 
     // construct arguments
     shadow::variable args[] = {myspace::static_create<int>(23),
-                               myspace::static_create<double>(2.534)};
+                               myspace::static_create<float>(2.534)};
 
     // construct an intholder variable
-    auto intholder_variable = myspace::manager.construct(
-        *found_constructor, std::begin(args), std::end(args));
+    try
+    {
+        auto intholder_variable = myspace::manager.construct(
+            *found_constructor, std::begin(args), std::end(args));
 
-
-    std::cout << intholder_variable << '\n';
+        std::cout << intholder_variable << '\n';
+    }
+    catch(const shadow::argument_error& err)
+    {
+        std::cerr << "construction failed with: " << err.what() << '\n';
+    }
 }
