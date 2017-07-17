@@ -239,4 +239,11 @@ main()
     {
         std::cerr << "constructor failed with: " << err.what() << '\n';
     }
+
+
+    // construct intholder variable using static_create
+    {
+        auto intholder_variable = myspace::static_create<intholder>(10, 23.5);
+        std::cout << intholder_variable << '\n';
+    }
 }
