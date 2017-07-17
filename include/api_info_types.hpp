@@ -328,6 +328,8 @@ class variable
     template <class Derived>
     friend class call_free_function;
 
+    friend class reflection_manager;
+
 public:
     typedef member_function_ member_function;
     typedef indexed_info_iterator_<const member_function_info,
