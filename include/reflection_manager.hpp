@@ -186,8 +186,8 @@ public:
     string_serializers() const;
 
     // create variable specified at compile time
-    template <class TypeUniverseList, class T>
-    variable static_create(const T& value) const;
+    template <class TypeUniverseList, class T, class... Args>
+    variable static_create(const Args&... args) const;
 
     // call constructor to create variable
     template <class Iterator>
@@ -527,15 +527,21 @@ reflection_manager::string_serializers() const
 }
 
 
-template <class TypeUniverseList, class T>
+template <class TypeUniverseList, class T, class... Args>
 inline variable
-reflection_manager::static_create(const T& value) const
+reflection_manager::static_create(const Args&... args) const
 {
     const auto type_index =
         metamusil::t_list::index_of_type_v<TypeUniverseList, T>;
 
-    return variable(value, type_index, this);
+    return variable(any(T(args...)), type_index, this);
 }
+
+// this template alias definition is used in macro SHADOW_INIT to create a
+// binding to a global instance of a reflection_manager
+template <class... Args>
+using static_create_member_pointer_type =
+    variable (reflection_manager::*)(const Args&...) const;
 
 
 template <class Iterator>
