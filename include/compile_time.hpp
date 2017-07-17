@@ -839,11 +839,11 @@ struct generate_array_of_string_serialization_info_holder
         string_serialization_info_array_holder()};                             \
                                                                                \
     template <class T, class... Args>                                          \
-    shadow::variable static_create(const Args&... args)                        \
+    shadow::variable static_create(Args&&... args)                             \
     {                                                                          \
         shadow::static_create_member_pointer_type<Args...> ptr =               \
             &shadow::reflection_manager::static_create<type_universe, T>;      \
                                                                                \
-        return (manager.*ptr)(args...);                                        \
+        return (manager.*ptr)(std::forward<Args>(args)...);                    \
     }
 
