@@ -838,12 +838,12 @@ struct generate_array_of_string_serialization_info_holder
         member_variable_info_array_holder(),                                   \
         string_serialization_info_array_holder()};                             \
                                                                                \
-    template <class TypeUniverseList, class T>                                 \
-    shadow::variable static_create_binding(const T& val)                       \
+    template <class T, class... Args>                                          \
+    shadow::variable static_create(Args&&... args)                             \
     {                                                                          \
-        return manager.static_create<TypeUniverseList>(val);                   \
-    }                                                                          \
+        shadow::static_create_member_pointer_type<Args...> ptr =               \
+            &shadow::reflection_manager::static_create<type_universe, T>;      \
                                                                                \
-    template <class T>                                                         \
-    constexpr auto static_create = &static_create_binding<type_universe, T>;
+        return (manager.*ptr)(std::forward<Args>(args)...);                    \
+    }
 
