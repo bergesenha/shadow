@@ -155,11 +155,6 @@ SHADOW_INIT()
 }
 
 
-typedef shadow::api_type_aggregator<shadow::type_info,
-                                    shadow::get_name_policy,
-                                    shadow::get_size_policy>
-    myapitype;
-
 int
 main()
 {
