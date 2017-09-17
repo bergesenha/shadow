@@ -156,4 +156,22 @@ REGISTER_MEMBER_VARIABLE(baz, baz_data1)
 REGISTER_MEMBER_VARIABLE_END()
 }
 
+### Finalizing Registration and Initializing Shadow
+When all desired information is registered, the macro SHADOW_INIT() initializes
+the library for use. SHADOW_INIT() declares a global variable of type
+shadow::reflection_manager within the namespace that information was registered.
+The shadow::reflection_manager is the main point of interaction with the
+reflection system.
+
+Example combining the above:
+
+```c++
+namespace my_space
+{
+REGISTER_TYPE_BEGIN()
+
+REGISTER_TYPE_END()
+}
+```
+
 ## Building
