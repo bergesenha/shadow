@@ -47,7 +47,7 @@ member variables before registering all the constructors.
 ### Registering Constructors
 In order to have the ability to construct and instantiate objects of a given
 type through the reflection system, the desired constructors of that type must
-also be registered. This is done with the REGISTER_CONSTRUCTOR(type_name,
+be registered. This is done with the REGISTER_CONSTRUCTOR(type_name,
 param_type1, param_type2, ...) macro. Similarly to the REGISTER_TYPE macros,
 REGISTER_CONSTRUCTOR macro calls must be enclosed within
 REGISTER_CONSTRUCTOR_BEGIN and REGISTER_CONSTRUCTOR_END macros.
@@ -109,5 +109,51 @@ REGISTER_FREE_FUNCTION_END()
 
 }
 ```
+
+### Registering Member Functions
+Similarly to registering free functions, member functions are registered with
+REGISTER_MEMBER_FUNCTION(object_type, member_function_name) and
+REGISTER_MEMBER_FUNCTION_EXPLICIT(object_type, member_function_name,
+return_type, param_type1, param_type2, ...).
+
+For example, if foo_memfun is a member function of the type foo with no
+overloads and bar_memfun of the type bar and has two overloads both with 'return
+type' void, one taking an int and one taking char and double:
+
+```c++
+namespace my_space
+{
+// type registration as above
+
+REGISTER_MEMBER_FUNCTION_BEGIN()
+
+REGISTER_MEMBER_FUNCTION(foo, foo_memfun)
+
+REGISTER_MEMBER_FUNCTION_EXPLICIT(bar, bar_memfun, void, int)
+REGISTER_MEMBER_FUNCTION_EXPLICIT(bar, bar_memfun, void, char, double)
+
+REGISTER_MEMBER_FUNCTION_END()
+
+}
+```
+
+### Registering Member Variables
+Any public member variable may be registered (provided that the type of the
+member variable is registered) using the macro
+REGISTER_MEMBER_VARIABLE(object_type, mem_var_name) enclosed within
+REGISTER_MEMBER_VARIABLE_BEGIN and REGISTER_MEMBER_VARIABLE_END macros. 
+
+For example, if baz has a public member variable baz_data1:
+
+namespace my_space
+{
+// type registration as above
+
+REGISTER_MEMBER_VARIABLE_BEGIN()
+
+REGISTER_MEMBER_VARIABLE(baz, baz_data1)
+
+REGISTER_MEMBER_VARIABLE_END()
+}
 
 ## Building
