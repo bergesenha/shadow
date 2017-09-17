@@ -39,8 +39,13 @@ Registering of fundamental types is already handled and is done within
 the REGISTER_TYPE_END macro, so there is no need to register ints, longs or
 doubles etc...
 
+Registering of types needs to come before all other, however once types are
+registered, constructors, free functions, member functions and member variables
+may be registered in any order you wish. For example, you may register all
+member variables before registering all the constructors.
+
 ### Registering Constructors
-To order to have the ability to construct and instantiate objects of a given
+In order to have the ability to construct and instantiate objects of a given
 type through the reflection system, the desired constructors of that type must
 also be registered. This is done with the REGISTER_CONSTRUCTOR(type_name,
 param_type1, param_type2, ...) macro. Similarly to the REGISTER_TYPE macros,
@@ -65,6 +70,42 @@ REGISTER_CONSTRUCTOR(bar_type, int, double)
 REGISTER_CONSTRUCTOR(baz_type, char)
 
 REGISTER_CONSTRUCTOR_END()
+
+}
+```
+
+### Registering Free Functions
+Registering free functions in the reflection system is done with the
+REGISTER_FREE_FUNCTION and REGISTER_FREE_FUNCTION_EXPLICIT macros enclosed
+within REGISTER_FREE_FUNCTION_BEGIN and REGISTER_FREE_FUNCTION_END macros.
+
+REGISTER_FREE_FUNCTION(function_name) is used for functions where there is no
+ambiguity in what the function_name refers to, in general when there are no
+overloads of the function and so the reflection system can infer the signature
+of the function.
+
+REGISTER_FREE_FUNCTION_EXPLICIT(function_name, return_type, param_type1,
+param_type2, ...) is used when there exists an overload set for the function
+and so the reflection system needs to be told the exact signature.
+
+For example, if foo_function refers to a simple function with no overloads and
+bar_function refers to two overloads returning int, one has a double parameter
+and one has a foo_type parameter:
+
+```c++
+namespace my_space
+{
+// type registration as above
+
+
+REGISTER_FREE_FUNCTION_BEGIN()
+
+REGISTER_FREE_FUNCTION(foo_function)
+
+REGISTER_FREE_FUNCTION_EXPLICIT(bar_function, int, double)
+REGISTER_FREE_FUNCTION_EXPLICIT(bar_function, int, foo_type)
+
+REGISTER_FREE_FUNCTION_END()
 
 }
 ```
