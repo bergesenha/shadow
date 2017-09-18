@@ -162,18 +162,61 @@ REGISTER_MEMBER_VARIABLE_END()
 
 #### Finalizing Registration and Initializing Shadow
 When all desired information is registered, the macro SHADOW_INIT() initializes
-the library for use. SHADOW_INIT() declares a global variable of type
-shadow::reflection_manager within the namespace that information was registered.
-The shadow::reflection_manager is the main point of interaction with the
-reflection system.
+the library for use. SHADOW_INIT() declares a global variable named 'manager' of
+type shadow::reflection_manager within the namespace that information was
+registered. The shadow::reflection_manager is the main point of interaction with
+the reflection system.
 
 Example combining the above:
 
 ```c++
 namespace my_space
 {
+// register types
 REGISTER_TYPE_BEGIN()
 
+REGISTER_TYPE(foo_type)
+REGISTER_TYPE(bar_type)
+
 REGISTER_TYPE_END()
+
+// register constructors
+REGISTER_CONSTRUCTOR_BEGIN()
+
+REGISTER_CONSTRUCTOR(foo_type)
+REGISTER_CONSTRUCTOR(bar_type)
+REGISTER_CONSTRUCTOR(bar_type, int, double)
+REGISTER_CONSTRUCTOR(baz_type, char)
+
+REGISTER_CONSTRUCTOR_END()
+
+// register free functions
+REGISTER_FREE_FUNCTION_BEGIN()
+
+REGISTER_FREE_FUNCTION(foo_function)
+
+REGISTER_FREE_FUNCTION_EXPLICIT(bar_function, int, double)
+REGISTER_FREE_FUNCTION_EXPLICIT(bar_function, int, foo_type)
+
+REGISTER_FREE_FUNCTION_END()
+
+// register member functions
+REGISTER_MEMBER_FUNCTION_BEGIN()
+
+REGISTER_MEMBER_FUNCTION(foo, foo_memfun)
+
+REGISTER_MEMBER_FUNCTION_EXPLICIT(bar, bar_memfun, void, int)
+REGISTER_MEMBER_FUNCTION_EXPLICIT(bar, bar_memfun, void, char, double)
+
+REGISTER_MEMBER_FUNCTION_END()
+
+// register member variables
+REGISTER_MEMBER_VARIABLE_BEGIN()
+
+REGISTER_MEMBER_VARIABLE(baz, baz_data1)
+
+REGISTER_MEMBER_VARIABLE_END()
+
+SHADOW_INIT()
 }
 ```
