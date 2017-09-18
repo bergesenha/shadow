@@ -221,7 +221,7 @@ SHADOW_INIT()
 }
 ```
 
-### Querying the Reflection System
+### Interacting with the Reflection System
 For the following examples it is assumed that the registration and
 initialization was done in the namespace 'my_space'.
 
@@ -321,7 +321,7 @@ auto baz_member_variables2 = my_space::manager.member_variables_by_type(baz_type
 ```
 
 Both member functions return a `std::pair` of iterators to
-`shadow::reflection::manager::member_variable or
+`shadow::reflection_manager::member_variable or
 shadow::variable::member_variable`, which can be queried for information:
 ```c++
 auto first_member_variable = *baz_member_variables.first;
@@ -387,3 +387,26 @@ shadow::variable return_value = a_baz_type.call_member_function(
 If the arguments given do not match the signature of the underlying member
 function, a shadow::argument_error exception will be thrown.
 
+#### Querying for and Calling Free Functions
+To query for all free functions registered in the reflection system:
+```c++
+auto free_functions_pair = my_space::manager.free_functions();
+
+shadow::reflection_manager::free_function first_free_function =
+    *free_functions_pair.first;
+
+std::string function_name = first_free_function.name();
+std::size_t num_params = first_free_function.num_parameters();
+auto parameter_types_pair = first_free_function.parameter_types();
+shadow::reflection_manager::type return_type =
+    first_free_function.return_type();
+```
+
+Free functions are called directly from the
+shadow::reflection_manager::free_function information type via the function call
+operator as it is not owned by any type.
+```c++
+// args is some container of shadow::variable
+shadow::variable return_value = first_free_function(std::begin(args),
+                                                    std::end(args));
+```
