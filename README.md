@@ -240,3 +240,23 @@ auto first_type = *types_pair.first;
 std::string name_of_first_type = first_type.name();
 std::size_t size_of_first_type = first_type.size();
 ```
+
+#### Querying for Constructors of a Type
+To query for the constructors available for a type:
+```c++
+auto constructors_pair = my_space::manager.constructors_by_type(first_type);
+```
+
+The `constructors_by_type` member function returns a `std::pair` of iterators to
+`shadow::reflection_manager::constructor`, that can be queried for the number of
+parameters, the types of the parameters, and of course the type that it
+constructs:
+```c++
+auto first_constructor = *constructors_pair.first;
+
+std::size_t num_parameters = first_constructor.num_parameters();
+auto parameters_pair = first_constructor.parameter_types();
+
+assert(first_constructor.get_type() == first_type);
+```
+
