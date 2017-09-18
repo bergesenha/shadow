@@ -195,8 +195,8 @@ main()
 
 
     // construct arguments
-    shadow::variable args[] = {myspace::static_create<int>(23),
-                               myspace::static_create<double>(2.534)};
+    std::vector<shadow::variable> args = {
+        myspace::static_create<int>(23), myspace::static_create<double>(2.534)};
 
     // construct an intholder variable
     try

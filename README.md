@@ -162,9 +162,9 @@ REGISTER_MEMBER_VARIABLE_END()
 
 #### Finalizing Registration and Initializing Shadow
 When all desired information is registered, the macro SHADOW_INIT() initializes
-the library for use. SHADOW_INIT() declares a global variable named 'manager' of
-type shadow::reflection_manager within the namespace that information was
-registered. The shadow::reflection_manager is the main point of interaction with
+the library for use. SHADOW_INIT() declares a global variable named `manager` of
+type `shadow::reflection_manager` within the namespace that information was
+registered. The `shadow::reflection_manager` is the main point of interaction with
 the reflection system.
 
 Example combining the above:
@@ -260,3 +260,43 @@ auto parameters_pair = first_constructor.parameter_types();
 assert(first_constructor.get_type() == first_type);
 ```
 
+#### Constructing Objects and Variables
+Shadow uses the type `shadow::variable` as a homogenous vessel to hold an object
+of any type that is registered in the reflection system. It is similar in
+concept to `std::any` in that it uses type erasure to be able to contain
+values of arbitrary types. In addition, an instance of `shadow::variable`
+contains metadata about the type of the value held within enabling us to
+interact with the value at runtime without having to know the type at compile
+time.
+
+To construct an object of a type that is known at compile time, a function
+template `template <class T, class... Args> shadow::variable
+static_create(Args&&... args)` is available in the namespace that registration and
+initialization was done:
+```c++
+shadow::variable a_foo_type = my_space::static_create<foo_type>();
+shadow::variable a_bar_type = my_space::static_create<bar_type>(23, 55.234);
+```
+`static_create` forwards the arguments to the constructor of the type and looks
+up the correct metadata about the type at compile time.
+
+To construct an object of a type decided at runtime, we can use the member
+function `shadow::reflection_manager::construct`. `construct` takes a
+`shadow::reflection_manager::constructor` as its first argument, and two
+iterators pointing to a range of `shadow::variable` to be used as arguments to
+the constructor. `construct` is templated on the iterators so we are free to use
+any container to hold the arguments.
+
+Assuming we have correctly queried and identified the constructor for bar_type
+taking int and double as arguments:
+```c++
+// create a container of arguments
+std::vector<shadow::variable> args =
+{ my_space::static_create<int>(23),
+  my_space::static_create<double>(55.234) };
+
+shadow::variable a_bar_type = my_space::manager.construct(bar_type_constructor,
+                                                          args.begin(),
+                                                          args.end());
+
+```
