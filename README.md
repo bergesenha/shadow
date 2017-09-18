@@ -346,3 +346,44 @@ a_baz_type.get_member_variable(first_member_variable);
 a_baz_type.set_member_variable(first_member_variable,
                                my_space::static_create<char>('a'));
 ```
+
+#### Querying for and Calling Member Functions
+As with member variables, member functions available can be queried from the
+global instance of `shadow::reflection_manager` or directly from a
+`shadow::variable`:
+```c+++
+auto baz_member_functions = a_baz_type.member_functions();
+
+auto baz_member_functions2 =
+    my_space::manager.member_functions_by_type(baz_type_tag);
+```
+
+As with member variables, we get a `std::pair` of iterators to
+`shadow::reflection_manager::member_function or
+shadow::variable::member_function` information objects. To query for information
+about a member function:
+```c++
+auto first_member_function = *baz_member_functions.first;
+
+std::string mem_fun_name = first_member_function.name();
+std::size_t num_params = first_member_function.num_parameters();
+auto param_types_pair = first_member_function.parameter_types();
+shadow::reflection_manager::type return_type =
+    first_member_function.return_type();
+shadow::reflection_manager::type object_type =
+    first_member_function.object_type();
+```
+
+A member function is called from the `shadow::variable` holding the object to
+call the member function from:
+```c++
+// args is some container of shadow::variable as arguments
+shadow::variable return_value = a_baz_type.call_member_function(
+                        first_member_function,
+                        std::begin(args),
+                        std::end(args));
+```
+
+If the arguments given do not match the signature of the underlying member
+function, a shadow::argument_error exception will be thrown.
+
