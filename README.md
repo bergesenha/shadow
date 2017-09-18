@@ -5,13 +5,15 @@ Shadow reflection library is in early development. The API is probably going to
 change and the library is not feature complete.
 
 
-## Use
+## Usage
+
+### Registering Information and Setup
 Before you can use any of your own types, members, or functions through the
 reflection system all the relevant information must be registered. This is done
 using macros at namespace scope, typically in your own namespace within the
 global namespace scope.
 
-### Registering Types
+#### Registering Types
 Before registering anything else you need to register all the custom types that
 you intend to have access to through the reflection system. This is done with
 the REGISTER_TYPE(type_name) successively for all your types enclosed with
@@ -44,7 +46,7 @@ registered, constructors, free functions, member functions and member variables
 may be registered in any order you wish. For example, you may register all
 member variables before registering all the constructors.
 
-### Registering Constructors
+#### Registering Constructors
 In order to have the ability to construct and instantiate objects of a given
 type through the reflection system, the desired constructors of that type must
 be registered. This is done with the REGISTER_CONSTRUCTOR(type_name,
@@ -74,7 +76,7 @@ REGISTER_CONSTRUCTOR_END()
 }
 ```
 
-### Registering Free Functions
+#### Registering Free Functions
 Registering free functions in the reflection system is done with the
 REGISTER_FREE_FUNCTION and REGISTER_FREE_FUNCTION_EXPLICIT macros enclosed
 within REGISTER_FREE_FUNCTION_BEGIN and REGISTER_FREE_FUNCTION_END macros.
@@ -110,7 +112,7 @@ REGISTER_FREE_FUNCTION_END()
 }
 ```
 
-### Registering Member Functions
+#### Registering Member Functions
 Similarly to registering free functions, member functions are registered with
 REGISTER_MEMBER_FUNCTION(object_type, member_function_name) and
 REGISTER_MEMBER_FUNCTION_EXPLICIT(object_type, member_function_name,
@@ -137,7 +139,7 @@ REGISTER_MEMBER_FUNCTION_END()
 }
 ```
 
-### Registering Member Variables
+#### Registering Member Variables
 Any public member variable may be registered (provided that the type of the
 member variable is registered) using the macro
 REGISTER_MEMBER_VARIABLE(object_type, mem_var_name) enclosed within
@@ -145,6 +147,7 @@ REGISTER_MEMBER_VARIABLE_BEGIN and REGISTER_MEMBER_VARIABLE_END macros.
 
 For example, if baz has a public member variable baz_data1:
 
+```c++
 namespace my_space
 {
 // type registration as above
@@ -155,8 +158,9 @@ REGISTER_MEMBER_VARIABLE(baz, baz_data1)
 
 REGISTER_MEMBER_VARIABLE_END()
 }
+```
 
-### Finalizing Registration and Initializing Shadow
+#### Finalizing Registration and Initializing Shadow
 When all desired information is registered, the macro SHADOW_INIT() initializes
 the library for use. SHADOW_INIT() declares a global variable of type
 shadow::reflection_manager within the namespace that information was registered.
@@ -173,5 +177,3 @@ REGISTER_TYPE_BEGIN()
 REGISTER_TYPE_END()
 }
 ```
-
-## Building
