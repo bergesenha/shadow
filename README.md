@@ -220,3 +220,23 @@ REGISTER_MEMBER_VARIABLE_END()
 SHADOW_INIT()
 }
 ```
+
+### Querying the Reflection System
+For the following examples it is assumed that the registration and
+initialization was done in the namespace 'my_space'.
+
+#### Querying for Types
+To query for all available types in the reflection system:
+```c++
+auto types_pair = my_space::manager.types();
+```
+
+The `types` member function returns a `std::pair` of iterators to a
+`shadow::reflection_manager::type`, which can be queried for the name of the
+type, the size in bytes of the type, and can be compared for equality:
+```c++
+auto first_type = *types_pair.first;
+
+std::string name_of_first_type = first_type.name();
+std::size_t size_of_first_type = first_type.size();
+```
