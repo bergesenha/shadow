@@ -145,7 +145,7 @@ member variable is registered) using the macro
 REGISTER_MEMBER_VARIABLE(object_type, mem_var_name) enclosed within
 REGISTER_MEMBER_VARIABLE_BEGIN and REGISTER_MEMBER_VARIABLE_END macros. 
 
-For example, if baz has a public member variable baz_data1:
+For example, if baz_type has a public member variable baz_data1:
 
 ```c++
 namespace my_space
@@ -154,7 +154,7 @@ namespace my_space
 
 REGISTER_MEMBER_VARIABLE_BEGIN()
 
-REGISTER_MEMBER_VARIABLE(baz, baz_data1)
+REGISTER_MEMBER_VARIABLE(baz_type, baz_data1)
 
 REGISTER_MEMBER_VARIABLE_END()
 }
@@ -213,7 +213,7 @@ REGISTER_MEMBER_FUNCTION_END()
 // register member variables
 REGISTER_MEMBER_VARIABLE_BEGIN()
 
-REGISTER_MEMBER_VARIABLE(baz, baz_data1)
+REGISTER_MEMBER_VARIABLE(baz_type, baz_data1)
 
 REGISTER_MEMBER_VARIABLE_END()
 
@@ -298,5 +298,51 @@ std::vector<shadow::variable> args =
 shadow::variable a_bar_type = my_space::manager.construct(bar_type_constructor,
                                                           args.begin(),
                                                           args.end());
+```
 
+If the types of the values held in the arguments or the number of arguments
+do not exactly match the signature of the constructor, a shadow::argument_error
+is thrown as an exception.
+
+#### Querying and Getting/Setting Member Variables
+As with constructors, member variables are represented by class that acts as an
+identifier/tag for interacting with the value and as an information interface
+for querying information about the member variable.
+
+Member variables can be queried from the global instance of
+`shadow::reflection_manager` (ie. `my_space::manager`) or directly from a
+`shadow::variable`:
+```c++
+// a_baz_type is a shadow::variable holding an instance of a baz_type
+auto baz_member_variables = a_baz_type.member_variables();
+
+// baz_type_tag is a shadow::reflection_manager::type identifying baz_type
+auto baz_member_variables2 = my_space::manager.member_variables_by_type(baz_type_tag);
+```
+
+Both member functions return a `std::pair` of iterators to
+`shadow::reflection::manager::member_variable or
+shadow::variable::member_variable`, which can be queried for information:
+```c++
+auto first_member_variable = *baz_member_variables.first;
+
+// name of the member variable
+std::string mem_var_name = first_member_variable.name();
+
+// type of the object owning the member variable
+auto mem_var_object_type = first_member_variable.object_type();
+assert(mem_var_object_type == baz_type_tag);
+
+// the type of the member variable
+auto mem_var_type = first_member_variable.get_type();
+```
+
+The member variable of an object held by a `shadow::variable` can be get and
+set with the member variable identifier:
+```c++
+shadow::variable baz_mem_var_value =
+a_baz_type.get_member_variable(first_member_variable);
+
+a_baz_type.set_member_variable(first_member_variable,
+                               my_space::static_create<char>('a'));
 ```
