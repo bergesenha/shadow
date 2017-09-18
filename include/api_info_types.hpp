@@ -15,9 +15,12 @@
 
 namespace shadow
 {
+// forward declaration
 class reflection_manager;
 
 
+// class template for aggregating reflection information types from policies
+// using CRTP
 template <class InfoType, template <class> class... Policies>
 class api_type_aggregator
     : public Policies<api_type_aggregator<InfoType, Policies...>>...
@@ -50,6 +53,8 @@ public:
 };
 
 
+// adds member function name, returning name of the information type where
+// relevant
 template <class Derived>
 class get_name_policy
 {
@@ -62,6 +67,7 @@ public:
 };
 
 
+// adds member function size, returning size of a type
 template <class Derived>
 class get_size_policy
 {
@@ -73,8 +79,24 @@ public:
     }
 };
 
+template <class Derived>
+class compare_policy
+{
+public:
+    bool
+    operator==(const Derived& other) const
+    {
+        return static_cast<const Derived*>(this)->info_ == other.info_;
+    }
+};
 
-typedef api_type_aggregator<type_info, get_name_policy, get_size_policy> type_;
+
+// aggregate type representing type information
+typedef api_type_aggregator<type_info,
+                            get_name_policy,
+                            get_size_policy,
+                            compare_policy>
+    type_;
 
 inline std::ostream&
 operator<<(std::ostream& out, const type_& tp)
@@ -83,6 +105,9 @@ operator<<(std::ostream& out, const type_& tp)
     return out;
 }
 
+
+// adds member function get_type, returning type of an information object where
+// relevant
 template <class Derived>
 class get_type_policy
 {
@@ -100,6 +125,8 @@ public:
 };
 
 
+// adds num_parameters member function, returning the number of parameters of a
+// function, member_function, constructor etc...
 template <class Derived>
 class get_num_parameters_policy
 {
@@ -112,6 +139,9 @@ public:
 };
 
 
+// adds member function parameter_types, returning pair of iterators to type
+// information objects representing the types of the parameters of a function,
+// member function, constructor or other.
 template <class Derived>
 class get_parameter_types_policy
 {
@@ -124,11 +154,14 @@ public:
     parameter_types() const;
 };
 
+
+// aggregate type representing a constructor for a type.
 typedef api_type_aggregator<constructor_info,
                             get_type_policy,
                             get_num_parameters_policy,
                             get_parameter_types_policy>
     constructor_;
+
 
 inline std::ostream&
 operator<<(std::ostream& out, const constructor_& con)
@@ -155,6 +188,7 @@ operator<<(std::ostream& out, const constructor_& con)
 }
 
 
+// adds member function from_type, returning a type information object
 template <class Derived>
 class get_from_type_policy
 {
@@ -171,6 +205,7 @@ public:
 };
 
 
+// adds member function to_type, returning a type information object
 template <class Derived>
 class get_to_type_policy
 {
@@ -187,12 +222,15 @@ public:
 };
 
 
+// aggregate type representing implicit conversions
 typedef api_type_aggregator<conversion_info,
                             get_from_type_policy,
                             get_to_type_policy>
     type_conversion_;
 
 
+// adds member function return_type, returning a type information object
+// representing the return type of a function, member_function etc.
 template <class Derived>
 class get_return_type_policy
 {
@@ -208,6 +246,8 @@ public:
 };
 
 
+// adds member function object_type, returning a type information object
+// representing the object owning the member variable, member function etc...
 template <class Derived>
 class get_object_type_policy
 {
@@ -224,6 +264,7 @@ public:
 };
 
 
+// aggregate type representing a member function
 typedef api_type_aggregator<member_function_info,
                             get_name_policy,
                             get_num_parameters_policy,
@@ -256,6 +297,7 @@ operator<<(std::ostream& out, const member_function_& mf)
 }
 
 
+// aggregate type representing a member variable
 typedef api_type_aggregator<member_variable_info,
                             get_name_policy,
                             get_object_type_policy,
@@ -272,6 +314,7 @@ operator<<(std::ostream& out, const member_variable_& mv)
 }
 
 
+// aggregate type representing a string serializer
 typedef api_type_aggregator<string_serialization_info, get_type_policy>
     string_serializer_;
 
@@ -285,9 +328,12 @@ class variable
     template <class Derived>
     friend class call_free_function;
 
+    friend class reflection_manager;
+
 public:
+    typedef member_function_ member_function;
     typedef indexed_info_iterator_<const member_function_info,
-                                   const member_function_>
+                                   const member_function>
         member_function_iterator;
 
     typedef member_variable_ member_variable;
@@ -296,42 +342,64 @@ public:
         member_variable_iterator;
 
 public:
-    variable() : value_(), type_index_(0), manager_(nullptr)
-    {
-    }
+    // default constructor, constructs an empty variable of type index 0
+    // corresponding to a type of 'void'
+    variable();
 
+    // full constructor, typically invoked by reflection_manager or
+    // static_create function template
     variable(const any& value,
              std::size_t type_index,
-             const reflection_manager* manager)
-        : value_(value), type_index_(type_index), manager_(manager)
-    {
-    }
+             const reflection_manager* manager);
 
 
 public:
+    // returns the type of the value held by the variable
     type_ type() const;
 
+    // returns pair of iterators to all member functions of the type of value
+    // held by variable
     std::pair<member_function_iterator, member_function_iterator>
     member_functions() const;
 
+    // returns pair of iterators to all member variables of the type of value
+    // held by the variable
     std::pair<member_variable_iterator, member_variable_iterator>
     member_variables() const;
 
-    variable
-    get_member_variable(const member_variable& mv) const
-    {
-        auto bind_point = mv.info_->get_bind_point;
+    // return value of member variable represented by mv
+    variable get_member_variable(const member_variable& mv) const;
 
-        return variable(bind_point(value_), mv.info_->type_index, manager_);
-    }
+    // overload returns member variable represented by mv_it, an iterator to a
+    // member_variable
+    variable get_member_variable(member_variable_iterator mv_it) const;
 
-    variable
-    get_member_variable(member_variable_iterator mv_it) const
-    {
-        auto bind_point = mv_it->info_->get_bind_point;
+    // set the value of member variable referred to by mv to val
+    void set_member_variable(const member_variable& mv, const variable& val);
 
-        return variable(bind_point(value_), mv_it->info_->type_index, manager_);
-    }
+    // overload sets the member variable referred to by mv_it, an iterator to a
+    // member_variable
+    void set_member_variable(member_variable_iterator mv_it,
+                             const variable& val);
+
+    // call member function identified by mf
+    template <class Iterator>
+    variable call_member_function(const member_function& mf,
+                                  Iterator arg_begin,
+                                  Iterator arg_end);
+
+    // overload for member function taking no parameters
+    variable call_member_function(const member_function& mf);
+
+    // overload taking member_function_iterator as identifier
+    template <class Iterator>
+    variable call_member_function(member_function_iterator mf_it,
+                                  Iterator arg_begin,
+                                  Iterator arg_end);
+
+    // overload taking member_function_iterator as identifier and calling member
+    // function with no arguments
+    variable call_member_function(member_function_iterator mf_it);
 
 private:
     // holds type erased value
@@ -342,10 +410,13 @@ private:
 };
 
 
+// adds member functions for invoking a free function.
 template <class Derived>
 class call_free_function
 {
 public:
+    // call specified at compile time with arguments as c++ types, no checking
+    // of the arguments
     template <class... Args>
     variable
     call_static_unsafe(Args... args) const
@@ -359,6 +430,9 @@ public:
                         static_cast<const Derived*>(this)->manager_);
     }
 
+    // call specified at compile time with arguments as c++ types, arguments
+    // checked for correctness,
+    // argument_error thrown if not correct
     template <class TypeUniverseList, class... Args>
     variable
     call_static_safe(Args... args) const
@@ -396,6 +470,9 @@ public:
     }
 
 
+    // call specified at runtime, arguments checked for correctness,
+    // arguments given by iterators to variable
+    // argument_error thrown if not correct
     template <class Iterator>
     variable
     operator()(Iterator arg_begin, Iterator arg_end) const
@@ -434,6 +511,8 @@ public:
                         static_cast<const Derived*>(this)->manager_);
     }
 
+    // overload for no parameters, if the function called does take parameters,
+    // argument_error thrown
     variable
     operator()() const
     {
@@ -450,6 +529,9 @@ public:
                         static_cast<const Derived*>(this)->manager_);
     }
 
+    // call specified at runtime, no checking of arguments. If arguments are
+    // arguments given by iterators to variable
+    // incorrect, may result in a segfault.
     template <class Iterator>
     variable
     call_unsafe(Iterator arg_begin, Iterator arg_end) const
@@ -467,6 +549,10 @@ public:
                         static_cast<const Derived*>(this)->manager_);
     }
 
+    // call specified at runtime, will attempt to convert arguments by implicit
+    // arguments given by iterators to variable
+    // conversion matching the parameters of the function. Throws argument_error
+    // if unable to convert or wrong number of arguments.
     template <class Iterator>
     variable
     call_with_conversion(Iterator arg_begin, Iterator arg_end) const
@@ -505,7 +591,8 @@ public:
                 if(found ==
                    manager->conversion_info_indices_by_type_[from_index].end())
                 {
-                    throw argument_error("conversion of argument not possible");
+                    throw type_conversion_error(
+                        "conversion of argument not possible");
                 }
 
                 const auto found_conversion_index = *found;
@@ -523,6 +610,7 @@ public:
 };
 
 
+// aggregate type representing a free function
 typedef api_type_aggregator<free_function_info,
                             get_name_policy,
                             get_num_parameters_policy,
@@ -551,5 +639,137 @@ operator<<(std::ostream& out, const free_function_& ff)
     out << ')';
 
     return out;
+}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// DEFINITIONS
+namespace shadow
+{
+inline variable::variable() : value_(), type_index_(0), manager_(nullptr)
+{
+}
+
+
+inline variable::variable(const any& value,
+                          std::size_t type_index,
+                          const reflection_manager* manager)
+    : value_(value), type_index_(type_index), manager_(manager)
+{
+}
+
+
+inline variable
+variable::get_member_variable(const member_variable& mv) const
+{
+    auto bind_point = mv.info_->get_bind_point;
+
+    return variable(bind_point(value_), mv.info_->type_index, manager_);
+}
+
+
+inline variable
+variable::get_member_variable(member_variable_iterator mv_it) const
+{
+    auto bind_point = mv_it->info_->get_bind_point;
+
+    return variable(bind_point(value_), mv_it->info_->type_index, manager_);
+}
+
+
+inline void
+variable::set_member_variable(const member_variable& mv, const variable& val)
+{
+    if(val.type_index_ != mv.info_->type_index)
+    {
+        throw argument_error("wrong type setting member variable");
+    }
+
+    auto bind_point = mv.info_->set_bind_point;
+
+    bind_point(value_, val.value_);
+}
+
+
+inline void
+variable::set_member_variable(member_variable_iterator mv_it,
+                              const variable& val)
+{
+    if(val.type_index_ != mv_it->info_->type_index)
+    {
+        throw argument_error("wrong type setting member variable");
+    }
+
+    auto bind_point = mv_it->info_->set_bind_point;
+
+    bind_point(value_, val.value_);
+}
+
+
+template <class Iterator>
+inline variable
+variable::call_member_function(const member_function& mf,
+                               Iterator arg_begin,
+                               Iterator arg_end)
+{
+    auto bind_point = mf.info_->bind_point;
+
+    // construct arg buffer
+    std::vector<any> arg_buffer;
+    arg_buffer.reserve(mf.info_->num_parameters);
+
+    std::transform(arg_begin,
+                   arg_end,
+                   std::back_inserter(arg_buffer),
+                   [](const variable& var) { return var.value_; });
+
+    if(arg_buffer.size() != mf.info_->num_parameters)
+    {
+        throw argument_error("wrong number of arguments provided");
+    }
+
+    for(auto i = 0ul; i < mf.info_->num_parameters; ++i)
+    {
+        if(mf.info_->parameter_type_indices[i] != arg_begin->type_index_)
+        {
+            throw argument_error("wrong argument type");
+        }
+
+        ++arg_begin;
+    }
+
+    return variable(bind_point(value_, arg_buffer.data()),
+                    mf.info_->return_type_index,
+                    manager_);
+}
+
+inline variable
+variable::call_member_function(const member_function& mf)
+{
+    if(mf.info_->num_parameters)
+    {
+        throw argument_error("wrong number of arguments");
+    }
+
+    auto bind_point = mf.info_->bind_point;
+
+    return variable(
+        bind_point(value_, nullptr), mf.info_->return_type_index, manager_);
+}
+
+
+template <class Iterator>
+inline variable
+variable::call_member_function(member_function_iterator mf_it,
+                               Iterator arg_begin,
+                               Iterator arg_end)
+{
+    return call_member_function(*mf_it, arg_begin, arg_end);
+}
+
+inline variable
+variable::call_member_function(member_function_iterator mf_it)
+{
+    return call_member_function(*mf_it);
 }
 }

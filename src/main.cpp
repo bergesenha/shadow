@@ -20,11 +20,11 @@ class intholder
 public:
     intholder() = default;
 
-    explicit intholder(int i) : i_(i), d_(0.0), mem_var1(i), mem_var2(0.0)
+    explicit intholder(int i) : mem_var1(i), mem_var2(0.0)
     {
     }
 
-    intholder(int i, double d) : i_(i), d_(d), mem_var1(i), mem_var2(d)
+    intholder(int i, double d) : mem_var1(i), mem_var2(d)
     {
     }
 
@@ -43,22 +43,18 @@ public:
     int
     member_overload(int i)
     {
-        return i_ * i;
+        return mem_var1 * i;
     }
 
     int
     member_overload(float f)
     {
-        return d_ * f;
+        return mem_var2 * f;
     }
 
 
     int mem_var1;
     double mem_var2;
-
-private:
-    int i_;
-    double d_;
 };
 
 
@@ -159,115 +155,90 @@ SHADOW_INIT()
 }
 
 
-typedef shadow::api_type_aggregator<shadow::type_info,
-                                    shadow::get_name_policy,
-                                    shadow::get_size_policy>
-    myapitype;
-
 int
 main()
 {
-    auto an_intholder =
-        myspace::static_create<intholder>(intholder(100, 200.4));
+    // find type of intholder
+    auto types_pair = myspace::manager.types();
 
-    std::cout << an_intholder << '\n';
-
-    auto mem_var_range = an_intholder.member_variables();
-
-    for(; mem_var_range.first != mem_var_range.second; ++mem_var_range.first)
-    {
-        std::cout << *mem_var_range.first << " == ";
-        std::cout << an_intholder.get_member_variable(mem_var_range.first)
-                  << '\n';
-    }
-
-    std::cout << "\n\n\nFree Functions:\n";
-    auto free_function_range = myspace::manager.free_functions();
-    for(auto i = free_function_range.first; i != free_function_range.second;
-        ++i)
-    {
-        std::cout << *i << '\n';
-    }
-
-    // find free function 'hello'
-    auto find_hello = std::find_if(
-        free_function_range.first,
-        free_function_range.second,
-        [](const auto& ffi) { return ffi.name() == std::string("hello"); });
-
-    if(find_hello != free_function_range.second)
-    {
-        auto hello = *find_hello;
-
-
-        std::cout << "\n\nCalling free function 'hello'\n";
-        auto return_value = hello();
-
-        std::cout << "returned value: " << return_value << '\n';
-    }
-
-    auto find_mult = std::find_if(
-        free_function_range.first,
-        free_function_range.second,
-        [](const auto& ffi) { return ffi.name() == std::string("mult"); });
-
-    if(find_mult != free_function_range.second)
-    {
-        auto mult = *find_mult;
-
-        std::cout << "\n\nCalling free function 'mult'\n";
-
-        std::vector<shadow::variable> args;
-        args.push_back(myspace::static_create<double>(34.2));
-        args.push_back(myspace::static_create<int>(3));
-
-        std::vector<shadow::variable> wrong_args;
-        wrong_args.push_back(myspace::static_create<float>(34.2f));
-        wrong_args.push_back(myspace::static_create<std::size_t>(3ul));
-
-        auto return_value = mult(args.begin(), args.end());
-        std::cout << "return value: " << return_value << '\n';
-
-        auto return_value2 = mult.call_unsafe(args.begin(), args.end());
-        std::cout << "return value: " << return_value2 << '\n';
-
-
-        auto return_value3 =
-            mult.call_with_conversion(wrong_args.begin(), wrong_args.end());
-        std::cout << "return value: " << return_value3 << '\n';
-    }
-
-    auto find_overload1_int = std::find_if(
-        free_function_range.first,
-        free_function_range.second,
-        [](const auto& ff) {
-
-            return ff.name() == std::string("overload1") &&
-                   ff.parameter_types().first->name() == std::string("int");
+    auto found_intholder =
+        std::find_if(types_pair.first, types_pair.second, [](const auto& tp) {
+            return tp.name() == std::string("intholder");
         });
 
-    if(find_overload1_int != free_function_range.second)
+    if(found_intholder == types_pair.second)
     {
+        std::cerr << "unable to find intholder type\n";
+        exit(EXIT_FAILURE);
+    }
 
-        std::cout << "\n\nCalling free function 'overload1(int)'\n";
 
-        auto return_value = find_overload1_int->call_static_unsafe(23);
+    // get constructors for intholder
+    auto constructors_pair =
+        myspace::manager.constructors_by_type(*found_intholder);
 
-        std::cout << return_value << '\n';
+    std::cout << std::distance(constructors_pair.first,
+                               constructors_pair.second)
+              << " constructors found for: " << *found_intholder << '\n';
 
-        try
-        {
-            find_overload1_int->call_static_safe<myspace::type_universe>(23,
-                                                                         30);
-        }
-        catch(const shadow::argument_error& exc)
-        {
-            std::cout << "caught argument_error: " << exc.what() << '\n';
-        }
+    // find constructor taking two arguments
+    auto found_constructor =
+        std::find_if(constructors_pair.first,
+                     constructors_pair.second,
+                     [](const auto& ctr) { return ctr.num_parameters() == 2; });
 
-        auto return_value2 =
-            find_overload1_int->call_static_safe<myspace::type_universe>(50);
+    if(found_constructor == constructors_pair.second)
+    {
+        std::cerr << "constructor taking two arguments not found\n";
+        exit(EXIT_FAILURE);
+    }
 
-        std::cout << return_value2 << '\n';
+
+    // construct arguments
+    std::vector<shadow::variable> args = {
+        myspace::static_create<int>(23), myspace::static_create<double>(2.534)};
+
+    // construct an intholder variable
+    try
+    {
+        auto intholder_variable = myspace::manager.construct(
+            *found_constructor, std::begin(args), std::end(args));
+
+        std::cout << intholder_variable << '\n';
+    }
+    catch(const shadow::argument_error& err)
+    {
+        std::cerr << "construction failed with: " << err.what() << '\n';
+    }
+
+
+    // find default constructor
+    auto found_default_ctor =
+        std::find_if(constructors_pair.first,
+                     constructors_pair.second,
+                     [](const auto& ctr) { return ctr.num_parameters() == 0; });
+
+    if(found_default_ctor == constructors_pair.second)
+    {
+        std::cerr << "default constructor not found\n";
+        exit(EXIT_FAILURE);
+    }
+
+    try
+    {
+        auto intholder_variable =
+            myspace::manager.construct(*found_default_ctor);
+        std::cout << intholder_variable << '\n';
+    }
+    catch(const shadow::argument_error& err)
+    {
+        std::cerr << "constructor failed with: " << err.what() << '\n';
+    }
+
+
+    // construct intholder variable using static_create
+    {
+        auto intholder_variable = myspace::static_create<intholder>(10, 23.5);
+        std::cout << intholder_variable << '\n';
     }
 }

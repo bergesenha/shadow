@@ -14,6 +14,7 @@ namespace shadow
 {
 
 
+// class providing the main point of interaction with the reflection system
 class reflection_manager
 {
 public:
@@ -84,6 +85,8 @@ public:
 public:
     reflection_manager();
 
+    // templated complete constructor, typically invoked in macros of the
+    // reflection system
     template <class TypeInfoArrayHolder,
               class ConstructorInfoArrayHolder,
               class ConversionInfoArrayHolder,
@@ -100,6 +103,7 @@ public:
                        StringSerializationInfoArrayHolder);
 
 private:
+    // private member functions used during initialization
     template <class ArrayHolderType>
     std::pair<const typename ArrayHolderType::type*,
               const typename ArrayHolderType::type*>
@@ -129,45 +133,70 @@ private:
 public:
     ////////////////////////////////////////////////////////////////////////////
     // main api interface for interacting with the reflection system
+
+    // returns pair of iterators to all types registered
     std::pair<const_type_iterator, const_type_iterator> types() const;
 
+    // returns pair of iterators to all constructors registered
     std::pair<const_constructor_iterator, const_constructor_iterator>
     constructors() const;
 
+    // returns pair of iterators to all constructors for the given type tp
     std::pair<const_indexed_constructor_iterator,
               const_indexed_constructor_iterator>
     constructors_by_type(const type& tp) const;
 
+    // returns pair of iterators to all implicit conversions registered
     std::pair<const_conversion_iterator, const_conversion_iterator>
     type_conversions() const;
 
+    // returns pair of iterators to all implicit conversions available from the
+    // given type tp
     std::pair<const_indexed_conversion_iterator,
               const_indexed_conversion_iterator>
     type_conversions_by_type(const type& tp) const;
 
+    // returns pair of iterators to all free functions registered
     std::pair<const_free_function_iterator, const_free_function_iterator>
     free_functions() const;
 
+    // returns pair of iterators to all member functions of all types registered
     std::pair<const_member_function_iterator, const_member_function_iterator>
     member_functions() const;
 
+    // returns pair of iterators to all member functions belinging to the given
+    // type tp
     std::pair<const_indexed_member_function_iterator,
               const_indexed_member_function_iterator>
     member_functions_by_type(const type& tp) const;
 
+    // returns pair of iterators to all member variables registered
     std::pair<const_member_variable_iterator, const_member_variable_iterator>
     member_variables() const;
 
+    // returns pair of iterators to all member variables belonging to the given
+    // type tp
     std::pair<const_indexed_member_variable_iterator,
               const_indexed_member_variable_iterator>
     member_variables_by_type(const type& tp) const;
 
+    // returns all available string serializers
     std::pair<const_string_serializer_iterator,
               const_string_serializer_iterator>
     string_serializers() const;
 
-    template <class TypeUniverseList, class T>
-    variable static_create(const T& value) const;
+    // create variable specified at compile time
+    template <class TypeUniverseList, class T, class... Args>
+    variable static_create(Args&&... args) const;
+
+    // call constructor to create variable
+    template <class Iterator>
+    variable construct(const constructor& ctr,
+                       Iterator arg_begin,
+                       Iterator arg_end) const;
+
+    // overload for default constructors
+    variable construct(const constructor& ctr) const;
 
 private:
     // pairs hold iterators to beginning and end of arrays of information
@@ -498,14 +527,75 @@ reflection_manager::string_serializers() const
 }
 
 
-template <class TypeUniverseList, class T>
+template <class TypeUniverseList, class T, class... Args>
 inline variable
-reflection_manager::static_create(const T& value) const
+reflection_manager::static_create(Args&&... args) const
 {
     const auto type_index =
         metamusil::t_list::index_of_type_v<TypeUniverseList, T>;
 
-    return variable(value, type_index, this);
+    return variable(any(T(std::forward<Args>(args)...)), type_index, this);
+}
+
+// this template alias definition is used in macro SHADOW_INIT to create a
+// binding to a global instance of a reflection_manager
+template <class... Args>
+using static_create_member_pointer_type =
+    variable (reflection_manager::*)(Args&&...) const;
+
+
+template <class Iterator>
+inline variable
+reflection_manager::construct(const constructor& ctr,
+                              Iterator arg_begin,
+                              Iterator arg_end) const
+{
+    const auto num_params = ctr.num_parameters();
+
+    std::vector<any> arg_buffer;
+    arg_buffer.reserve(num_params);
+
+    std::transform(arg_begin,
+                   arg_end,
+                   std::back_inserter(arg_buffer),
+                   [](const variable& var) { return var.value_; });
+
+    // check number of arguments provided
+    if(arg_buffer.size() != num_params)
+    {
+        throw argument_error("wrong number of arguments provided");
+    }
+
+    std::vector<std::size_t> arg_type_indices;
+    arg_type_indices.reserve(num_params);
+
+    std::transform(arg_begin,
+                   arg_end,
+                   std::back_inserter(arg_type_indices),
+                   [](const variable& var) { return var.type_index_; });
+
+    if(!std::equal(arg_type_indices.begin(),
+                   arg_type_indices.end(),
+                   ctr.info_->parameter_type_indices))
+    {
+        throw argument_error("wrong argument types provided");
+    }
+
+    return variable(
+        ctr.info_->bind_point(arg_buffer.data()), ctr.info_->type_index, this);
+}
+
+
+inline variable
+reflection_manager::construct(const constructor& ctr) const
+{
+    if(ctr.num_parameters() != 0)
+    {
+        throw argument_error("wrong number of arguments provided");
+    }
+
+    return variable(
+        ctr.info_->bind_point(nullptr), ctr.info_->type_index, this);
 }
 }
 
