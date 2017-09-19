@@ -254,12 +254,15 @@ struct generate_array_of_string_serialization_info_holder
 ////////////////////////////////////////////////////////////////////////////////
 // Type registration
 #define REGISTER_TYPE_BEGIN()                                                  \
+    /* set beginning line number to search from */                             \
     constexpr std::size_t type_line_begin = __LINE__;                          \
+    /* declaration of compile time info later specialized for each line item*/ \
     template <std::size_t LineNum>                                             \
     struct compile_time_type_info;
 
 
 #define REGISTER_TYPE(type_name)                                               \
+    /* specialization contains type information */                             \
     template <>                                                                \
     struct compile_time_type_info<__LINE__>                                    \
     {                                                                          \
@@ -268,8 +271,11 @@ struct generate_array_of_string_serialization_info_holder
         static const std::size_t size = sizeof(type_name);                     \
     };                                                                         \
                                                                                \
+    /* definition required for static member */                                \
     constexpr char compile_time_type_info<__LINE__>::name[];
 
+
+// used internally to register fundamental types
 #define REGISTER_FUNDAMENTAL_BEGIN()                                           \
     template <class T>                                                         \
     struct fundamental_compile_time_info;                                      \
@@ -326,7 +332,7 @@ struct generate_array_of_string_serialization_info_holder
 
 
 #define REGISTER_TYPE_END()                                                    \
-                                                                               \
+    /* register fundamental types */                                           \
     REGISTER_FUNDAMENTAL_BEGIN()                                               \
     REGISTER_FUNDAMENTAL(std::nullptr_t)                                       \
     REGISTER_FUNDAMENTAL(bool)                                                 \
@@ -350,6 +356,7 @@ struct generate_array_of_string_serialization_info_holder
     REGISTER_FUNDAMENTAL(std::string)                                          \
     REGISTER_FUNDAMENTAL_END()                                                 \
                                                                                \
+    /* set ending line number to stop search at */                             \
     constexpr std::size_t type_line_end = __LINE__;                            \
                                                                                \
     typedef metamusil::int_seq::integer_sequence_from_range_t<                 \
@@ -829,6 +836,7 @@ struct generate_array_of_string_serialization_info_holder
     typedef shadow::generate_array_of_string_serialization_info_holder<        \
         type_universe>::type string_serialization_info_array_holder;           \
                                                                                \
+    /* instantiate reflection manager with compile time info */                \
     static const shadow::reflection_manager manager{                           \
         type_info_array_holder(),                                              \
         constructor_info_array_holder(),                                       \
