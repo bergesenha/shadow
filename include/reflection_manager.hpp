@@ -692,6 +692,7 @@ operator<<(std::ostream& out, const variable& var)
 
     if(found != ssi_range.second)
     {
+        // found serializer for built in type
         out << found->serialize_bind_point(var.value_);
     }
     else
@@ -710,6 +711,8 @@ operator<<(std::ostream& out, const variable& var)
             auto index_begin = mem_var_info_indices.cbegin();
             auto index_end = mem_var_info_indices.cend();
 
+            // recurse by constructing shadow::variable of the members and
+            // calling operator<< on it
             out << "\"" << mem_var_info_buffer[*index_begin].name << "\":"
                 << variable(mem_var_info_buffer[*index_begin].get_bind_point(
                                 var.value_),
@@ -756,6 +759,7 @@ operator>>(std::istream& in, variable& var)
     }
     else
     {
+        // TODO: parse json
     }
 
     return in;
