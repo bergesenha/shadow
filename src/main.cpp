@@ -1,19 +1,10 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <sstream>
 
 #include <compile_time.hpp>
 #include <algorithm>
 
-#include <sfinae.hpp>
-#include <type_list.hpp>
-
-template <class T>
-void p(T)
-{
-    puts(__PRETTY_FUNCTION__);
-}
 
 class intholder
 {
