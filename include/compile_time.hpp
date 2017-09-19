@@ -383,7 +383,12 @@ struct generate_array_of_string_serialization_info_holder
                                                                                \
     typedef metamusil::t_list::type_transform_t<all_compile_time_infos,        \
                                                 shadow::extract_type>          \
-        type_universe;
+        type_universe;                                                         \
+                                                                               \
+    REGISTER_CONSTRUCTOR_BEGIN()                                               \
+    REGISTER_FREE_FUNCTION_BEGIN()                                             \
+    REGISTER_MEMBER_FUNCTION_BEGIN()                                           \
+    REGISTER_MEMBER_VARIABLE_BEGIN()
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -815,6 +820,10 @@ struct generate_array_of_string_serialization_info_holder
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize Shadow reflection library
 #define SHADOW_INIT()                                                          \
+    REGISTER_CONSTRUCTOR_END()                                                 \
+    REGISTER_FREE_FUNCTION_END()                                               \
+    REGISTER_MEMBER_FUNCTION_END()                                             \
+    REGISTER_MEMBER_VARIABLE_END()                                             \
                                                                                \
     typedef metamusil::t_list::for_each_combination_t<type_universe,           \
                                                       shadow::type_pair>       \
