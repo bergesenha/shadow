@@ -21,6 +21,9 @@ REGISTER_TYPE_BEGIN() and REGISTER_TYPE_END(). You can register types in
 arbitrary order, even if a type requires a declaration of another type.
 
 ```c++
+#include <shadow.hpp>
+
+
 namespace my_space
 {
 
