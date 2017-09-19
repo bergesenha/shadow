@@ -673,6 +673,8 @@ variable::member_variables() const
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+// stream operators on shadow::variable
 inline std::ostream&
 operator<<(std::ostream& out, const variable& var)
 {
