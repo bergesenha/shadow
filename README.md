@@ -1,4 +1,4 @@
-# SHADOW
+# SHADOW REFLECTION LIBRARY
 
 ## Warning
 Shadow reflection library is in early development. The API is probably going to
