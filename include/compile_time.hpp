@@ -836,6 +836,7 @@ struct generate_array_of_string_serialization_info_holder
     typedef shadow::generate_array_of_string_serialization_info_holder<        \
         type_universe>::type string_serialization_info_array_holder;           \
                                                                                \
+    /* instantiate reflection manager with compile time info */                \
     static const shadow::reflection_manager manager{                           \
         type_info_array_holder(),                                              \
         constructor_info_array_holder(),                                       \
