@@ -285,24 +285,44 @@ inline reflection_manager::reflection_manager(
 // ArrayHolderType.
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wtautological-pointer-compare"
+
+
+// used to select different functions at compile time in case
+// ArrayHolderType::value is a nullptr, ie empty array
+template <class ArrayHolderType, bool IsArrayType>
+struct initialize_range_selector
+{
+    static std::pair<const typename ArrayHolderType::type*,
+                     const typename ArrayHolderType::type*>
+    dispatch()
+    {
+        return std::pair<const typename ArrayHolderType::type*,
+                         const typename ArrayHolderType::type*>(nullptr,
+                                                                nullptr);
+    }
+};
+
+template <class ArrayHolderType>
+struct initialize_range_selector<ArrayHolderType, true>
+{
+    static std::pair<const typename ArrayHolderType::type*,
+                     const typename ArrayHolderType::type*>
+    dispatch()
+    {
+        return std::make_pair(std::begin(ArrayHolderType::value),
+                              std::end(ArrayHolderType::value));
+    }
+};
+
+
 template <class ArrayHolderType>
 inline std::pair<const typename ArrayHolderType::type*,
                  const typename ArrayHolderType::type*>
     reflection_manager::initialize_range(ArrayHolderType)
 {
-    if(ArrayHolderType::value != nullptr)
-    {
-        return std::make_pair(std::begin(ArrayHolderType::value),
-                              std::end(ArrayHolderType::value));
-    }
-    else
-    {
-        std::pair<const typename ArrayHolderType::type*,
-                  const typename ArrayHolderType::type*>
-            out(nullptr, nullptr);
-
-        return out;
-    }
+    return initialize_range_selector<
+        ArrayHolderType,
+        std::is_array<decltype(ArrayHolderType::value)>::value>::dispatch();
 }
 
 

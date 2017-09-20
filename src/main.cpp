@@ -105,14 +105,6 @@ REGISTER_CONSTRUCTOR(intholder, int, double)
 REGISTER_CONSTRUCTOR(contains_intholder, float, int, double)
 
 
-REGISTER_FREE_FUNCTION(free_function1)
-REGISTER_FREE_FUNCTION(hello)
-REGISTER_FREE_FUNCTION(mult)
-
-REGISTER_FREE_FUNCTION_EXPLICIT(overload1, int, int)
-REGISTER_FREE_FUNCTION_EXPLICIT(overload1, int, double)
-
-
 REGISTER_MEMBER_FUNCTION(intholder, member_function1)
 REGISTER_MEMBER_FUNCTION(intholder, member_function2)
 
