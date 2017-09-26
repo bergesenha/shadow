@@ -35,6 +35,7 @@ TEST_CASE("get iterator pair to all available functions",
 
     REQUIRE(ff_pair.second - ff_pair.first == 2);
 
+
     SECTION("find fun1")
     {
         auto found =
@@ -79,6 +80,7 @@ TEST_CASE("get iterator pair to all available functions",
 
             auto res = fun2_refl(args.begin(), args.end());
             REQUIRE(res.type().name() == std::string("void"));
+            REQUIRE(test_space::static_value_cast<int>(args[0]) == 23);
         }
     }
 }
