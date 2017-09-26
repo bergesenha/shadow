@@ -330,6 +330,9 @@ class variable
 
     friend class reflection_manager;
 
+    template <class T>
+    friend T extract_value(const variable& var);
+
 public:
     typedef member_function_ member_function;
     typedef indexed_info_iterator_<const member_function_info,
