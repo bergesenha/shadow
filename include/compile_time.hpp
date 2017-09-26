@@ -872,5 +872,22 @@ extract_value(const variable& var)
             &shadow::reflection_manager::static_create<type_universe, T>;      \
                                                                                \
         return (manager.*ptr)(std::forward<Args>(args)...);                    \
+    }                                                                          \
+                                                                               \
+    template <class T>                                                         \
+    T static_value_cast(const shadow::variable& var)                           \
+    {                                                                          \
+        constexpr std::size_t type_index =                                     \
+            metamusil::t_list::index_of_type_v<type_universe, T>;              \
+                                                                               \
+        std::string type_name(type_info_array_holder::value[type_index].name); \
+                                                                               \
+        if(type_name != var.type().name())                                     \
+        {                                                                      \
+            throw shadow::type_conversion_error(                               \
+                "attempt to convert to value of wrong type");                  \
+        }                                                                      \
+                                                                               \
+        return shadow::extract_value<T>(var);                                  \
     }
 
