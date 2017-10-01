@@ -248,6 +248,16 @@ struct generate_array_of_string_serialization_info_holder
         string_serialization_info>
         type;
 };
+
+// this is used to gain access to private member variable value_ of variable
+// since the function static_value_cast declared in SHADOW_INIT macro is of
+// unknown namespace
+template <class T>
+T
+extract_value(const variable& var)
+{
+    return var.value_.get<T>();
+}
 }
 
 
@@ -862,5 +872,22 @@ struct generate_array_of_string_serialization_info_holder
             &shadow::reflection_manager::static_create<type_universe, T>;      \
                                                                                \
         return (manager.*ptr)(std::forward<Args>(args)...);                    \
+    }                                                                          \
+                                                                               \
+    template <class T>                                                         \
+    T static_value_cast(const shadow::variable& var)                           \
+    {                                                                          \
+        constexpr std::size_t type_index =                                     \
+            metamusil::t_list::index_of_type_v<type_universe, T>;              \
+                                                                               \
+        std::string type_name(type_info_array_holder::value[type_index].name); \
+                                                                               \
+        if(type_name != var.type().name())                                     \
+        {                                                                      \
+            throw shadow::type_conversion_error(                               \
+                "attempt to convert to value of wrong type");                  \
+        }                                                                      \
+                                                                               \
+        return shadow::extract_value<T>(var);                                  \
     }
 
