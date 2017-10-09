@@ -454,7 +454,9 @@ public:
             ++arg_begin;
         }
 
-        return variable(info->bind_point(arg_buffer.data()),
+        auto return_value = info->bind_point(arg_buffer.data());
+
+        return variable(return_value,
                         info->return_type_index,
                         static_cast<const Derived*>(this)->manager_);
     }
