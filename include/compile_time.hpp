@@ -166,6 +166,7 @@ struct extract_free_function_info
         CTFFI::return_type_index,
         metamusil::t_list::length_v<typename CTFFI::parameter_list>,
         CTFFI::parameter_type_indices_holder::value,
+        CTFFI::parameter_pointer_flags_holder::value,
         CTFFI::bind_point};
 };
 
