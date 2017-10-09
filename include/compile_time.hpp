@@ -571,7 +571,11 @@ extract_value(const variable& var)
         typedef metamusil::deduce_parameter_types_t<function_pointer_type>     \
             parameter_list;                                                    \
                                                                                \
-        typedef metamusil::t_list::order_t<parameter_list, type_universe>      \
+        typedef metamusil::t_list::type_transform_t<parameter_list,            \
+                                                    metamusil::base_t>         \
+            base_parameter_list;                                               \
+                                                                               \
+        typedef metamusil::t_list::order_t<base_parameter_list, type_universe> \
             parameter_index_sequence;                                          \
                                                                                \
         typedef metamusil::int_seq::integer_sequence_to_array<                 \
