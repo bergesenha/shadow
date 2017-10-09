@@ -444,15 +444,7 @@ public:
             throw argument_error("wrong number of arguments provided");
         }
 
-        for(auto i = 0ul; i < info->num_parameters; ++i)
-        {
-            if(info->parameter_type_indices[i] != arg_begin->type_index_)
-            {
-                throw argument_error("wrong argument type");
-            }
-
-            ++arg_begin;
-        }
+        check_parameter_types(arg_begin, arg_end, *info);
 
         auto return_value = info->bind_point(arg_buffer.data());
 
@@ -477,6 +469,22 @@ public:
         return variable(info->bind_point(nullptr),
                         info->return_type_index,
                         static_cast<const Derived*>(this)->manager_);
+    }
+
+private:
+    template <class ArgIterator, class InfoType>
+    void
+    check_parameter_types(ArgIterator arg_begin,
+                          ArgIterator arg_end,
+                          const InfoType& info) const
+    {
+        for(auto i = 0ul; i < info.num_parameters; ++i, ++arg_begin)
+        {
+            if(info.parameter_type_indices[i] != arg_begin->type_index_)
+            {
+                throw argument_error("wrong argument type");
+            }
+        }
     }
 };
 
