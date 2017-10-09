@@ -430,23 +430,25 @@ public:
 
 
         // construct argument buffer
-        std::vector<any> arg_buffer;
-        arg_buffer.reserve(info->num_parameters);
+        std::vector<any> arg_values;
+        arg_values.reserve(info->num_parameters);
 
         std::transform(arg_begin,
                        arg_end,
-                       std::back_inserter(arg_buffer),
+                       std::back_inserter(arg_values),
                        [](const variable& var) { return var.value_; });
 
         // check arguments
-        if(arg_buffer.size() != info->num_parameters)
+        if(arg_values.size() != info->num_parameters)
         {
             throw argument_error("wrong number of arguments provided");
         }
 
         check_parameter_types(arg_begin, arg_end, *info);
 
-        auto return_value = info->bind_point(arg_buffer.data());
+        auto return_value = info->bind_point(arg_values.data());
+
+        pass_arguments_out(arg_begin, arg_end, arg_values.begin());
 
         return variable(return_value,
                         info->return_type_index,
@@ -484,6 +486,18 @@ private:
             {
                 throw argument_error("wrong argument type");
             }
+        }
+    }
+
+    template <class ArgIterator, class ArgValueIterator>
+    void
+    pass_arguments_out(ArgIterator first,
+                       ArgIterator last,
+                       ArgValueIterator value_first) const
+    {
+        for(; first != last; ++first, ++value_first)
+        {
+            first->value_ = *value_first;
         }
     }
 };
