@@ -582,6 +582,10 @@ extract_value(const variable& var)
             parameter_index_sequence>                                          \
             parameter_type_indices_holder;                                     \
                                                                                \
+        typedef metamusil::t_list::value_transform<parameter_list,             \
+                                                   std::is_pointer>            \
+            parameter_pointer_flags_holder;                                    \
+                                                                               \
         static constexpr shadow::free_function_binding_signature bind_point =  \
             &shadow::free_function_detail::generic_free_function_bind_point<   \
                 decltype(&function_name),                                      \
