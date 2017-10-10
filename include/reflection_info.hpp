@@ -12,6 +12,7 @@ struct type_info
 {
     const char* name;
     std::size_t size;
+    address_of_signature address_of_bind_point;
 };
 
 inline bool
