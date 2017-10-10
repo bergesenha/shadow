@@ -515,4 +515,16 @@ generic_string_deserialization_bind_point(const std::string& str_value)
     return string_deserialize_type_selector<T>::dispatch(str_value);
 }
 } // namespace string_serialization_detail
+
+
+namespace address_of_detail
+{
+template <class T>
+any
+generic_address_of_bind_point(any& value)
+{
+    return any(&(value.get<T>()));
+}
+} // namespace address_of_detail
+
 } // namespace shadow
