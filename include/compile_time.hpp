@@ -53,8 +53,11 @@ using generate_array_of_strings =
 template <class CompileTimeTypeInfo>
 struct extract_type_info
 {
-    static constexpr type_info value = {CompileTimeTypeInfo::name,
-                                        CompileTimeTypeInfo::size};
+    static constexpr type_info value = {
+        CompileTimeTypeInfo::name,
+        CompileTimeTypeInfo::size,
+        &address_of_detail::generic_address_of_bind_point<
+            typename CompileTimeTypeInfo::type>};
 };
 
 template <class TypeListOfCompileTimeTypeInfo>
