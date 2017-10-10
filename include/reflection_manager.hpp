@@ -396,7 +396,7 @@ reflection_manager::indices_by_type(
 inline reflection_manager::type
 reflection_manager::type_by_index(std::size_t index) const
 {
-    return type(type_info_range_.first + index, this);
+    return {type_info_range_.first + index, this};
 }
 
 
