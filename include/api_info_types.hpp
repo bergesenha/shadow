@@ -353,7 +353,7 @@ public:
 
     // full constructor, typically invoked by reflection_manager or
     // static_create function template
-    variable(const any& value,
+    variable(any value,
              std::size_t type_index,
              const reflection_manager* manager);
 
@@ -580,10 +580,10 @@ inline variable::variable() : value_(), type_index_(0), manager_(nullptr)
 }
 
 
-inline variable::variable(const any& value,
+inline variable::variable(any value,
                           std::size_t type_index,
                           const reflection_manager* manager)
-    : value_(value), type_index_(type_index), manager_(manager)
+    : value_(std::move(value)), type_index_(type_index), manager_(manager)
 {
 }
 
