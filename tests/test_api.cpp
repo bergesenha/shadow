@@ -171,10 +171,11 @@ TEST_CASE("get iterator pair to all available functions",
             std::vector<shadow::variable> args{
                 test_space::static_create<int>(10)};
 
-            //auto res = fun5_refl(args.begin(), args.end());
+            auto res = fun5_refl(args.begin(), args.end());
 
-            //REQUIRE(res.type().name() == std::string("int"));
-            //REQUIRE(test_space::static_value_cast<int>(args[0]) == 10);
+            REQUIRE(res.type().name() == std::string("int"));
+            REQUIRE(test_space::static_value_cast<int>(res) == 20);
+            REQUIRE(test_space::static_value_cast<int>(args[0]) == 10);
         }
     }
 }
