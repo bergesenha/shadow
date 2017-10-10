@@ -314,7 +314,7 @@ struct conversion_specializer<
     static any
     dispatch(const any& src)
     {
-        TargetType temp = (TargetType)src.get<SourceType>();
+        TargetType temp = static_cast<TargetType>(src.get<SourceType>());
         return temp;
     }
 };
