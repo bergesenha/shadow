@@ -730,9 +730,8 @@ operator<<(std::ostream& out, const variable& var)
 
         out << "{ ";
 
-        if(mem_var_info_indices.size() > 0)
+        if(!mem_var_info_indices.empty())
         {
-
             auto index_begin = mem_var_info_indices.cbegin();
             auto index_end = mem_var_info_indices.cend();
 
