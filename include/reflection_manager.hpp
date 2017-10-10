@@ -102,7 +102,7 @@ public:
                        FreeFunctionInfoArrayHolder,
                        MemberFunctionInfoArrayHolder,
                        MemberVariableInfoArrayHolder,
-                       StringSerializationInfoArrayHolder);
+                       StringSerializationInfoArrayHolder) noexcept;
 
 private:
     // private member functions used during initialization
@@ -248,7 +248,7 @@ inline reflection_manager::reflection_manager(
     FreeFunctionInfoArrayHolder,
     MemberFunctionInfoArrayHolder,
     MemberVariableInfoArrayHolder,
-    StringSerializationInfoArrayHolder)
+    StringSerializationInfoArrayHolder) noexcept
     : type_info_range_(initialize_range(TypeInfoArrayHolder())),
       constructor_info_range_(initialize_range(ConstructorInfoArrayHolder())),
       conversion_info_range_(initialize_range(ConversionInfoArrayHolder())),
