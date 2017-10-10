@@ -29,7 +29,7 @@ public:
     friend class any;
 
 public:
-    holder(const T& value) : value_(value)
+    explicit holder(const T& value) : value_(value)
     {
     }
 
