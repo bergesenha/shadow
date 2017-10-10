@@ -31,6 +31,8 @@ typedef std::string (*string_serialization_signature)(const any&);
 typedef any (*string_deserialization_signature)(const std::string&);
 // address of signature
 typedef any (*address_of_signature)(any&);
+// dereference signature
+typedef any (*dereference_signature)(any&);
 
 
 ////////////////////////////////////////////////////////////////////////////////
