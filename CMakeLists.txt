@@ -31,6 +31,7 @@ if(SHADOW_BUILD_TESTS)
         tests/test_member_variable_binding.cpp
         tests/test_constructor_binding.cpp
         tests/test_conversion_binding.cpp
+        tests/test_address_of_binding.cpp
         tests/test_iterators.cpp
         tests/test_api.cpp
         )
