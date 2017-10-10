@@ -88,6 +88,8 @@ public:
         return *this;
     }
 
+    ~any() = default;
+
 
 public:
     // unsafe interaction with underlying value, intended to be used by higher
