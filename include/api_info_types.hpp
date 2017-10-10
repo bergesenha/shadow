@@ -675,7 +675,7 @@ variable::call_member_function(const member_function& mf,
 inline variable
 variable::call_member_function(const member_function& mf)
 {
-    if(mf.info_->num_parameters)
+    if(mf.info_->num_parameters > 0)
     {
         throw argument_error("wrong number of arguments");
     }
