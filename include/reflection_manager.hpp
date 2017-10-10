@@ -2,15 +2,15 @@
 #define REFLECTION_MANAGER_HPP
 
 
+#include <algorithm>
+#include <istream>
+#include <ostream>
 #include <utility>
 #include <vector>
-#include <algorithm>
-#include <ostream>
-#include <istream>
 
-#include "reflection_info.hpp"
-#include "info_iterator.hpp"
 #include "api_info_types.hpp"
+#include "info_iterator.hpp"
+#include "reflection_info.hpp"
 
 namespace shadow
 {
@@ -102,7 +102,7 @@ public:
                        FreeFunctionInfoArrayHolder,
                        MemberFunctionInfoArrayHolder,
                        MemberVariableInfoArrayHolder,
-                       StringSerializationInfoArrayHolder);
+                       StringSerializationInfoArrayHolder) noexcept;
 
 private:
     // private member functions used during initialization
@@ -248,7 +248,7 @@ inline reflection_manager::reflection_manager(
     FreeFunctionInfoArrayHolder,
     MemberFunctionInfoArrayHolder,
     MemberVariableInfoArrayHolder,
-    StringSerializationInfoArrayHolder)
+    StringSerializationInfoArrayHolder) noexcept
     : type_info_range_(initialize_range(TypeInfoArrayHolder())),
       constructor_info_range_(initialize_range(ConstructorInfoArrayHolder())),
       conversion_info_range_(initialize_range(ConversionInfoArrayHolder())),
@@ -335,10 +335,8 @@ inline std::size_t reflection_manager::array_size(ArrayHolderType)
     {
         return 0;
     }
-    else
-    {
-        return std::extent<decltype(ArrayHolderType::value)>::value;
-    }
+
+    return std::extent<decltype(ArrayHolderType::value)>::value;
 }
 
 
@@ -362,10 +360,9 @@ reflection_manager::buckets_by_index(
 
         return out;
     }
-    else
-    {
-        return std::vector<std::vector<ValueType>>();
-    }
+
+
+    return std::vector<std::vector<ValueType>>();
 }
 
 
@@ -388,10 +385,9 @@ reflection_manager::indices_by_type(
 
         return out;
     }
-    else
-    {
-        return std::vector<std::vector<std::size_t>>();
-    }
+
+
+    return std::vector<std::vector<std::size_t>>();
 }
 
 #pragma clang diagnostic pop
@@ -400,7 +396,7 @@ reflection_manager::indices_by_type(
 inline reflection_manager::type
 reflection_manager::type_by_index(std::size_t index) const
 {
-    return type(type_info_range_.first + index, this);
+    return {type_info_range_.first + index, this};
 }
 
 
@@ -707,7 +703,7 @@ variable::address_of()
 inline std::ostream&
 operator<<(std::ostream& out, const variable& var)
 {
-    if(!var.manager_)
+    if(var.manager_ == nullptr)
     {
         out << "empty";
         return out;
@@ -734,9 +730,8 @@ operator<<(std::ostream& out, const variable& var)
 
         out << "{ ";
 
-        if(mem_var_info_indices.size() > 0)
+        if(!mem_var_info_indices.empty())
         {
-
             auto index_begin = mem_var_info_indices.cbegin();
             auto index_end = mem_var_info_indices.cend();
 

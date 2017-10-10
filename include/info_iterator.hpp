@@ -2,8 +2,8 @@
 #define INFO_ITERATOR_HPP
 
 
-#include <iterator>
 #include <cstddef>
+#include <iterator>
 
 
 namespace shadow
@@ -23,7 +23,10 @@ public:
 
 public:
     indexed_info_iterator_()
-        : current_index_(0), index_buffer_(nullptr), data_buffer_(nullptr)
+        : current_index_(0),
+          index_buffer_(nullptr),
+          data_buffer_(nullptr),
+          manager_(nullptr)
     {
     }
 
@@ -63,7 +66,7 @@ public:
         return *this;
     }
 
-    indexed_info_iterator_ operator++(int)
+    const indexed_info_iterator_ operator++(int)
     {
         auto temp = *this;
         ++(*this);
@@ -76,7 +79,7 @@ public:
         return *this;
     }
 
-    indexed_info_iterator_ operator--(int)
+    const indexed_info_iterator_ operator--(int)
     {
         auto temp = *this;
         --(*this);
@@ -210,7 +213,7 @@ public:
         return *this;
     }
 
-    info_iterator_ operator++(int)
+    const info_iterator_ operator++(int)
     {
         auto temp = *this;
         ++(*this);
@@ -223,7 +226,7 @@ public:
         return *this;
     }
 
-    info_iterator_ operator--(int)
+    const info_iterator_ operator--(int)
     {
         auto temp = *this;
         --(*this);

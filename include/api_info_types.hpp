@@ -2,18 +2,18 @@
 #define API_INFO_TYPES_HPP
 
 
+#include <algorithm>
+#include <ostream>
 #include <string>
 #include <utility>
-#include <ostream>
 #include <vector>
-#include <algorithm>
 
 
 #include <integer_sequence.hpp>
 
-#include "reflection_info.hpp"
-#include "info_iterator.hpp"
 #include "exceptions.hpp"
+#include "info_iterator.hpp"
+#include "reflection_info.hpp"
 
 namespace shadow
 {
@@ -353,7 +353,7 @@ public:
 
     // full constructor, typically invoked by reflection_manager or
     // static_create function template
-    variable(const any& value,
+    variable(any value,
              std::size_t type_index,
              const reflection_manager* manager);
 
@@ -505,7 +505,7 @@ private:
                           ArgIterator arg_end,
                           const InfoType& info) const
     {
-        for(auto i = 0ul; i < info.num_parameters; ++i, ++arg_begin)
+        for(auto i = 0ul; arg_begin != arg_end; ++i, ++arg_begin)
         {
             if(info.parameter_type_indices[i] != arg_begin->type_index_)
             {
@@ -580,10 +580,10 @@ inline variable::variable() : value_(), type_index_(0), manager_(nullptr)
 }
 
 
-inline variable::variable(const any& value,
+inline variable::variable(any value,
                           std::size_t type_index,
                           const reflection_manager* manager)
-    : value_(value), type_index_(type_index), manager_(manager)
+    : value_(std::move(value)), type_index_(type_index), manager_(manager)
 {
 }
 
@@ -675,7 +675,7 @@ variable::call_member_function(const member_function& mf,
 inline variable
 variable::call_member_function(const member_function& mf)
 {
-    if(mf.info_->num_parameters)
+    if(mf.info_->num_parameters > 0)
     {
         throw argument_error("wrong number of arguments");
     }

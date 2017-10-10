@@ -2,14 +2,14 @@
 #define REFLECTION_BINDING_HPP
 
 
-#include <utility>
-#include <type_traits>
 #include <string>
+#include <type_traits>
+#include <utility>
 
 #include "any.hpp"
-#include <type_list.hpp>
 #include <function_deduction.hpp>
 #include <member_variable_deduction.hpp>
+#include <type_list.hpp>
 #include <void_t.hpp>
 
 
@@ -314,7 +314,7 @@ struct conversion_specializer<
     static any
     dispatch(const any& src)
     {
-        TargetType temp = (TargetType)src.get<SourceType>();
+        TargetType temp = static_cast<TargetType>(src.get<SourceType>());
         return temp;
     }
 };
@@ -372,7 +372,7 @@ template <>
 struct string_serialize_type_selector<void>
 {
     static std::string
-    dispatch(const any& value)
+    dispatch(const any&)
     {
         return "empty";
     }
@@ -507,7 +507,7 @@ template <>
 struct string_deserialize_type_selector<void>
 {
     static any
-    dispatch(const std::string& str_value)
+    dispatch(const std::string&)
     {
         return shadow::any();
     }
@@ -534,7 +534,7 @@ generic_address_of_bind_point(any& value)
 
 template <>
 inline any
-generic_address_of_bind_point<void>(any& value)
+generic_address_of_bind_point<void>(any&)
 {
     return any(nullptr);
 }
@@ -548,7 +548,7 @@ generic_dereference_bind_point(any& value)
 
 template <>
 inline any
-generic_dereference_bind_point<void>(any& value)
+generic_dereference_bind_point<void>(any&)
 {
     return any();
 }

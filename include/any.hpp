@@ -3,6 +3,7 @@
 
 
 #include <memory>
+#include <utility>
 
 
 namespace shadow
@@ -29,7 +30,7 @@ public:
     friend class any;
 
 public:
-    holder(const T& value) : value_(value)
+    explicit holder(T value) : value_(std::move(value))
     {
     }
 
@@ -86,6 +87,8 @@ public:
         holder_ = std::move(other.holder_);
         return *this;
     }
+
+    ~any() = default;
 
 
 public:

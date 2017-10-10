@@ -4,10 +4,10 @@
 
 #include <string>
 
-#include <type_list.hpp>
+#include <function_deduction.hpp>
 #include <integer_sequence.hpp>
 #include <sfinae.hpp>
-#include <function_deduction.hpp>
+#include <type_list.hpp>
 
 #include "reflection_info.hpp"
 #include "reflection_manager.hpp"
@@ -56,7 +56,7 @@ template <class CompileTimeTypeInfo>
 struct extract_type_info
 {
     static constexpr type_info value = {
-        CompileTimeTypeInfo::name,
+        static_cast<const char*>(CompileTimeTypeInfo::name),
         CompileTimeTypeInfo::size,
         &pointer_detail::generic_address_of_bind_point<
             typename CompileTimeTypeInfo::type>,
@@ -84,7 +84,8 @@ struct extract_constructor_info
     static constexpr constructor_info value = {
         CTCI::type_index,
         CTCI::num_parameters,
-        CTCI::parameter_type_indices_holder::value,
+        static_cast<const std::size_t*>(
+            CTCI::parameter_type_indices_holder::value),
         CTCI::bind_point};
 };
 
