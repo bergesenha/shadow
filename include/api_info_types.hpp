@@ -436,10 +436,8 @@ public:
         std::vector<any> arg_values;
         arg_values.reserve(info->num_parameters);
 
-        std::transform(arg_begin,
-                       arg_end,
-                       std::back_inserter(arg_values),
-                       [](const variable& var) { return var.value_; });
+        construct_argument_values(
+            arg_begin, arg_end, std::back_inserter(arg_values), *info);
 
         // check arguments
         if(arg_values.size() != info->num_parameters)
@@ -477,6 +475,28 @@ public:
     }
 
 private:
+    template <class ArgIterator, class OutputIterator, class InfoType>
+    void
+    construct_argument_values(ArgIterator first,
+                              ArgIterator last,
+                              OutputIterator out,
+                              const InfoType& info) const
+    {
+        for(auto i = 0ul; first != last; ++first, ++i, ++out)
+        {
+            // in case the parameter is a pointer type, take the address of the
+            // value
+            if(info.parameter_pointer_flags[i])
+            {
+                *out = first->address_of();
+            }
+            else
+            {
+                *out = first->value_;
+            }
+        }
+    }
+
     template <class ArgIterator, class InfoType>
     void
     check_parameter_types(ArgIterator arg_begin,
@@ -668,4 +688,6 @@ variable::call_member_function(member_function_iterator mf_it)
 {
     return call_member_function(*mf_it);
 }
+
+
 } // namespace shadow
