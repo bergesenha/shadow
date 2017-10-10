@@ -259,7 +259,7 @@ extract_value(const variable& var)
 {
     return var.value_.get<T>();
 }
-}
+} // namespace shadow
 
 
 ////////////////////////////////////////////////////////////////////////////////

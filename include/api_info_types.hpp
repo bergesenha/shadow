@@ -533,7 +533,7 @@ operator<<(std::ostream& out, const free_function_& ff)
 
     return out;
 }
-}
+} // namespace shadow
 
 ////////////////////////////////////////////////////////////////////////////////
 // DEFINITIONS
@@ -665,4 +665,4 @@ variable::call_member_function(member_function_iterator mf_it)
 {
     return call_member_function(*mf_it);
 }
-}
+} // namespace shadow

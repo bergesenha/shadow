@@ -108,4 +108,4 @@ public:
 private:
     std::unique_ptr<holder_base> holder_;
 };
-}
+} // namespace shadow

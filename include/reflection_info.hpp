@@ -115,4 +115,4 @@ operator==(const string_serialization_info& lhs,
     return lhs.serialize_bind_point == rhs.serialize_bind_point &&
            lhs.deserialize_bind_point == rhs.deserialize_bind_point;
 }
-}
+} // namespace shadow

@@ -306,7 +306,7 @@ private:
     InfoType* current_;
     const reflection_manager* manager_;
 };
-}
+} // namespace shadow
 
 
 namespace std
@@ -354,4 +354,4 @@ struct iterator_traits<shadow::indexed_info_iterator_<InfoType, ProxyType>>
                                                 ProxyType>::iterator_category
             iterator_category;
 };
-}
+} // namespace std

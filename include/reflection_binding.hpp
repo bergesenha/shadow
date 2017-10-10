@@ -111,7 +111,7 @@ generic_free_function_bind_point(any* argument_array)
         template dispatch<FunctionPointerType, FunctionPointerValue>(
             argument_array, parameter_types(), parameter_sequence());
 }
-}
+} // namespace free_function_detail
 
 
 namespace member_function_detail
@@ -183,7 +183,7 @@ generic_member_function_bind_point(any& object, any* argument_array)
         template dispatch<MemFunPointerType, MemFunPointerValue, object_type>(
             object, argument_array, parameter_types(), parameter_sequence());
 }
-}
+} // namespace member_function_detail
 
 
 namespace member_variable_detail
@@ -240,7 +240,7 @@ generic_member_variable_set_bind_point(any& object, const any& value)
                         object_type,
                         member_variable_type>(object, value);
 }
-}
+} // namespace member_variable_detail
 
 
 namespace constructor_detail
@@ -288,7 +288,7 @@ generic_constructor_bind_point(any* argument_array)
     return braced_init_selector<T, ParamTypes...>::constructor_dispatch(
         argument_array, param_sequence());
 }
-}
+} // namespace constructor_detail
 
 
 namespace conversion_detail
@@ -319,7 +319,7 @@ generic_conversion_bind_point(const any& src)
 {
     return conversion_specializer<TargetType, SourceType>::dispatch(src);
 }
-}
+} // namespace conversion_detail
 
 
 namespace string_serialization_detail
@@ -514,5 +514,5 @@ generic_string_deserialization_bind_point(const std::string& str_value)
 {
     return string_deserialize_type_selector<T>::dispatch(str_value);
 }
-}
-}
+} // namespace string_serialization_detail
+} // namespace shadow
