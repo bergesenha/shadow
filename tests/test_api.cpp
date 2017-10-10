@@ -34,6 +34,12 @@ fun5(const int* i)
     return *i * 2;
 }
 
+void
+fun6(int* i)
+{
+    *i *= 2;
+}
+
 namespace test_space
 {
 REGISTER_TYPE_BEGIN()
@@ -44,6 +50,7 @@ REGISTER_FREE_FUNCTION(fun2)
 REGISTER_FREE_FUNCTION(fun3)
 REGISTER_FREE_FUNCTION(fun4)
 REGISTER_FREE_FUNCTION(fun5)
+REGISTER_FREE_FUNCTION(fun6)
 
 SHADOW_INIT()
 }
@@ -176,6 +183,29 @@ TEST_CASE("get iterator pair to all available functions",
             REQUIRE(res.type().name() == std::string("int"));
             REQUIRE(test_space::static_value_cast<int>(res) == 20);
             REQUIRE(test_space::static_value_cast<int>(args[0]) == 10);
+        }
+    }
+
+    SECTION("find fun6")
+    {
+        auto found =
+            std::find_if(ff_pair.first, ff_pair.second, [](const auto& ff) {
+                return ff.name() == std::string("fun6");
+            });
+
+        REQUIRE(found != ff_pair.second);
+
+        SECTION("call fun6 through reflection system")
+        {
+            auto fun6_refl = *found;
+
+            std::vector<shadow::variable> args{
+                test_space::static_create<int>(10)};
+
+            auto res = fun6_refl(args.begin(), args.end());
+
+            REQUIRE(res.type().name() == std::string("void"));
+            REQUIRE(test_space::static_value_cast<int>(args[0]) == 20);
         }
     }
 }
