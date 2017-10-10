@@ -405,6 +405,9 @@ public:
     variable call_member_function(member_function_iterator mf_it);
 
 private:
+    any address_of();
+
+private:
     // holds type erased value
     any value_;
     // these identify the type erased value

@@ -692,6 +692,13 @@ variable::member_variables() const
             manager_));
 }
 
+inline any
+variable::address_of()
+{
+    const auto& info = manager_->type_info_range_.first[type_index_];
+
+    return info.address_of_bind_point(value_);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // stream operators on shadow::variable
