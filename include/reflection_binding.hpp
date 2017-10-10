@@ -519,7 +519,7 @@ generic_string_deserialization_bind_point(const std::string& str_value)
 } // namespace string_serialization_detail
 
 
-namespace address_of_detail
+namespace pointer_detail
 {
 template <class T>
 inline any
@@ -535,6 +535,6 @@ generic_address_of_bind_point<void>(any& value)
     return any(nullptr);
 }
 
-} // namespace address_of_detail
+} // namespace pointer_detail
 
 } // namespace shadow

@@ -18,8 +18,7 @@ TEST_CASE("test generic_address_of_bind_point",
     SECTION("create an any containing pointer to int in anint")
     {
         auto anintpointer =
-            shadow::address_of_detail::generic_address_of_bind_point<int>(
-                anint);
+            shadow::pointer_detail::generic_address_of_bind_point<int>(anint);
 
         REQUIRE(anint.get<int>() == 20);
         REQUIRE(*anintpointer.get<int*>() == 20);
