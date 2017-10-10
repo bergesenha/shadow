@@ -522,11 +522,19 @@ generic_string_deserialization_bind_point(const std::string& str_value)
 namespace address_of_detail
 {
 template <class T>
-any
+inline any
 generic_address_of_bind_point(any& value)
 {
     return any(&(value.get<T>()));
 }
+
+template <>
+inline any
+generic_address_of_bind_point<void>(any& value)
+{
+    return any(nullptr);
+}
+
 } // namespace address_of_detail
 
 } // namespace shadow
