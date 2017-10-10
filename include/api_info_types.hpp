@@ -505,7 +505,7 @@ private:
                           ArgIterator arg_end,
                           const InfoType& info) const
     {
-        for(auto i = 0ul; i < info.num_parameters; ++i, ++arg_begin)
+        for(auto i = 0ul; arg_begin != arg_end; ++i, ++arg_begin)
         {
             if(info.parameter_type_indices[i] != arg_begin->type_index_)
             {
