@@ -2,15 +2,15 @@
 #define REFLECTION_MANAGER_HPP
 
 
+#include <algorithm>
+#include <istream>
+#include <ostream>
 #include <utility>
 #include <vector>
-#include <algorithm>
-#include <ostream>
-#include <istream>
 
-#include "reflection_info.hpp"
-#include "info_iterator.hpp"
 #include "api_info_types.hpp"
+#include "info_iterator.hpp"
+#include "reflection_info.hpp"
 
 namespace shadow
 {

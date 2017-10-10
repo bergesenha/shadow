@@ -4,10 +4,10 @@
 
 #include <string>
 
-#include <type_list.hpp>
+#include <function_deduction.hpp>
 #include <integer_sequence.hpp>
 #include <sfinae.hpp>
-#include <function_deduction.hpp>
+#include <type_list.hpp>
 
 #include "reflection_info.hpp"
 #include "reflection_manager.hpp"

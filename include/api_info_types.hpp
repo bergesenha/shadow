@@ -2,18 +2,18 @@
 #define API_INFO_TYPES_HPP
 
 
+#include <algorithm>
+#include <ostream>
 #include <string>
 #include <utility>
-#include <ostream>
 #include <vector>
-#include <algorithm>
 
 
 #include <integer_sequence.hpp>
 
-#include "reflection_info.hpp"
-#include "info_iterator.hpp"
 #include "exceptions.hpp"
+#include "info_iterator.hpp"
+#include "reflection_info.hpp"
 
 namespace shadow
 {

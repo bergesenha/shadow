@@ -1,9 +1,9 @@
 #include <iostream>
-#include <vector>
 #include <string>
+#include <vector>
 
-#include <shadow.hpp>
 #include <algorithm>
+#include <shadow.hpp>
 
 namespace myspace
 {

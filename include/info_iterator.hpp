@@ -2,8 +2,8 @@
 #define INFO_ITERATOR_HPP
 
 
-#include <iterator>
 #include <cstddef>
+#include <iterator>
 
 
 namespace shadow
