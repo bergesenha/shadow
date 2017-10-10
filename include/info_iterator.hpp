@@ -66,7 +66,7 @@ public:
         return *this;
     }
 
-    indexed_info_iterator_ operator++(int)
+    const indexed_info_iterator_ operator++(int)
     {
         auto temp = *this;
         ++(*this);
@@ -79,7 +79,7 @@ public:
         return *this;
     }
 
-    indexed_info_iterator_ operator--(int)
+    const indexed_info_iterator_ operator--(int)
     {
         auto temp = *this;
         --(*this);
@@ -213,7 +213,7 @@ public:
         return *this;
     }
 
-    info_iterator_ operator++(int)
+    const info_iterator_ operator++(int)
     {
         auto temp = *this;
         ++(*this);
@@ -226,7 +226,7 @@ public:
         return *this;
     }
 
-    info_iterator_ operator--(int)
+    const info_iterator_ operator--(int)
     {
         auto temp = *this;
         --(*this);
