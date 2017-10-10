@@ -57,6 +57,8 @@ struct extract_type_info
         CompileTimeTypeInfo::name,
         CompileTimeTypeInfo::size,
         &pointer_detail::generic_address_of_bind_point<
+            typename CompileTimeTypeInfo::type>,
+        &pointer_detail::generic_dereference_bind_point<
             typename CompileTimeTypeInfo::type>};
 };
 
