@@ -53,8 +53,13 @@ using generate_array_of_strings =
 template <class CompileTimeTypeInfo>
 struct extract_type_info
 {
-    static constexpr type_info value = {CompileTimeTypeInfo::name,
-                                        CompileTimeTypeInfo::size};
+    static constexpr type_info value = {
+        CompileTimeTypeInfo::name,
+        CompileTimeTypeInfo::size,
+        &pointer_detail::generic_address_of_bind_point<
+            typename CompileTimeTypeInfo::type>,
+        &pointer_detail::generic_dereference_bind_point<
+            typename CompileTimeTypeInfo::type>};
 };
 
 template <class TypeListOfCompileTimeTypeInfo>
@@ -166,6 +171,7 @@ struct extract_free_function_info
         CTFFI::return_type_index,
         metamusil::t_list::length_v<typename CTFFI::parameter_list>,
         CTFFI::parameter_type_indices_holder::value,
+        CTFFI::parameter_pointer_flags_holder::value,
         CTFFI::bind_point};
 };
 
@@ -258,7 +264,7 @@ extract_value(const variable& var)
 {
     return var.value_.get<T>();
 }
-}
+} // namespace shadow
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -581,6 +587,10 @@ extract_value(const variable& var)
         typedef metamusil::int_seq::integer_sequence_to_array<                 \
             parameter_index_sequence>                                          \
             parameter_type_indices_holder;                                     \
+                                                                               \
+        typedef metamusil::t_list::value_transform<parameter_list,             \
+                                                   std::is_pointer>            \
+            parameter_pointer_flags_holder;                                    \
                                                                                \
         static constexpr shadow::free_function_binding_signature bind_point =  \
             &shadow::free_function_detail::generic_free_function_bind_point<   \

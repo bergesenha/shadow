@@ -13,7 +13,7 @@ REGISTER_TYPE_END()
 
 
 SHADOW_INIT()
-}
+} // namespace myspace
 
 
 int

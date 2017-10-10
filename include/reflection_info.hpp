@@ -12,6 +12,8 @@ struct type_info
 {
     const char* name;
     std::size_t size;
+    address_of_signature address_of_bind_point;
+    dereference_signature dereference_bind_point;
 };
 
 inline bool
@@ -56,6 +58,7 @@ struct free_function_info
     std::size_t return_type_index;
     std::size_t num_parameters;
     const std::size_t* parameter_type_indices;
+    const bool* parameter_pointer_flags;
     free_function_binding_signature bind_point;
 };
 
@@ -114,4 +117,4 @@ operator==(const string_serialization_info& lhs,
     return lhs.serialize_bind_point == rhs.serialize_bind_point &&
            lhs.deserialize_bind_point == rhs.deserialize_bind_point;
 }
-}
+} // namespace shadow

@@ -405,6 +405,9 @@ public:
     variable call_member_function(member_function_iterator mf_it);
 
 private:
+    any address_of();
+
+private:
     // holds type erased value
     any value_;
     // these identify the type erased value
@@ -433,10 +436,8 @@ public:
         std::vector<any> arg_values;
         arg_values.reserve(info->num_parameters);
 
-        std::transform(arg_begin,
-                       arg_end,
-                       std::back_inserter(arg_values),
-                       [](const variable& var) { return var.value_; });
+        construct_argument_values(
+            arg_begin, arg_end, std::back_inserter(arg_values), *info);
 
         // check arguments
         if(arg_values.size() != info->num_parameters)
@@ -448,7 +449,7 @@ public:
 
         auto return_value = info->bind_point(arg_values.data());
 
-        pass_arguments_out(arg_begin, arg_end, arg_values.begin());
+        pass_arguments_out(arg_begin, arg_end, arg_values.begin(), *info);
 
         return variable(return_value,
                         info->return_type_index,
@@ -474,6 +475,28 @@ public:
     }
 
 private:
+    template <class ArgIterator, class OutputIterator, class InfoType>
+    void
+    construct_argument_values(ArgIterator first,
+                              ArgIterator last,
+                              OutputIterator out,
+                              const InfoType& info) const
+    {
+        for(auto i = 0ul; first != last; ++first, ++i, ++out)
+        {
+            // in case the parameter is a pointer type, take the address of the
+            // value
+            if(info.parameter_pointer_flags[i])
+            {
+                *out = first->address_of();
+            }
+            else
+            {
+                *out = first->value_;
+            }
+        }
+    }
+
     template <class ArgIterator, class InfoType>
     void
     check_parameter_types(ArgIterator arg_begin,
@@ -489,15 +512,26 @@ private:
         }
     }
 
-    template <class ArgIterator, class ArgValueIterator>
+    template <class ArgIterator, class ArgValueIterator, class InfoType>
     void
     pass_arguments_out(ArgIterator first,
                        ArgIterator last,
-                       ArgValueIterator value_first) const
+                       ArgValueIterator value_first,
+                       const InfoType& info) const
     {
-        for(; first != last; ++first, ++value_first)
+        for(auto i = 0ul; first != last; ++first, ++value_first, ++i)
         {
-            first->value_ = *value_first;
+            if(info.parameter_pointer_flags[i])
+            {
+                const auto type_index = first->type_index_;
+                const auto& info =
+                    first->manager_->type_info_range_.first[type_index];
+                first->value_ = info.dereference_bind_point(*value_first);
+            }
+            else
+            {
+                first->value_ = *value_first;
+            }
         }
     }
 };
@@ -533,7 +567,7 @@ operator<<(std::ostream& out, const free_function_& ff)
 
     return out;
 }
-}
+} // namespace shadow
 
 ////////////////////////////////////////////////////////////////////////////////
 // DEFINITIONS
@@ -665,4 +699,6 @@ variable::call_member_function(member_function_iterator mf_it)
 {
     return call_member_function(*mf_it);
 }
-}
+
+
+} // namespace shadow

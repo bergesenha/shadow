@@ -223,7 +223,7 @@ private:
     std::vector<std::vector<std::size_t>> member_function_info_indices_by_type_;
     std::vector<std::vector<std::size_t>> member_variable_info_indices_by_type_;
 };
-}
+} // namespace shadow
 
 ////////////////////////////////////////////////////////////////////////////////
 // DEFINITIONS
@@ -617,7 +617,7 @@ reflection_manager::construct(const constructor& ctr) const
     return variable(
         ctr.info_->bind_point(nullptr), ctr.info_->type_index, this);
 }
-}
+} // namespace shadow
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -692,6 +692,13 @@ variable::member_variables() const
             manager_));
 }
 
+inline any
+variable::address_of()
+{
+    const auto& info = manager_->type_info_range_.first[type_index_];
+
+    return info.address_of_bind_point(value_);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // stream operators on shadow::variable
@@ -784,4 +791,4 @@ operator>>(std::istream& in, variable& var)
 
     return in;
 }
-}
+} // namespace shadow
