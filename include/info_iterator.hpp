@@ -1,4 +1,6 @@
-#pragma once
+#ifndef INFO_ITERATOR_HPP
+#define INFO_ITERATOR_HPP
+
 
 #include <iterator>
 #include <cstddef>
@@ -355,3 +357,5 @@ struct iterator_traits<shadow::indexed_info_iterator_<InfoType, ProxyType>>
             iterator_category;
 };
 } // namespace std
+
+#endif

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef API_INFO_TYPES_HPP
+#define API_INFO_TYPES_HPP
+
 
 #include <string>
 #include <utility>
@@ -702,3 +704,5 @@ variable::call_member_function(member_function_iterator mf_it)
 
 
 } // namespace shadow
+
+#endif

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef EXCEPTIONS_HPP
+#define EXCEPTIONS_HPP
+
 
 #include <stdexcept>
 
@@ -25,3 +27,5 @@ public:
     using runtime_error::runtime_error;
 };
 } // namespace shadow
+
+#endif

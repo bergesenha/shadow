@@ -1,4 +1,6 @@
-#pragma once
+#ifndef REFLECTION_MANAGER_HPP
+#define REFLECTION_MANAGER_HPP
+
 
 #include <utility>
 #include <vector>
@@ -792,3 +794,5 @@ operator>>(std::istream& in, variable& var)
     return in;
 }
 } // namespace shadow
+
+#endif

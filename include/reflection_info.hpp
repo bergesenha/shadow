@@ -1,4 +1,6 @@
-#pragma once
+#ifndef REFLECTION_INFO_HPP
+#define REFLECTION_INFO_HPP
+
 
 #include <cstddef>
 #include <string>
@@ -118,3 +120,5 @@ operator==(const string_serialization_info& lhs,
            lhs.deserialize_bind_point == rhs.deserialize_bind_point;
 }
 } // namespace shadow
+
+#endif

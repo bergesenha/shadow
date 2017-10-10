@@ -1,4 +1,6 @@
-#pragma once
+#ifndef COMPILE_TIME_HPP
+#define COMPILE_TIME_HPP
+
 
 #include <string>
 
@@ -905,3 +907,5 @@ extract_value(const variable& var)
         return shadow::extract_value<T>(var);                                  \
     }
 
+
+#endif

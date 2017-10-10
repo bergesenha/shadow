@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ANY_HPP
+#define ANY_HPP
+
 
 #include <memory>
 
@@ -109,3 +111,5 @@ private:
     std::unique_ptr<holder_base> holder_;
 };
 } // namespace shadow
+
+#endif

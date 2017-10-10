@@ -1,4 +1,6 @@
-#pragma once
+#ifndef REFLECTION_BINDING_HPP
+#define REFLECTION_BINDING_HPP
+
 
 #include <utility>
 #include <type_traits>
@@ -554,3 +556,5 @@ generic_dereference_bind_point<void>(any& value)
 } // namespace pointer_detail
 
 } // namespace shadow
+
+#endif
