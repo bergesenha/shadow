@@ -535,6 +535,20 @@ generic_address_of_bind_point<void>(any& value)
     return any(nullptr);
 }
 
+template <class T>
+inline any
+generic_dereference_bind_point(any& value)
+{
+    return any(*(value.get<T*>()));
+}
+
+template <>
+inline any
+generic_dereference_bind_point<void>(any& value)
+{
+    return any();
+}
+
 } // namespace pointer_detail
 
 } // namespace shadow
