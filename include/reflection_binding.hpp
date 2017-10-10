@@ -29,6 +29,8 @@ typedef any (*conversion_binding_signature)(const any&);
 typedef std::string (*string_serialization_signature)(const any&);
 // string deserialization signature
 typedef any (*string_deserialization_signature)(const std::string&);
+// address of signature
+typedef any (*address_of_signature)(any&);
 
 
 ////////////////////////////////////////////////////////////////////////////////
