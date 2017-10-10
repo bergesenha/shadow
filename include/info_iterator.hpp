@@ -23,7 +23,10 @@ public:
 
 public:
     indexed_info_iterator_()
-        : current_index_(0), index_buffer_(nullptr), data_buffer_(nullptr)
+        : current_index_(0),
+          index_buffer_(nullptr),
+          data_buffer_(nullptr),
+          manager_(nullptr)
     {
     }
 
