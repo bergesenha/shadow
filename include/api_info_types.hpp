@@ -449,7 +449,7 @@ public:
 
         auto return_value = info->bind_point(arg_values.data());
 
-        pass_arguments_out(arg_begin, arg_end, arg_values.begin());
+        pass_arguments_out(arg_begin, arg_end, arg_values.begin(), *info);
 
         return variable(return_value,
                         info->return_type_index,
@@ -512,15 +512,26 @@ private:
         }
     }
 
-    template <class ArgIterator, class ArgValueIterator>
+    template <class ArgIterator, class ArgValueIterator, class InfoType>
     void
     pass_arguments_out(ArgIterator first,
                        ArgIterator last,
-                       ArgValueIterator value_first) const
+                       ArgValueIterator value_first,
+                       const InfoType& info) const
     {
-        for(; first != last; ++first, ++value_first)
+        for(auto i = 0ul; first != last; ++first, ++value_first, ++i)
         {
-            first->value_ = *value_first;
+            if(info.parameter_pointer_flags[i])
+            {
+                const auto type_index = first->type_index_;
+                const auto& info =
+                    first->manager_->type_info_range_.first[type_index];
+                first->value_ = info.dereference_bind_point(*value_first);
+            }
+            else
+            {
+                first->value_ = *value_first;
+            }
         }
     }
 };
