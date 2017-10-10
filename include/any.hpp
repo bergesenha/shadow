@@ -8,6 +8,8 @@ namespace shadow
 
 
 // abstract base class providing interface to held value
+// holds no type information, intended as building block for a more complex type
+// that holds type information through a reflection mechanism
 class holder_base
 {
 public:
@@ -41,8 +43,6 @@ private:
 
 
 // specialization for type void, represents empty value
-// holds no type information, intended as building block for a more complex type
-// that holds type information through a reflection mechanism
 template <>
 class holder<void> : public holder_base
 {
