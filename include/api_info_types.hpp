@@ -418,61 +418,6 @@ template <class Derived>
 class call_free_function
 {
 public:
-    // call specified at compile time with arguments as c++ types, no checking
-    // of the arguments
-    template <class... Args>
-    variable
-    call_static_unsafe(Args... args) const
-    {
-        const auto info = static_cast<const Derived*>(this)->info_;
-
-        any arg_array[] = {args...};
-
-        return variable(info->bind_point(arg_array),
-                        info->return_type_index,
-                        static_cast<const Derived*>(this)->manager_);
-    }
-
-    // call specified at compile time with arguments as c++ types, arguments
-    // checked for correctness,
-    // argument_error thrown if not correct
-    template <class TypeUniverseList, class... Args>
-    variable
-    call_static_safe(Args... args) const
-    {
-        const auto info = static_cast<const Derived*>(this)->info_;
-
-        typedef metamusil::t_list::type_list<Args...> given_types;
-        typedef metamusil::t_list::order_t<given_types, TypeUniverseList>
-            given_types_indices;
-        typedef metamusil::int_seq::integer_sequence_to_array<
-            given_types_indices>
-            given_types_index_array_holder;
-
-        if(std::extent<decltype(
-               given_types_index_array_holder::value)>::value !=
-           info->num_parameters)
-        {
-            throw argument_error("wrong number of arguments");
-        }
-
-        for(auto i = 0; i < info->num_parameters; ++i)
-        {
-            if(given_types_index_array_holder::value[i] !=
-               info->parameter_type_indices[i])
-            {
-                throw argument_error("wrong argument type");
-            }
-        }
-
-        any arg_array[] = {args...};
-
-        return variable(info->bind_point(arg_array),
-                        info->return_type_index,
-                        static_cast<const Derived*>(this)->manager_);
-    }
-
-
     // call specified at runtime, arguments checked for correctness,
     // arguments given by iterators to variable
     // argument_error thrown if not correct
@@ -485,31 +430,27 @@ public:
 
 
         // construct argument buffer
-        std::vector<any> arg_buffer;
-        arg_buffer.reserve(info->num_parameters);
+        std::vector<any> arg_values;
+        arg_values.reserve(info->num_parameters);
 
         std::transform(arg_begin,
                        arg_end,
-                       std::back_inserter(arg_buffer),
+                       std::back_inserter(arg_values),
                        [](const variable& var) { return var.value_; });
 
         // check arguments
-        if(arg_buffer.size() != info->num_parameters)
+        if(arg_values.size() != info->num_parameters)
         {
             throw argument_error("wrong number of arguments provided");
         }
 
-        for(auto i = 0ul; i < info->num_parameters; ++i)
-        {
-            if(info->parameter_type_indices[i] != arg_begin->type_index_)
-            {
-                throw argument_error("wrong argument type");
-            }
+        check_parameter_types(arg_begin, arg_end, *info);
 
-            ++arg_begin;
-        }
+        auto return_value = info->bind_point(arg_values.data());
 
-        return variable(info->bind_point(arg_buffer.data()),
+        pass_arguments_out(arg_begin, arg_end, arg_values.begin());
+
+        return variable(return_value,
                         info->return_type_index,
                         static_cast<const Derived*>(this)->manager_);
     }
@@ -532,83 +473,32 @@ public:
                         static_cast<const Derived*>(this)->manager_);
     }
 
-    // call specified at runtime, no checking of arguments. If arguments are
-    // arguments given by iterators to variable
-    // incorrect, may result in a segfault.
-    template <class Iterator>
-    variable
-    call_unsafe(Iterator arg_begin, Iterator arg_end) const
+private:
+    template <class ArgIterator, class InfoType>
+    void
+    check_parameter_types(ArgIterator arg_begin,
+                          ArgIterator arg_end,
+                          const InfoType& info) const
     {
-        const auto info = static_cast<const Derived*>(this)->info_;
-        std::vector<any> arg_buffer;
-        arg_buffer.reserve(info->num_parameters);
-        std::transform(arg_begin,
-                       arg_end,
-                       std::back_inserter(arg_buffer),
-                       [](const variable& var) { return var.value_; });
-
-        return variable(info->bind_point(arg_buffer.data()),
-                        info->return_type_index,
-                        static_cast<const Derived*>(this)->manager_);
+        for(auto i = 0ul; i < info.num_parameters; ++i, ++arg_begin)
+        {
+            if(info.parameter_type_indices[i] != arg_begin->type_index_)
+            {
+                throw argument_error("wrong argument type");
+            }
+        }
     }
 
-    // call specified at runtime, will attempt to convert arguments by implicit
-    // arguments given by iterators to variable
-    // conversion matching the parameters of the function. Throws argument_error
-    // if unable to convert or wrong number of arguments.
-    template <class Iterator>
-    variable
-    call_with_conversion(Iterator arg_begin, Iterator arg_end) const
+    template <class ArgIterator, class ArgValueIterator>
+    void
+    pass_arguments_out(ArgIterator first,
+                       ArgIterator last,
+                       ArgValueIterator value_first) const
     {
-        const auto info = static_cast<const Derived*>(this)->info_;
-
-        const auto num_params = info->num_parameters;
-
-        if(num_params != std::distance(arg_begin, arg_end))
+        for(; first != last; ++first, ++value_first)
         {
-            throw argument_error("wrong number of arguments provided");
+            first->value_ = *value_first;
         }
-
-        std::vector<any> arg_buffer;
-        arg_buffer.reserve(num_params);
-
-        std::transform(
-            arg_begin,
-            arg_end,
-            info->parameter_type_indices,
-            std::back_inserter(arg_buffer),
-            [](const auto& var, const auto to_index) {
-                const auto from_index = var.type_index_;
-                const auto manager = var.manager_;
-
-                auto found = std::find_if(
-                    manager->conversion_info_indices_by_type_[from_index]
-                        .begin(),
-                    manager->conversion_info_indices_by_type_[from_index].end(),
-                    [to_index, manager](auto converter_index) {
-                        return manager->conversion_info_range_
-                                   .first[converter_index]
-                                   .to_type_index == to_index;
-                    });
-
-                if(found ==
-                   manager->conversion_info_indices_by_type_[from_index].end())
-                {
-                    throw type_conversion_error(
-                        "conversion of argument not possible");
-                }
-
-                const auto found_conversion_index = *found;
-
-                return manager->conversion_info_range_
-                    .first[found_conversion_index]
-                    .bind_point(var.value_);
-
-            });
-
-        return variable(info->bind_point(arg_buffer.data()),
-                        info->return_type_index,
-                        static_cast<const Derived*>(this)->manager_);
     }
 };
 
