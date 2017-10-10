@@ -335,10 +335,8 @@ inline std::size_t reflection_manager::array_size(ArrayHolderType)
     {
         return 0;
     }
-    else
-    {
-        return std::extent<decltype(ArrayHolderType::value)>::value;
-    }
+
+    return std::extent<decltype(ArrayHolderType::value)>::value;
 }
 
 
@@ -362,10 +360,9 @@ reflection_manager::buckets_by_index(
 
         return out;
     }
-    else
-    {
-        return std::vector<std::vector<ValueType>>();
-    }
+
+
+    return std::vector<std::vector<ValueType>>();
 }
 
 
@@ -388,10 +385,9 @@ reflection_manager::indices_by_type(
 
         return out;
     }
-    else
-    {
-        return std::vector<std::vector<std::size_t>>();
-    }
+
+
+    return std::vector<std::vector<std::size_t>>();
 }
 
 #pragma clang diagnostic pop
