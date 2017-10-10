@@ -703,7 +703,7 @@ variable::address_of()
 inline std::ostream&
 operator<<(std::ostream& out, const variable& var)
 {
-    if(!var.manager_)
+    if(var.manager_ == nullptr)
     {
         out << "empty";
         return out;
