@@ -38,6 +38,12 @@ public:
     {
         return 2 * i;
     }
+
+    void
+    fun5(int& i)
+    {
+        i = 20000;
+    }
 };
 
 
@@ -51,6 +57,7 @@ REGISTER_MEMBER_FUNCTION(tmfapi1, fun1)
 REGISTER_MEMBER_FUNCTION(tmfapi1, fun2)
 REGISTER_MEMBER_FUNCTION(tmfapi1, fun3)
 REGISTER_MEMBER_FUNCTION(tmfapi1, fun4)
+REGISTER_MEMBER_FUNCTION(tmfapi1, fun5)
 
 SHADOW_INIT()
 }
