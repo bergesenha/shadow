@@ -330,9 +330,17 @@ construct_argument_values(ArgumentIterator first,
                           OutputIterator arg_val_out,
                           const InfoType& info)
 {
-    for(std::size_t i = 0; first != last; ++first, ++arg_val_out, ++i)
+    for(auto ptr_flags = info.parameter_pointer_flags; first != last;
+        ++first, ++arg_val_out, ++ptr_flags)
     {
-        *arg_val_out = first->value_;
+        if(*ptr_flags)
+        {
+            *arg_val_out = first->address_of();
+        }
+        else
+        {
+            *arg_val_out = first->value_;
+        }
     }
 }
 
@@ -366,9 +374,20 @@ pass_arguments_out(ArgumentValueIterator first,
                    OutputIterator variable_out,
                    const InfoType& info)
 {
-    for(; first != last; ++first, ++variable_out)
+    for(auto ptr_flags = info.parameter_pointer_flags; first != last;
+        ++first, ++variable_out, ++ptr_flags)
     {
-        variable_out->value_ = *first;
+        if(*ptr_flags)
+        {
+            const auto type_index = variable_out->type_index_;
+            const auto& t_info =
+                variable_out->manager_->type_info_range_.first[type_index];
+            variable_out->value_ = t_info.dereference_bind_point(*first);
+        }
+        else
+        {
+            variable_out->value_ = *first;
+        }
     }
 }
 }
