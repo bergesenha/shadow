@@ -380,6 +380,23 @@ class variable
     friend std::ostream& operator<<(std::ostream&, const variable&);
     friend std::istream& operator>>(std::istream&, variable&);
 
+    template <class ArgumentIterator, class OutputIterator, class InfoType>
+    friend void call_utils::construct_argument_values(ArgumentIterator,
+                                                      ArgumentIterator,
+                                                      OutputIterator,
+                                                      const InfoType&);
+
+    template <class ArgumentIterator, class InfoType>
+    friend void call_utils::check_parameter_types(ArgumentIterator,
+                                                  ArgumentIterator,
+                                                  const InfoType&);
+
+    template <class ArgumentValueIterator, class OutputIterator, class InfoType>
+    friend void call_utils::pass_arguments_out(ArgumentValueIterator,
+                                               ArgumentValueIterator,
+                                               OutputIterator,
+                                               const InfoType&);
+
     template <class Derived>
     friend class call_free_function;
 
@@ -696,33 +713,21 @@ variable::call_member_function(const member_function& mf,
 {
     auto bind_point = mf.info_->bind_point;
 
+    call_utils::check_parameter_types(arg_begin, arg_end, *mf.info_);
+
     // construct arg buffer
     std::vector<any> arg_buffer;
     arg_buffer.reserve(mf.info_->num_parameters);
 
-    std::transform(arg_begin,
-                   arg_end,
-                   std::back_inserter(arg_buffer),
-                   [](const variable& var) { return var.value_; });
+    call_utils::construct_argument_values(
+        arg_begin, arg_end, std::back_inserter(arg_buffer), *mf.info_);
 
-    if(arg_buffer.size() != mf.info_->num_parameters)
-    {
-        throw argument_error("wrong number of arguments provided");
-    }
+    auto return_value = bind_point(value_, arg_buffer.data());
 
-    for(auto i = 0ul; i < mf.info_->num_parameters; ++i)
-    {
-        if(mf.info_->parameter_type_indices[i] != arg_begin->type_index_)
-        {
-            throw argument_error("wrong argument type");
-        }
+    call_utils::pass_arguments_out(
+        arg_buffer.begin(), arg_buffer.end(), arg_begin, *mf.info_);
 
-        ++arg_begin;
-    }
-
-    return variable(bind_point(value_, arg_buffer.data()),
-                    mf.info_->return_type_index,
-                    manager_);
+    return variable(return_value, mf.info_->return_type_index, manager_);
 }
 
 inline variable
