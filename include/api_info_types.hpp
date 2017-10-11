@@ -321,11 +321,100 @@ typedef api_type_aggregator<string_serialization_info, get_type_policy>
     string_serializer_;
 
 
+namespace call_utils
+{
+template <class ArgumentIterator, class OutputIterator, class InfoType>
+void
+construct_argument_values(ArgumentIterator first,
+                          ArgumentIterator last,
+                          OutputIterator arg_val_out,
+                          const InfoType& info)
+{
+    for(auto ptr_flags = info.parameter_pointer_flags; first != last;
+        ++first, ++arg_val_out, ++ptr_flags)
+    {
+        if(*ptr_flags)
+        {
+            *arg_val_out = first->address_of();
+        }
+        else
+        {
+            *arg_val_out = first->value_;
+        }
+    }
+}
+
+
+template <class ArgumentIterator, class InfoType>
+void
+check_parameter_types(ArgumentIterator first,
+                      ArgumentIterator last,
+                      const InfoType& info)
+{
+    if(std::distance(first, last) != info.num_parameters)
+    {
+        throw argument_error("wrong number of arguments provided");
+    }
+
+    for(auto prm_index = info.parameter_type_indices; first != last;
+        ++first, ++prm_index)
+    {
+        if(*prm_index != first->type_index_)
+        {
+            throw argument_error("wrong argument type");
+        }
+    }
+}
+
+
+template <class ArgumentValueIterator, class OutputIterator, class InfoType>
+void
+pass_arguments_out(ArgumentValueIterator first,
+                   ArgumentValueIterator last,
+                   OutputIterator variable_out,
+                   const InfoType& info)
+{
+    for(auto ptr_flags = info.parameter_pointer_flags; first != last;
+        ++first, ++variable_out, ++ptr_flags)
+    {
+        if(*ptr_flags)
+        {
+            const auto type_index = variable_out->type_index_;
+            const auto& t_info =
+                variable_out->manager_->type_info_range_.first[type_index];
+            variable_out->value_ = t_info.dereference_bind_point(*first);
+        }
+        else
+        {
+            variable_out->value_ = *first;
+        }
+    }
+}
+}
+
+
 // holds one value with type/reflection information
 class variable
 {
     friend std::ostream& operator<<(std::ostream&, const variable&);
     friend std::istream& operator>>(std::istream&, variable&);
+
+    template <class ArgumentIterator, class OutputIterator, class InfoType>
+    friend void call_utils::construct_argument_values(ArgumentIterator,
+                                                      ArgumentIterator,
+                                                      OutputIterator,
+                                                      const InfoType&);
+
+    template <class ArgumentIterator, class InfoType>
+    friend void call_utils::check_parameter_types(ArgumentIterator,
+                                                  ArgumentIterator,
+                                                  const InfoType&);
+
+    template <class ArgumentValueIterator, class OutputIterator, class InfoType>
+    friend void call_utils::pass_arguments_out(ArgumentValueIterator,
+                                               ArgumentValueIterator,
+                                               OutputIterator,
+                                               const InfoType&);
 
     template <class Derived>
     friend class call_free_function;
@@ -526,9 +615,9 @@ private:
             if(info.parameter_pointer_flags[i])
             {
                 const auto type_index = first->type_index_;
-                const auto& info =
+                const auto& t_info =
                     first->manager_->type_info_range_.first[type_index];
-                first->value_ = info.dereference_bind_point(*value_first);
+                first->value_ = t_info.dereference_bind_point(*value_first);
             }
             else
             {
@@ -643,33 +732,21 @@ variable::call_member_function(const member_function& mf,
 {
     auto bind_point = mf.info_->bind_point;
 
+    call_utils::check_parameter_types(arg_begin, arg_end, *mf.info_);
+
     // construct arg buffer
     std::vector<any> arg_buffer;
     arg_buffer.reserve(mf.info_->num_parameters);
 
-    std::transform(arg_begin,
-                   arg_end,
-                   std::back_inserter(arg_buffer),
-                   [](const variable& var) { return var.value_; });
+    call_utils::construct_argument_values(
+        arg_begin, arg_end, std::back_inserter(arg_buffer), *mf.info_);
 
-    if(arg_buffer.size() != mf.info_->num_parameters)
-    {
-        throw argument_error("wrong number of arguments provided");
-    }
+    auto return_value = bind_point(value_, arg_buffer.data());
 
-    for(auto i = 0ul; i < mf.info_->num_parameters; ++i)
-    {
-        if(mf.info_->parameter_type_indices[i] != arg_begin->type_index_)
-        {
-            throw argument_error("wrong argument type");
-        }
+    call_utils::pass_arguments_out(
+        arg_buffer.begin(), arg_buffer.end(), arg_begin, *mf.info_);
 
-        ++arg_begin;
-    }
-
-    return variable(bind_point(value_, arg_buffer.data()),
-                    mf.info_->return_type_index,
-                    manager_);
+    return variable(return_value, mf.info_->return_type_index, manager_);
 }
 
 inline variable

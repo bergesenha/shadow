@@ -194,6 +194,7 @@ struct extract_member_function_info
         CTMFI::return_type_index,
         CTMFI::num_parameters,
         CTMFI::parameter_type_indices_holder::value,
+        CTMFI::parameter_pointer_flags_holder::value,
         CTMFI::bind_point};
 };
 
@@ -698,15 +699,24 @@ extract_value(const variable& var)
             member_function_signature_type>                                    \
             parameter_type_list;                                               \
                                                                                \
+        typedef metamusil::t_list::type_transform_t<parameter_type_list,       \
+                                                    metamusil::base_t>         \
+            base_parameter_type_list;                                          \
+                                                                               \
         static const std::size_t num_parameters =                              \
             metamusil::t_list::length_v<parameter_type_list>;                  \
                                                                                \
-        typedef metamusil::t_list::order_t<parameter_type_list, type_universe> \
+        typedef metamusil::t_list::order_t<base_parameter_type_list,           \
+                                           type_universe>                      \
             parameter_index_sequence;                                          \
                                                                                \
         typedef metamusil::int_seq::integer_sequence_to_array<                 \
             parameter_index_sequence>                                          \
             parameter_type_indices_holder;                                     \
+                                                                               \
+        typedef metamusil::t_list::value_transform<parameter_type_list,        \
+                                                   std::is_pointer>            \
+            parameter_pointer_flags_holder;                                    \
                                                                                \
         static constexpr shadow::member_function_binding_signature             \
             bind_point = &shadow::member_function_detail::                     \
