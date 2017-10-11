@@ -321,6 +321,59 @@ typedef api_type_aggregator<string_serialization_info, get_type_policy>
     string_serializer_;
 
 
+namespace call_utils
+{
+template <class ArgumentIterator, class OutputIterator, class InfoType>
+void
+construct_argument_values(ArgumentIterator first,
+                          ArgumentIterator last,
+                          OutputIterator arg_val_out,
+                          const InfoType& info)
+{
+    for(std::size_t i = 0; first != last; ++first, ++arg_val_out, ++i)
+    {
+        *arg_val_out = first->value_;
+    }
+}
+
+
+template <class ArgumentIterator, class InfoType>
+void
+check_parameter_types(ArgumentIterator first,
+                      ArgumentIterator last,
+                      const InfoType& info)
+{
+    if(std::distance(first, last) != info.num_parameters)
+    {
+        throw argument_error("wrong number of arguments provided");
+    }
+
+    for(auto prm_index = info.parameter_type_indices; first != last;
+        ++first, ++prm_index)
+    {
+        if(*prm_index != first->type_index_)
+        {
+            throw argument_error("wrong argument type");
+        }
+    }
+}
+
+
+template <class ArgumentValueIterator, class OutputIterator, class InfoType>
+void
+pass_arguments_out(ArgumentValueIterator first,
+                   ArgumentValueIterator last,
+                   OutputIterator variable_out,
+                   const InfoType& info)
+{
+    for(; first != last; ++first, ++variable_out)
+    {
+        variable_out->value_ = *first;
+    }
+}
+}
+
+
 // holds one value with type/reflection information
 class variable
 {
