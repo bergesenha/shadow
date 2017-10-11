@@ -1,5 +1,6 @@
 #include "catch.hpp"
 
+#include <list>
 #include <shadow.hpp>
 
 class tmfapi1
@@ -44,6 +45,12 @@ public:
     {
         i = 20000;
     }
+
+    double
+    fun6(const int& i, const double& j)
+    {
+        return i * j;
+    }
 };
 
 
@@ -58,6 +65,7 @@ REGISTER_MEMBER_FUNCTION(tmfapi1, fun2)
 REGISTER_MEMBER_FUNCTION(tmfapi1, fun3)
 REGISTER_MEMBER_FUNCTION(tmfapi1, fun4)
 REGISTER_MEMBER_FUNCTION(tmfapi1, fun5)
+REGISTER_MEMBER_FUNCTION(tmfapi1, fun6)
 
 SHADOW_INIT()
 }
@@ -165,5 +173,27 @@ TEST_CASE("set up shadow::variable containing a tmfapi object",
 
         REQUIRE(res.type().name() == std::string("void"));
         REQUIRE(tmfapi_space::static_value_cast<int>(arg) == 20000);
+    }
+
+    SECTION("find fun6 and call it")
+    {
+        auto found = std::find_if(
+            mem_fun_pair.first, mem_fun_pair.second, [](const auto& mf) {
+                return mf.name() == std::string("fun6");
+            });
+
+        REQUIRE(found != mem_fun_pair.second);
+
+        std::list<shadow::variable> args{
+            tmfapi_space::static_create<int>(2),
+            tmfapi_space::static_create<double>(10.0)};
+
+        auto res =
+            test_obj.call_member_function(*found, args.begin(), args.end());
+
+        REQUIRE(res.type().name() == std::string("double"));
+        REQUIRE(tmfapi_space::static_value_cast<double>(res) == Approx(20.0));
+        REQUIRE(tmfapi_space::static_value_cast<int>(args.front()) == 2);
+        REQUIRE(tmfapi_space::static_value_cast<double>(args.back()) == 10.0);
     }
 }
