@@ -522,25 +522,19 @@ public:
 
         const auto info = static_cast<const Derived*>(this)->info_;
 
+        call_utils::check_parameter_types(arg_begin, arg_end, *info);
 
         // construct argument buffer
         std::vector<any> arg_values;
         arg_values.reserve(info->num_parameters);
-
-        construct_argument_values(
+        call_utils::construct_argument_values(
             arg_begin, arg_end, std::back_inserter(arg_values), *info);
 
-        // check arguments
-        if(arg_values.size() != info->num_parameters)
-        {
-            throw argument_error("wrong number of arguments provided");
-        }
-
-        check_parameter_types(arg_begin, arg_end, *info);
 
         auto return_value = info->bind_point(arg_values.data());
 
-        pass_arguments_out(arg_begin, arg_end, arg_values.begin(), *info);
+        call_utils::pass_arguments_out(
+            arg_values.begin(), arg_values.end(), arg_begin, *info);
 
         return variable(return_value,
                         info->return_type_index,
@@ -563,67 +557,6 @@ public:
         return variable(info->bind_point(nullptr),
                         info->return_type_index,
                         static_cast<const Derived*>(this)->manager_);
-    }
-
-private:
-    template <class ArgIterator, class OutputIterator, class InfoType>
-    void
-    construct_argument_values(ArgIterator first,
-                              ArgIterator last,
-                              OutputIterator out,
-                              const InfoType& info) const
-    {
-        for(auto i = 0ul; first != last; ++first, ++i, ++out)
-        {
-            // in case the parameter is a pointer type, take the address of the
-            // value
-            if(info.parameter_pointer_flags[i])
-            {
-                *out = first->address_of();
-            }
-            else
-            {
-                *out = first->value_;
-            }
-        }
-    }
-
-    template <class ArgIterator, class InfoType>
-    void
-    check_parameter_types(ArgIterator arg_begin,
-                          ArgIterator arg_end,
-                          const InfoType& info) const
-    {
-        for(auto i = 0ul; arg_begin != arg_end; ++i, ++arg_begin)
-        {
-            if(info.parameter_type_indices[i] != arg_begin->type_index_)
-            {
-                throw argument_error("wrong argument type");
-            }
-        }
-    }
-
-    template <class ArgIterator, class ArgValueIterator, class InfoType>
-    void
-    pass_arguments_out(ArgIterator first,
-                       ArgIterator last,
-                       ArgValueIterator value_first,
-                       const InfoType& info) const
-    {
-        for(auto i = 0ul; first != last; ++first, ++value_first, ++i)
-        {
-            if(info.parameter_pointer_flags[i])
-            {
-                const auto type_index = first->type_index_;
-                const auto& t_info =
-                    first->manager_->type_info_range_.first[type_index];
-                first->value_ = t_info.dereference_bind_point(*value_first);
-            }
-            else
-            {
-                first->value_ = *value_first;
-            }
-        }
     }
 };
 
