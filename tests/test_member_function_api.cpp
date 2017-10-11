@@ -149,4 +149,21 @@ TEST_CASE("set up shadow::variable containing a tmfapi object",
             tmfapi_space::static_value_cast<tmfapi1>(test_obj).public_value ==
             20);
     }
+
+    SECTION("find fun5 and call it")
+    {
+        auto found = std::find_if(
+            mem_fun_pair.first, mem_fun_pair.second, [](const auto& mf) {
+                return mf.name() == std::string("fun5");
+            });
+
+        REQUIRE(found != mem_fun_pair.second);
+
+        auto arg = tmfapi_space::static_create<int>();
+
+        auto res = test_obj.call_member_function(*found, &arg, &arg + 1);
+
+        REQUIRE(res.type().name() == std::string("void"));
+        REQUIRE(tmfapi_space::static_value_cast<int>(arg) == 20000);
+    }
 }
