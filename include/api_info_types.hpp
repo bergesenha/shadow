@@ -596,9 +596,9 @@ private:
             if(info.parameter_pointer_flags[i])
             {
                 const auto type_index = first->type_index_;
-                const auto& info =
+                const auto& t_info =
                     first->manager_->type_info_range_.first[type_index];
-                first->value_ = info.dereference_bind_point(*value_first);
+                first->value_ = t_info.dereference_bind_point(*value_first);
             }
             else
             {
