@@ -46,6 +46,12 @@ public:
     friend std::ostream& operator<<(std::ostream&, const variable&);
     friend std::istream& operator>>(std::istream&, variable&);
 
+    template <class ArgumentValueIterator, class OutputIterator, class InfoType>
+    friend void call_utils::pass_arguments_out(ArgumentValueIterator,
+                                               ArgumentValueIterator,
+                                               OutputIterator,
+                                               const InfoType&);
+
     typedef type_ type;
     typedef info_iterator_<const type_info, const type> const_type_iterator;
 
