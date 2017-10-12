@@ -258,6 +258,27 @@ TEST_CASE("get all types", "[reflection_manager]")
             auto constr_pair = tca_space::manager.constructors_by_type(*found);
 
             REQUIRE(std::distance(constr_pair.first, constr_pair.second) == 1);
+
+            SECTION("find constructor taking one arg")
+            {
+                auto found_constr = std::find_if(
+                    constr_pair.first, constr_pair.second, [](const auto& ctr) {
+                        return ctr.num_parameters() == 1;
+                    });
+
+                REQUIRE(found_constr != constr_pair.second);
+
+                SECTION("construct tca3 with one argument")
+                {
+                    std::vector<shadow::variable> args{
+                        tca_space::static_create<int>(100)};
+
+                    auto obj = tca_space::manager.construct(
+                        *found_constr, args.begin(), args.end());
+
+                    REQUIRE(obj.type().name() == std::string("tca3"));
+                }
+            }
         }
     }
 }
