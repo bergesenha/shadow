@@ -576,34 +576,16 @@ reflection_manager::construct(const constructor& ctr,
 {
     const auto num_params = ctr.num_parameters();
 
+    call_utils::check_parameter_types(arg_begin, arg_end, *ctr.info_);
+
     std::vector<any> arg_buffer;
     arg_buffer.reserve(num_params);
 
-    std::transform(arg_begin,
-                   arg_end,
-                   std::back_inserter(arg_buffer),
-                   [](const variable& var) { return var.value_; });
-
-    // check number of arguments provided
-    if(arg_buffer.size() != num_params)
-    {
-        throw argument_error("wrong number of arguments provided");
-    }
+    call_utils::construct_argument_values(
+        arg_begin, arg_end, std::back_inserter(arg_buffer), *ctr.info_);
 
     std::vector<std::size_t> arg_type_indices;
     arg_type_indices.reserve(num_params);
-
-    std::transform(arg_begin,
-                   arg_end,
-                   std::back_inserter(arg_type_indices),
-                   [](const variable& var) { return var.type_index_; });
-
-    if(!std::equal(arg_type_indices.begin(),
-                   arg_type_indices.end(),
-                   ctr.info_->parameter_type_indices))
-    {
-        throw argument_error("wrong argument types provided");
-    }
 
     return variable(
         ctr.info_->bind_point(arg_buffer.data()), ctr.info_->type_index, this);
