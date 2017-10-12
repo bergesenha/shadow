@@ -63,6 +63,24 @@ public:
     {
         *i = public_value;
     }
+
+    void
+    fun9(int& i)
+    {
+        i *= 2;
+    }
+
+    void
+    fun9(double& d)
+    {
+        d *= 2.0;
+    }
+
+    void
+    fun9(char* c)
+    {
+        *c += 2;
+    }
 };
 
 
@@ -80,6 +98,10 @@ REGISTER_MEMBER_FUNCTION(tmfapi1, fun5)
 REGISTER_MEMBER_FUNCTION(tmfapi1, fun6)
 REGISTER_MEMBER_FUNCTION(tmfapi1, fun7)
 REGISTER_MEMBER_FUNCTION(tmfapi1, fun8)
+
+REGISTER_MEMBER_FUNCTION_EXPLICIT(tmfapi1, fun9, void, int&)
+REGISTER_MEMBER_FUNCTION_EXPLICIT(tmfapi1, fun9, void, double&)
+REGISTER_MEMBER_FUNCTION_EXPLICIT(tmfapi1, fun9, void, char*)
 
 SHADOW_INIT()
 }
@@ -250,5 +272,68 @@ TEST_CASE("set up shadow::variable containing a tmfapi object",
         REQUIRE(
             tmfapi_space::static_value_cast<tmfapi1>(test_obj).public_value ==
             20);
+    }
+
+    SECTION("find fun9 with int& param")
+    {
+        auto found = std::find_if(
+            mem_fun_pair.first, mem_fun_pair.second, [](const auto& mf) {
+                return mf.name() == std::string("fun9") &&
+                       mf.parameter_types().first->name() == std::string("int");
+            });
+
+        REQUIRE(found != mem_fun_pair.second);
+
+        SECTION("call it")
+        {
+            auto anint = tmfapi_space::static_create<int>(22);
+
+            test_obj.call_member_function(found, &anint, &anint + 1);
+
+            REQUIRE(tmfapi_space::static_value_cast<int>(anint) == 44);
+        }
+    }
+
+    SECTION("find fun9 with double& param")
+    {
+        auto found = std::find_if(
+            mem_fun_pair.first, mem_fun_pair.second, [](const auto& mf) {
+                return mf.name() == std::string("fun9") &&
+                       mf.parameter_types().first->name() ==
+                           std::string("double");
+            });
+
+        REQUIRE(found != mem_fun_pair.second);
+
+        SECTION("call it")
+        {
+            auto adouble = tmfapi_space::static_create<double>(1.5);
+
+            test_obj.call_member_function(found, &adouble, &adouble + 1);
+
+            REQUIRE(tmfapi_space::static_value_cast<double>(adouble) ==
+                    Approx(3.0));
+        }
+    }
+
+    SECTION("find fun9 with char* param")
+    {
+        auto found = std::find_if(
+            mem_fun_pair.first, mem_fun_pair.second, [](const auto& mf) {
+                return mf.name() == std::string("fun9") &&
+                       mf.parameter_types().first->name() ==
+                           std::string("char");
+            });
+
+        REQUIRE(found != mem_fun_pair.second);
+
+        SECTION("call it")
+        {
+            auto achar = tmfapi_space::static_create<char>('a');
+
+            test_obj.call_member_function(found, &achar, &achar + 1);
+
+            REQUIRE(tmfapi_space::static_value_cast<char>(achar) == 'c');
+        }
     }
 }
