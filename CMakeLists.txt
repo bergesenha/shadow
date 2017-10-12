@@ -35,6 +35,7 @@ if(SHADOW_BUILD_TESTS)
         tests/test_iterators.cpp
         tests/test_free_function_api.cpp
         tests/test_member_function_api.cpp
+        tests/test_constructor_api.cpp
         )
 
     add_executable(unit_tests ${SHADOW_TEST_SRC})
