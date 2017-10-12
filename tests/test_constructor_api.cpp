@@ -49,6 +49,15 @@ private:
     int i_;
 };
 
+struct tca4
+{
+    tca4(const int* i_ptr) : i(*i_ptr)
+    {
+    }
+
+    int i;
+};
+
 
 namespace tca_space
 {
@@ -56,6 +65,7 @@ REGISTER_TYPE_BEGIN()
 REGISTER_TYPE(tca1)
 REGISTER_TYPE(tca2)
 REGISTER_TYPE(tca3)
+REGISTER_TYPE(tca4)
 REGISTER_TYPE_END()
 
 REGISTER_CONSTRUCTOR(tca1, int, char)
@@ -64,6 +74,8 @@ REGISTER_CONSTRUCTOR(tca2)
 REGISTER_CONSTRUCTOR(tca2, char)
 
 REGISTER_CONSTRUCTOR(tca3, const int&)
+
+REGISTER_CONSTRUCTOR(tca4, const int*)
 
 SHADOW_INIT()
 }
@@ -277,6 +289,42 @@ TEST_CASE("get all types", "[reflection_manager]")
                         *found_constr, args.begin(), args.end());
 
                     REQUIRE(obj.type().name() == std::string("tca3"));
+                }
+            }
+        }
+    }
+
+    SECTION("find tca4 type")
+    {
+        auto found = std::find_if(
+            types_pair.first, types_pair.second, [](const auto& tp) {
+                return tp.name() == std::string("tca4");
+            });
+
+        REQUIRE(found != types_pair.second);
+
+        SECTION("get all constructors for tca4")
+        {
+            auto constr_pair = tca_space::manager.constructors_by_type(*found);
+
+            REQUIRE(std::distance(constr_pair.first, constr_pair.second) == 1);
+
+            SECTION("find constructor taking one arg")
+            {
+                auto found_constr = std::find_if(
+                    constr_pair.first, constr_pair.second, [](const auto& ctr) {
+                        return ctr.num_parameters() == 1;
+                    });
+
+                REQUIRE(found_constr != constr_pair.second);
+
+                SECTION("construct a tca4 with one int argument")
+                {
+                    std::vector<shadow::variable> args{
+                        tca_space::static_create<int>(44)};
+
+                    auto obj = tca_space::manager.construct(
+                        *found_constr, args.begin(), args.end());
                 }
             }
         }
