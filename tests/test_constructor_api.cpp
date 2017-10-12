@@ -1,6 +1,7 @@
 #include "catch.hpp"
 
 #include <shadow.hpp>
+#include <vector>
 #include <iostream>
 
 
@@ -80,6 +81,44 @@ TEST_CASE("get all types", "[reflection_manager]")
             auto constr_pair = tca_space::manager.constructors_by_type(*found);
 
             REQUIRE(std::distance(constr_pair.first, constr_pair.second) == 2);
+
+            SECTION("find constructor taking 0 arguments")
+            {
+                auto found_constr = std::find_if(
+                    constr_pair.first, constr_pair.second, [](const auto& ctr) {
+                        return ctr.num_parameters() == 0;
+                    });
+
+                REQUIRE(found_constr != constr_pair.second);
+
+                SECTION("constructor double with 0 args")
+                {
+                    // construct with no arg overload
+                    auto obj = tca_space::manager.construct(*found_constr);
+
+                    // construct with overload taking iterators to args
+                    std::vector<shadow::variable> args;
+                    auto obj2 = tca_space::manager.construct(
+                        *found_constr, args.begin(), args.end());
+
+                    REQUIRE(obj.type().name() == std::string("double"));
+                    REQUIRE(obj2.type().name() == std::string("double"));
+                    REQUIRE(tca_space::static_value_cast<double>(obj) ==
+                            Approx(0.0));
+                    REQUIRE(tca_space::static_value_cast<double>(obj2) ==
+                            Approx(0.0));
+                }
+            }
+
+            SECTION("find constructor taking 1 argument")
+            {
+                auto found_constr = std::find_if(
+                    constr_pair.first, constr_pair.second, [](const auto& ctr) {
+                        return ctr.num_parameters() == 1;
+                    });
+
+                REQUIRE(found_constr != constr_pair.second);
+            }
         }
     }
 
