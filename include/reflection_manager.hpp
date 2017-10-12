@@ -558,7 +558,7 @@ reflection_manager::static_create(Args&&... args) const
     const auto type_index =
         metamusil::t_list::index_of_type_v<TypeUniverseList, T>;
 
-    return variable(any(T(std::forward<Args>(args)...)), type_index, this);
+    return variable(any(T{std::forward<Args>(args)...}), type_index, this);
 }
 
 // this template alias definition is used in macro SHADOW_INIT to create a

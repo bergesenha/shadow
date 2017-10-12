@@ -115,7 +115,7 @@ class get_type_policy
 {
 public:
     type_
-    get_type() const
+    type() const
     {
         // retrieve type index
         const auto type_index =
@@ -168,7 +168,7 @@ typedef api_type_aggregator<constructor_info,
 inline std::ostream&
 operator<<(std::ostream& out, const constructor_& con)
 {
-    out << con.get_type().name() << '(';
+    out << con.type().name() << '(';
 
     const auto num_params = con.num_parameters();
 
@@ -310,7 +310,7 @@ typedef api_type_aggregator<member_variable_info,
 inline std::ostream&
 operator<<(std::ostream& out, const member_variable_& mv)
 {
-    out << mv.get_type() << " " << mv.object_type() << "::" << mv.name();
+    out << mv.type() << " " << mv.object_type() << "::" << mv.name();
 
     return out;
 }
