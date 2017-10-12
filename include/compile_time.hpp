@@ -86,6 +86,7 @@ struct extract_constructor_info
         CTCI::num_parameters,
         static_cast<const std::size_t*>(
             CTCI::parameter_type_indices_holder::value),
+        static_cast<const bool*>(CTCI::parameter_pointer_flags_holder::value),
         CTCI::bind_point};
 };
 
@@ -440,6 +441,10 @@ extract_value(const variable& var)
             parameter_index_sequence>                                          \
             parameter_type_indices_holder;                                     \
                                                                                \
+        typedef metamusil::t_list::value_transform<parameter_type_list,        \
+                                                   std::is_pointer>            \
+            parameter_pointer_flags_holder;                                    \
+                                                                               \
         static constexpr shadow::constructor_binding_signature bind_point =    \
             shadow::constructor_bind_point_from_type_list_v<                   \
                 ResultType,                                                    \
@@ -521,6 +526,10 @@ extract_value(const variable& var)
         typedef metamusil::int_seq::integer_sequence_to_array<                 \
             parameter_index_sequence>                                          \
             parameter_type_indices_holder;                                     \
+                                                                               \
+        typedef metamusil::t_list::value_transform<parameter_type_list,        \
+                                                   std::is_pointer>            \
+            parameter_pointer_flags_holder;                                    \
                                                                                \
         static constexpr shadow::constructor_binding_signature bind_point =    \
             shadow::constructor_bind_point_from_type_list_v<                   \
