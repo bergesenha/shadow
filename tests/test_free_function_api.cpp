@@ -40,6 +40,24 @@ fun6(int* i)
     *i *= 2;
 }
 
+void
+fun7(int& i)
+{
+    i *= 2;
+}
+
+void
+fun7(double& d)
+{
+    d *= 2.0;
+}
+
+void
+fun7(char* c)
+{
+    *c += 2;
+}
+
 namespace test_space
 {
 REGISTER_TYPE_BEGIN()
@@ -51,6 +69,10 @@ REGISTER_FREE_FUNCTION(fun3)
 REGISTER_FREE_FUNCTION(fun4)
 REGISTER_FREE_FUNCTION(fun5)
 REGISTER_FREE_FUNCTION(fun6)
+
+REGISTER_FREE_FUNCTION_EXPLICIT(fun7, void, int&)
+REGISTER_FREE_FUNCTION_EXPLICIT(fun7, void, double&)
+REGISTER_FREE_FUNCTION_EXPLICIT(fun7, void, char*)
 
 SHADOW_INIT()
 }
@@ -206,6 +228,78 @@ TEST_CASE("get iterator pair to all available functions",
 
             REQUIRE(res.type().name() == std::string("void"));
             REQUIRE(test_space::static_value_cast<int>(args[0]) == 20);
+        }
+    }
+
+    SECTION("find fun7 with int& param")
+    {
+        auto found =
+            std::find_if(ff_pair.first, ff_pair.second, [](const auto& ff) {
+                return ff.name() == std::string("fun7") &&
+                       ff.parameter_types().first->name() == std::string("int");
+            });
+
+        REQUIRE(found != ff_pair.second);
+
+        SECTION("call fun7(int&) through reflection system")
+        {
+            auto fun7_refl = *found;
+
+            auto anint = test_space::static_create<int>(200);
+
+            auto res = fun7_refl(&anint, &anint + 1);
+
+            REQUIRE(res.type().name() == std::string("void"));
+            REQUIRE(test_space::static_value_cast<int>(anint) == 400);
+        }
+    }
+
+    SECTION("find fun7 with double& param")
+    {
+        auto found =
+            std::find_if(ff_pair.first, ff_pair.second, [](const auto& ff) {
+                return ff.name() == std::string("fun7") &&
+                       ff.parameter_types().first->name() ==
+                           std::string("double");
+            });
+
+        REQUIRE(found != ff_pair.second);
+
+        SECTION("call fun7(double&) through reflection system")
+        {
+            auto fun7_refl = *found;
+
+            auto adouble = test_space::static_create<double>(1.5);
+
+            auto res = fun7_refl(&adouble, &adouble + 1);
+
+            REQUIRE(res.type().name() == std::string("void"));
+            REQUIRE(test_space::static_value_cast<double>(adouble) ==
+                    Approx(3.0));
+        }
+    }
+
+    SECTION("find fun7 with char* param")
+    {
+        auto found =
+            std::find_if(ff_pair.first, ff_pair.second, [](const auto& ff) {
+                return ff.name() == std::string("fun7") &&
+                       ff.parameter_types().first->name() ==
+                           std::string("char");
+            });
+
+        REQUIRE(found != ff_pair.second);
+
+        SECTION("call fun7(char*) through reflection system")
+        {
+            auto fun7_refl = *found;
+
+            auto achar = test_space::static_create<char>('a');
+
+            auto res = fun7_refl(&achar, &achar + 1);
+
+            REQUIRE(res.type().name() == std::string("void"));
+            REQUIRE(test_space::static_value_cast<char>(achar) == 'c');
         }
     }
 }
