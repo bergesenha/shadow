@@ -118,6 +118,19 @@ TEST_CASE("get all types", "[reflection_manager]")
                     });
 
                 REQUIRE(found_constr != constr_pair.second);
+
+                SECTION("constructor double with 1 arg")
+                {
+                    // construct with overload taking iterators to args
+                    std::vector<shadow::variable> args{
+                        tca_space::static_create<double>(20.0)};
+                    auto obj = tca_space::manager.construct(
+                        *found_constr, args.begin(), args.end());
+
+                    REQUIRE(obj.type().name() == std::string("double"));
+                    REQUIRE(tca_space::static_value_cast<double>(obj) ==
+                            Approx(20.0));
+                }
             }
         }
     }
