@@ -22,6 +22,12 @@ public:
     {
     }
 
+    char
+    get_c() const
+    {
+        return c_;
+    }
+
 private:
     char c_;
 };
@@ -192,6 +198,48 @@ TEST_CASE("get all types", "[reflection_manager]")
             auto constr_pair = tca_space::manager.constructors_by_type(*found);
 
             REQUIRE(std::distance(constr_pair.first, constr_pair.second) == 2);
+
+            SECTION("find default constructor for tca2")
+            {
+                auto found_constr = std::find_if(
+                    constr_pair.first, constr_pair.second, [](const auto& ctr) {
+                        return ctr.num_parameters() == 0;
+                    });
+
+                REQUIRE(found_constr != constr_pair.second);
+
+                SECTION("construct tca2 with default constructor")
+                {
+                    auto obj = tca_space::manager.construct(*found_constr);
+
+                    REQUIRE(obj.type().name() == std::string("tca2"));
+                    REQUIRE(tca_space::static_value_cast<tca2>(obj).get_c() ==
+                            'a');
+                }
+            }
+
+            SECTION("find constructor for tca2 taking one argument")
+            {
+                auto found_constr = std::find_if(
+                    constr_pair.first, constr_pair.second, [](const auto& ctr) {
+                        return ctr.num_parameters() == 1;
+                    });
+
+                REQUIRE(found_constr != constr_pair.second);
+
+                SECTION("construct tca2 with one arg constructor")
+                {
+                    std::vector<shadow::variable> args{
+                        tca_space::static_create<char>('w')};
+
+                    auto obj = tca_space::manager.construct(
+                        *found_constr, args.begin(), args.end());
+
+                    REQUIRE(obj.type().name() == std::string("tca2"));
+                    REQUIRE(tca_space::static_value_cast<tca2>(obj).get_c() ==
+                            'w');
+                }
+            }
         }
     }
 
