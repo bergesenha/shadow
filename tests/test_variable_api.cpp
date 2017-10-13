@@ -3,6 +3,15 @@
 #include <shadow.hpp>
 
 
-TEST_CASE("", "")
+REGISTER_TYPE_BEGIN()
+REGISTER_TYPE_END()
+
+SHADOW_INIT()
+
+
+TEST_CASE("test special member functions of shadow::variable", "[variable]")
 {
+    shadow::variable a;
+
+    REQUIRE(a.type().name() == std::string("void"));
 }
