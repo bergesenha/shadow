@@ -13,5 +13,5 @@ TEST_CASE("test special member functions of shadow::variable", "[variable]")
 {
     shadow::variable a;
 
-    REQUIRE(a.type().name() == std::string("void"));
+    REQUIRE(a.has_value() == false);
 }

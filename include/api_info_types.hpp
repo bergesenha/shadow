@@ -495,6 +495,8 @@ public:
     // function with no arguments
     variable call_member_function(member_function_iterator mf_it);
 
+    bool has_value() const;
+
 private:
     any address_of();
 
@@ -710,6 +712,13 @@ inline variable
 variable::call_member_function(member_function_iterator mf_it)
 {
     return call_member_function(*mf_it);
+}
+
+
+inline bool
+variable::has_value() const
+{
+    return manager_ != nullptr;
 }
 
 
