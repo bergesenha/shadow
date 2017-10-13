@@ -264,11 +264,19 @@ struct generate_array_of_string_serialization_info_holder
 // since the function static_value_cast declared in SHADOW_INIT macro is of
 // unknown namespace
 template <class T>
-T
+const T&
 extract_value(const variable& var)
 {
     return var.value_.get<T>();
 }
+
+template <class T>
+T&
+extract_value(variable& var)
+{
+    return var.value_.get<T>();
+}
+
 } // namespace shadow
 
 
@@ -933,7 +941,24 @@ extract_value(const variable& var)
     }                                                                          \
                                                                                \
     template <class T>                                                         \
-    T static_value_cast(const shadow::variable& var)                           \
+    const T& static_value_cast(const shadow::variable& var)                    \
+    {                                                                          \
+        constexpr std::size_t type_index =                                     \
+            metamusil::t_list::index_of_type_v<type_universe, T>;              \
+                                                                               \
+        std::string type_name(type_info_array_holder::value[type_index].name); \
+                                                                               \
+        if(type_name != var.type().name())                                     \
+        {                                                                      \
+            throw shadow::type_conversion_error(                               \
+                "attempt to convert to value of wrong type");                  \
+        }                                                                      \
+                                                                               \
+        return shadow::extract_value<T>(var);                                  \
+    }                                                                          \
+                                                                               \
+    template <class T>                                                         \
+    T& static_value_cast(shadow::variable& var)                                \
     {                                                                          \
         constexpr std::size_t type_index =                                     \
             metamusil::t_list::index_of_type_v<type_universe, T>;              \

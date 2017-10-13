@@ -422,7 +422,10 @@ class variable
     friend class reflection_manager;
 
     template <class T>
-    friend T extract_value(const variable& var);
+    friend const T& extract_value(const variable& var);
+
+    template <class T>
+    friend T& extract_value(variable& var);
 
 public:
     typedef member_function_ member_function;

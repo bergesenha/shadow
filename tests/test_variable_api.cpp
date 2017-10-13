@@ -67,5 +67,7 @@ TEST_CASE("create a variable with an int using static_create", "[variable]")
         REQUIRE(tv_space::static_value_cast<int>(a) == 10);
         REQUIRE(b.has_value() == true);
         REQUIRE(tv_space::static_value_cast<int>(b) == 10);
+        REQUIRE(&(tv_space::static_value_cast<int>(a)) !=
+                &(tv_space::static_value_cast<int>(b)));
     }
 }
