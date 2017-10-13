@@ -50,3 +50,22 @@ TEST_CASE("default construct a variable", "[variable]")
         }
     }
 }
+
+
+TEST_CASE("create a variable with an int using static_create", "[variable]")
+{
+    shadow::variable a = tv_space::static_create<int>(10);
+
+    REQUIRE(a.has_value() == true);
+    REQUIRE(tv_space::static_value_cast<int>(a) == 10);
+
+    SECTION("copy construct another variable from a")
+    {
+        shadow::variable b = a;
+
+        REQUIRE(a.has_value() == true);
+        REQUIRE(tv_space::static_value_cast<int>(a) == 10);
+        REQUIRE(b.has_value() == true);
+        REQUIRE(tv_space::static_value_cast<int>(b) == 10);
+    }
+}
