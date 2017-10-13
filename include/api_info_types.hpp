@@ -422,7 +422,10 @@ class variable
     friend class reflection_manager;
 
     template <class T>
-    friend T extract_value(const variable& var);
+    friend const T& extract_value(const variable& var);
+
+    template <class T>
+    friend T& extract_value(variable& var);
 
 public:
     typedef member_function_ member_function;
@@ -494,6 +497,8 @@ public:
     // overload taking member_function_iterator as identifier and calling member
     // function with no arguments
     variable call_member_function(member_function_iterator mf_it);
+
+    bool has_value() const;
 
 private:
     any address_of();
@@ -710,6 +715,13 @@ inline variable
 variable::call_member_function(member_function_iterator mf_it)
 {
     return call_member_function(*mf_it);
+}
+
+
+inline bool
+variable::has_value() const
+{
+    return manager_ != nullptr;
 }
 
 
