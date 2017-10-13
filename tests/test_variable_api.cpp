@@ -70,4 +70,50 @@ TEST_CASE("create a variable with an int using static_create", "[variable]")
         REQUIRE(&(tv_space::static_value_cast<int>(a)) !=
                 &(tv_space::static_value_cast<int>(b)));
     }
+
+    SECTION("move construct another variable from a")
+    {
+        shadow::variable b = std::move(a);
+
+        REQUIRE(b.has_value() == true);
+        REQUIRE(tv_space::static_value_cast<int>(b) == 10);
+
+        SECTION("assign a new value to moved from variable a")
+        {
+            a = tv_space::static_create<char>('a');
+
+            REQUIRE(a.has_value() == true);
+            REQUIRE(tv_space::static_value_cast<char>(a) == 'a');
+        }
+    }
+
+    SECTION("default construct a variable and copy assign a to it")
+    {
+        shadow::variable b;
+        b = a;
+
+        REQUIRE(a.has_value() == true);
+        REQUIRE(tv_space::static_value_cast<int>(a) == 10);
+        REQUIRE(b.has_value() == true);
+        REQUIRE(tv_space::static_value_cast<int>(b) == 10);
+        REQUIRE(&(tv_space::static_value_cast<int>(a)) !=
+                &(tv_space::static_value_cast<int>(b)));
+    }
+
+    SECTION("default construct a variable and move assign a to it")
+    {
+        shadow::variable b;
+        b = std::move(a);
+
+        REQUIRE(b.has_value() == true);
+        REQUIRE(tv_space::static_value_cast<int>(b) == 10);
+
+        SECTION("assign a new value to moved from variable a")
+        {
+            a = tv_space::static_create<char>('a');
+
+            REQUIRE(a.has_value() == true);
+            REQUIRE(tv_space::static_value_cast<char>(a) == 'a');
+        }
+    }
 }
