@@ -10,7 +10,6 @@
 #include <type_list.hpp>
 
 #include "reflection_info.hpp"
-#include "reflection_manager.hpp"
 
 
 namespace shadow
@@ -260,22 +259,6 @@ struct generate_array_of_string_serialization_info_holder
         type;
 };
 
-// this is used to gain access to private member variable value_ of variable
-// since the function static_value_cast declared in SHADOW_INIT macro is of
-// unknown namespace
-template <class T>
-const T&
-extract_value(const variable& var)
-{
-    return var.value_.get<T>();
-}
-
-template <class T>
-T&
-extract_value(variable& var)
-{
-    return var.value_.get<T>();
-}
 
 } // namespace shadow
 
@@ -919,60 +902,7 @@ extract_value(variable& var)
         conversion_info_array_holder;                                          \
                                                                                \
     typedef shadow::generate_array_of_string_serialization_info_holder<        \
-        type_universe>::type string_serialization_info_array_holder;           \
-                                                                               \
-    /* instantiate reflection manager with compile time info */                \
-    static const shadow::reflection_manager manager{                           \
-        type_info_array_holder(),                                              \
-        constructor_info_array_holder(),                                       \
-        conversion_info_array_holder(),                                        \
-        free_function_info_array_holder(),                                     \
-        member_function_info_array_holder(),                                   \
-        member_variable_info_array_holder(),                                   \
-        string_serialization_info_array_holder()};                             \
-                                                                               \
-    template <class T, class... Args>                                          \
-    shadow::variable static_create(Args&&... args)                             \
-    {                                                                          \
-        shadow::static_create_member_pointer_type<Args...> ptr =               \
-            &shadow::reflection_manager::static_create<type_universe, T>;      \
-                                                                               \
-        return (manager.*ptr)(std::forward<Args>(args)...);                    \
-    }                                                                          \
-                                                                               \
-    template <class T>                                                         \
-    const T& static_value_cast(const shadow::variable& var)                    \
-    {                                                                          \
-        constexpr std::size_t type_index =                                     \
-            metamusil::t_list::index_of_type_v<type_universe, T>;              \
-                                                                               \
-        std::string type_name(type_info_array_holder::value[type_index].name); \
-                                                                               \
-        if(type_name != var.type().name())                                     \
-        {                                                                      \
-            throw shadow::type_conversion_error(                               \
-                "attempt to convert to value of wrong type");                  \
-        }                                                                      \
-                                                                               \
-        return shadow::extract_value<T>(var);                                  \
-    }                                                                          \
-                                                                               \
-    template <class T>                                                         \
-    T& static_value_cast(shadow::variable& var)                                \
-    {                                                                          \
-        constexpr std::size_t type_index =                                     \
-            metamusil::t_list::index_of_type_v<type_universe, T>;              \
-                                                                               \
-        std::string type_name(type_info_array_holder::value[type_index].name); \
-                                                                               \
-        if(type_name != var.type().name())                                     \
-        {                                                                      \
-            throw shadow::type_conversion_error(                               \
-                "attempt to convert to value of wrong type");                  \
-        }                                                                      \
-                                                                               \
-        return shadow::extract_value<T>(var);                                  \
-    }
+        type_universe>::type string_serialization_info_array_holder;
 
 
 #endif
