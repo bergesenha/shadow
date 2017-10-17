@@ -8,12 +8,16 @@
 #include <any.hpp>
 #include <reflection_info.hpp>
 
+
 namespace shadow
 {
-
 class type_tag
 {
 public:
+    type_tag() = default;
+
+    type_tag(const type_info& info);
+
     std::string name() const;
     std::size_t size() const;
 
@@ -68,5 +72,9 @@ inline bool
 type_tag::operator!=(const type_tag& other) const
 {
     return !operator==(other);
+}
+
+inline type_tag::type_tag(const type_info& info) : info_ptr_(&info)
+{
 }
 }
