@@ -20,7 +20,7 @@ public:
     info_iterator_() = default;
 
 
-    info_iterator_(const InfoType* current) : current_(current)
+    explicit info_iterator_(const InfoType* current) : current_(current)
     {
     }
 

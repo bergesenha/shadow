@@ -103,6 +103,8 @@ typedef info_type_aggregate<type_info,
                             comparison_policy>
     type_tag;
 
+typedef info_type_aggregate<constructor_info> constructor_tag;
+
 class object
 {
 public:
