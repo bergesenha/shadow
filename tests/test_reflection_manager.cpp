@@ -17,6 +17,14 @@ TEST_CASE(
 
     shadow::reflection_manager man(
         ti_arr, ci_arr, cvi_arr, ffi_arr, mfi_arr, mvi_arr, ssi_arr);
+
+
+    SECTION("retrieve types")
+    {
+        auto types_pair = man.types();
+
+        REQUIRE(types_pair.first == types_pair.second);
+    }
 }
 
 
@@ -34,4 +42,13 @@ TEST_CASE("instantiate reflection_manager with only type_info",
 
     shadow::reflection_manager man(
         ti_arr, ci_arr, cvi_arr, ffi_arr, mfi_arr, mvi_arr, ssi_arr);
+
+    SECTION("retrieve types")
+    {
+        auto types_pair = man.types();
+
+        REQUIRE(std::distance(types_pair.first, types_pair.second) == 2);
+        REQUIRE(types_pair.first->name() == std::string("void"));
+        REQUIRE(types_pair.first->size() == 0);
+    }
 }

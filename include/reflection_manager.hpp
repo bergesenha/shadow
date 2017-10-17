@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include <array_view.hpp>
 #include "reflection_info.hpp"
 #include "api_types.hpp"
@@ -41,6 +43,9 @@ struct array_selector<T*>
 class reflection_manager
 {
 public:
+    typedef info_iterator_<const type_info, type_tag> const_type_iterator;
+
+public:
     template <class TypeInfoArray,
               class ConstructorInfoArray,
               class ConversionInfoArray,
@@ -55,6 +60,9 @@ public:
                        MemberFunctionArray& mf_arr,
                        MemberVariableArray& mv_arr,
                        StringSerializationArray& ss_arr);
+
+
+    std::pair<const_type_iterator, const_type_iterator> types() const;
 
 private:
     // array_views of reflection information generated at compile time
@@ -103,5 +111,12 @@ inline reflection_manager::reflection_manager(TypeInfoArray& ti_arr,
           reflection_initialization_detail::array_selector<
               StringSerializationArray>::initialize(ss_arr))
 {
+}
+
+std::pair<typename reflection_manager::const_type_iterator,
+          typename reflection_manager::const_type_iterator>
+reflection_manager::types() const
+{
+    return std::make_pair(type_info_view_.cbegin(), type_info_view_.cend());
 }
 } // namespace shadow
