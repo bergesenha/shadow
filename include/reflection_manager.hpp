@@ -9,6 +9,8 @@ namespace shadow
 
 namespace reflection_initialization_detail
 {
+// used to handle cases where reflection_manager is initialized with nullptrs
+// (ie empty) instead of arrays
 template <class ArrayType>
 struct array_selector;
 
@@ -52,6 +54,7 @@ public:
                        StringSerializationArray& ss_arr);
 
 private:
+    // array_views of reflection information generated at compile time
     helene::array_view<const type_info> type_info_view_;
     helene::array_view<const constructor_info> constructor_info_view_;
     helene::array_view<const conversion_info> conversion_info_view_;
@@ -61,4 +64,41 @@ private:
     helene::array_view<const string_serialization_info>
         string_serialization_info_view_;
 };
+}
+
+namespace shadow
+{
+template <class TypeInfoArray,
+          class ConstructorInfoArray,
+          class ConversionInfoArray,
+          class FreeFunctionArray,
+          class MemberFunctionArray,
+          class MemberVariableArray,
+          class StringSerializationArray>
+inline reflection_manager::reflection_manager(TypeInfoArray& ti_arr,
+                                              ConstructorInfoArray& ci_arr,
+                                              ConversionInfoArray& cv_arr,
+                                              FreeFunctionArray& ff_arr,
+                                              MemberFunctionArray& mf_arr,
+                                              MemberVariableArray& mv_arr,
+                                              StringSerializationArray& ss_arr)
+    : type_info_view_(reflection_initialization_detail::array_selector<
+                      TypeInfoArray>::initialize(ti_arr)),
+      constructor_info_view_(reflection_initialization_detail::array_selector<
+                             ConstructorInfoArray>::initialize(ci_arr)),
+      conversion_info_view_(reflection_initialization_detail::array_selector<
+                            ConversionInfoArray>::initialize(cv_arr)),
+      free_function_info_view_(reflection_initialization_detail::array_selector<
+                               FreeFunctionArray>::initialize(ff_arr)),
+      member_function_info_view_(
+          reflection_initialization_detail::array_selector<
+              MemberFunctionArray>::initialize(mf_arr)),
+      member_variable_info_view_(
+          reflection_initialization_detail::array_selector<
+              MemberVariableArray>::initialize(mv_arr)),
+      string_serialization_info_view_(
+          reflection_initialization_detail::array_selector<
+              StringSerializationArray>::initialize(ss_arr))
+{
+}
 }
