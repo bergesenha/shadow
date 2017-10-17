@@ -22,6 +22,9 @@ class info_type_aggregate
     template <class Derived>
     friend class size_policy;
 
+    template <class Derived>
+    friend class comparison_policy;
+
 public:
     info_type_aggregate() = default;
 
@@ -57,7 +60,38 @@ public:
 };
 
 
-typedef info_type_aggregate<type_info, name_policy, size_policy> type_tag;
+template <class Derived>
+class comparison_policy
+{
+public:
+    bool
+    operator==(const Derived& other) const
+    {
+        if(static_cast<const Derived*>(this)->info_ptr_ == other.info_ptr_)
+        {
+            return true;
+        }
+        else if(std::strcmp(static_cast<const Derived*>(this)->info_ptr_->name,
+                            other.info_ptr_->name) == 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    bool
+    operator!=(const Derived& other) const
+    {
+        return !operator==(other);
+    }
+};
+
+typedef info_type_aggregate<type_info,
+                            name_policy,
+                            size_policy,
+                            comparison_policy>
+    type_tag;
 
 class object
 {
