@@ -11,23 +11,36 @@
 
 namespace shadow
 {
-class type_tag
+
+template <class InfoType, template <class> class... Policies>
+class info_type_aggregate
+    : Policies<info_type_aggregate<InfoType, Policies...>>...
 {
 public:
-    type_tag() = default;
+    info_type_aggregate() = default;
 
-    type_tag(const type_info& info);
-
-    std::string name() const;
-    std::size_t size() const;
-
-    bool operator==(const type_tag& other) const;
-    bool operator!=(const type_tag& other) const;
+    info_type_aggregate(const InfoType& info) : info_ptr_(&info)
+    {
+    }
 
 private:
-    const type_info* info_ptr_;
+    const InfoType* info_ptr_;
 };
 
+
+template <class Derived>
+class name_policy
+{
+public:
+    std::string
+    name() const
+    {
+        return std::string(static_cast<const Derived*>(this)->info_ptr_->name);
+    }
+};
+
+
+typedef info_type_aggregate<type_info, name_policy> type_tag;
 
 class object
 {
@@ -40,41 +53,4 @@ private:
 
 namespace shadow
 {
-
-inline std::string
-type_tag::name() const
-{
-    return std::string(info_ptr_->name);
-}
-
-inline std::size_t
-type_tag::size() const
-{
-    return info_ptr_->size;
-}
-
-inline bool
-type_tag::operator==(const type_tag& other) const
-{
-    if(info_ptr_ == other.info_ptr_)
-    {
-        return true;
-    }
-    else if(std::strcmp(info_ptr_->name, other.info_ptr_->name) == 0)
-    {
-        return true;
-    }
-
-    return false;
-}
-
-inline bool
-type_tag::operator!=(const type_tag& other) const
-{
-    return !operator==(other);
-}
-
-inline type_tag::type_tag(const type_info& info) : info_ptr_(&info)
-{
-}
 }
