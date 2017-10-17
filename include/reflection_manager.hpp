@@ -8,6 +8,21 @@ namespace shadow
 class reflection_manager
 {
 public:
+    template <class TypeInfoArray,
+              class ConstructorInfoArray,
+              class ConversionInfoArray,
+              class FreeFunctionArray,
+              class MemberFunctionArray,
+              class MemberVariableArray,
+              class StringSerializationArray>
+    reflection_manager(TypeInfoArray&,
+                       ConstructorInfoArray&,
+                       ConversionInfoArray&,
+                       FreeFunctionArray&,
+                       MemberFunctionArray&,
+                       MemberVariableArray&,
+                       StringSerializationArray&);
+
 private:
     helene::array_view<const type_info> type_info_view_;
     helene::array_view<const constructor_info> constructor_info_view_;
