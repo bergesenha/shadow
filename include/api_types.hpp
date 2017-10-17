@@ -32,6 +32,16 @@ public:
     {
     }
 
+    info_type_aggregate* operator->()
+    {
+        return this;
+    }
+
+    const info_type_aggregate* operator->() const
+    {
+        return this;
+    }
+
 private:
     const InfoType* info_ptr_;
 };
