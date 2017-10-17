@@ -32,9 +32,10 @@ struct array_selector<T*>
         return helene::array_view<T>();
     }
 };
-}
+} // namespace reflection_initialization_detail
 
 
+// point of interaction with the reflection system
 class reflection_manager
 {
 public:
@@ -64,7 +65,7 @@ private:
     helene::array_view<const string_serialization_info>
         string_serialization_info_view_;
 };
-}
+} // namespace shadow
 
 namespace shadow
 {
@@ -101,4 +102,4 @@ inline reflection_manager::reflection_manager(TypeInfoArray& ti_arr,
               StringSerializationArray>::initialize(ss_arr))
 {
 }
-}
+} // namespace shadow
