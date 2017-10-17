@@ -3,6 +3,7 @@
 #include <array_view.hpp>
 #include "reflection_info.hpp"
 #include "api_types.hpp"
+#include "info_iterators.hpp"
 
 namespace shadow
 {
