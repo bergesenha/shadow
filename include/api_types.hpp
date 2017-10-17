@@ -14,8 +14,14 @@ namespace shadow
 
 template <class InfoType, template <class> class... Policies>
 class info_type_aggregate
-    : Policies<info_type_aggregate<InfoType, Policies...>>...
+    : public Policies<info_type_aggregate<InfoType, Policies...>>...
 {
+    template <class Derived>
+    friend class name_policy;
+
+    template <class Derived>
+    friend class size_policy;
+
 public:
     info_type_aggregate() = default;
 
@@ -39,8 +45,19 @@ public:
     }
 };
 
+template <class Derived>
+class size_policy
+{
+public:
+    std::size_t
+    size() const
+    {
+        return static_cast<const Derived*>(this)->info_ptr_->size;
+    }
+};
 
-typedef info_type_aggregate<type_info, name_policy> type_tag;
+
+typedef info_type_aggregate<type_info, name_policy, size_policy> type_tag;
 
 class object
 {
