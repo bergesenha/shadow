@@ -64,6 +64,9 @@ public:
 
     std::pair<const_type_iterator, const_type_iterator> types() const;
 
+    std::string type_name(const type_tag& tag) const;
+    std::size_t type_size(const type_tag& tag) const;
+
 private:
     // array_views of reflection information generated at compile time
     helene::array_view<const type_info> type_info_view_;
@@ -113,10 +116,24 @@ inline reflection_manager::reflection_manager(TypeInfoArray& ti_arr,
 {
 }
 
-std::pair<typename reflection_manager::const_type_iterator,
-          typename reflection_manager::const_type_iterator>
+inline std::pair<typename reflection_manager::const_type_iterator,
+                 typename reflection_manager::const_type_iterator>
 reflection_manager::types() const
 {
     return std::make_pair(type_info_view_.cbegin(), type_info_view_.cend());
 }
+
+inline std::string
+reflection_manager::type_name(const type_tag& tag) const
+{
+    return tag.name();
+}
+
+inline std::size_t
+reflection_manager::type_size(const type_tag& tag) const
+{
+    return tag.size();
+}
+
+
 } // namespace shadow
