@@ -266,5 +266,20 @@ reflection_manager::construct_object(const constructor_tag& tag,
                                      Iterator first,
                                      Iterator last) const
 {
+    if(check_arguments(first, last, *tag.info_ptr_) == false)
+    {
+        throw std::runtime_error("wrong argument types");
+    }
+
+    std::vector<any> arg_vec;
+    arg_vec.reserve(std::distance(first, last));
+
+    construct_argument_array(
+        first, last, std::back_inserter(arg_vec), *tag.info_ptr_);
+
+    auto return_value = tag.info_ptr_->bind_point(arg_vec.data());
+
+    return object(
+        return_value, type_info_view_.data() + tag.info_ptr_->type_index, this);
 }
 } // namespace shadow

@@ -127,5 +127,30 @@ TEST_CASE("instantiate reflection_manager with type info and constructor info",
                 REQUIRE((*param_pair2.first).name() == std::string("int"));
             }
         }
+
+        SECTION("find constructor with 0 parameters")
+        {
+            auto found =
+                std::find_if(constr_tag_pair.first,
+                             constr_tag_pair.second,
+                             [&man](const auto& ct) {
+                                 auto param_pair1 =
+                                     man.constructor_parameter_types(ct);
+
+                                 return std::distance(param_pair1.first,
+                                                      param_pair1.second) == 0;
+                             });
+
+            REQUIRE(found != constr_tag_pair.second);
+
+            SECTION("default construct an int object through type_manager")
+            {
+                std::vector<shadow::object> args;
+                auto res =
+                    man.construct_object(*found, args.begin(), args.end());
+
+                REQUIRE(res.type().name() == std::string("int"));
+            }
+        }
     }
 }
