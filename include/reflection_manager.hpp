@@ -44,6 +44,8 @@ class reflection_manager
 {
 public:
     typedef info_iterator_<const type_info, type_tag> const_type_iterator;
+    typedef indexed_info_iterator_<const type_info, type_tag>
+        const_indexed_type_iterator;
     typedef info_iterator_<const constructor_info, constructor_tag>
         const_constructor_iterator;
 
@@ -79,6 +81,8 @@ public:
 
     type_tag constructor_type(const constructor_tag& tag) const;
 
+    std::pair<const_indexed_type_iterator, const_indexed_type_iterator>
+    constructor_parameter_types(const constructor_tag& tag) const;
 
 
 private:
@@ -165,4 +169,17 @@ reflection_manager::constructor_type(const constructor_tag& tag) const
     return type_tag(type_info_view_[tag.info_ptr_->type_index]);
 }
 
+inline std::pair<reflection_manager::const_indexed_type_iterator,
+                 reflection_manager::const_indexed_type_iterator>
+reflection_manager::constructor_parameter_types(
+    const constructor_tag& tag) const
+{
+    auto index_buffer = tag.info_ptr_->parameter_type_indices;
+    auto data_buffer = type_info_view_.data();
+
+    return std::make_pair(
+        const_indexed_type_iterator(0, index_buffer, data_buffer),
+        const_indexed_type_iterator(
+            tag.info_ptr_->num_parameters, index_buffer, data_buffer));
+}
 } // namespace shadow
