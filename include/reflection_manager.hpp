@@ -85,6 +85,15 @@ public:
     std::pair<const_indexed_type_iterator, const_indexed_type_iterator>
     constructor_parameter_types(const constructor_tag& tag) const;
 
+    template <class Iterator>
+    object construct_object(const constructor_tag& tag,
+                            Iterator first,
+                            Iterator last) const;
+
+private:
+    template <class Iterator, class InfoType>
+    bool
+    check_arguments(Iterator first, Iterator last, const InfoType& info) const;
 
     bool compare_type(const type_tag& tag, std::size_t index) const;
 
@@ -192,5 +201,36 @@ reflection_manager::compare_type(const type_tag& tag, std::size_t index) const
     type_tag tag_from_index(type_info_view_[index]);
 
     return tag == tag_from_index;
+}
+
+template <class Iterator, class InfoType>
+inline bool
+reflection_manager::check_arguments(Iterator first,
+                                    Iterator last,
+                                    const InfoType& info) const
+{
+    if(info.num_parameters != std::distance(first, last))
+    {
+        return false;
+    }
+
+    for(auto index_ptr = info.parameter_type_indices; first != last;
+        ++index_ptr, ++first)
+    {
+        if(compare_type(first->type(), *index_ptr) == false)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+template <class Iterator>
+inline object
+reflection_manager::construct_object(const constructor_tag& tag,
+                                     Iterator first,
+                                     Iterator last) const
+{
 }
 } // namespace shadow
