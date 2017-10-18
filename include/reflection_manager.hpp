@@ -66,13 +66,20 @@ public:
 
     // queries on types
     std::pair<const_type_iterator, const_type_iterator> types() const;
+
     std::string type_name(const type_tag& tag) const;
+
     std::size_t type_size(const type_tag& tag) const;
+
 
     // queries on constructors
     std::pair<const_constructor_iterator, const_constructor_iterator>
+
     constructors() const;
+
     type_tag constructor_type(const constructor_tag& tag) const;
+
+
 
 private:
     // array_views of reflection information generated at compile time
