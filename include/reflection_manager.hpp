@@ -86,6 +86,8 @@ public:
     constructor_parameter_types(const constructor_tag& tag) const;
 
 
+    bool compare_type(const type_tag& tag, std::size_t index) const;
+
 private:
     // array_views of reflection information generated at compile time
     helene::array_view<const type_info> type_info_view_;
@@ -182,5 +184,13 @@ reflection_manager::constructor_parameter_types(
         const_indexed_type_iterator(0, index_buffer, data_buffer),
         const_indexed_type_iterator(
             tag.info_ptr_->num_parameters, index_buffer, data_buffer));
+}
+
+inline bool
+reflection_manager::compare_type(const type_tag& tag, std::size_t index) const
+{
+    type_tag tag_from_index(type_info_view_[index]);
+
+    return tag == tag_from_index;
 }
 } // namespace shadow
