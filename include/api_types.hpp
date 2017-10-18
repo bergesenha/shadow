@@ -79,12 +79,8 @@ public:
     bool
     operator==(const Derived& other) const
     {
-        if(static_cast<const Derived*>(this)->info_ptr_ == other.info_ptr_)
-        {
-            return true;
-        }
-        else if(std::strcmp(static_cast<const Derived*>(this)->info_ptr_->name,
-                            other.info_ptr_->name) == 0)
+        if(std::strcmp(static_cast<const Derived*>(this)->info_ptr_->name,
+                       other.info_ptr_->name) == 0)
         {
             return true;
         }
