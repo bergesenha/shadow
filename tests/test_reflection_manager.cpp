@@ -92,7 +92,7 @@ TEST_CASE("instantiate reflection_manager with type info and constructor info",
         REQUIRE(std::distance(constr_tag_pair.first, constr_tag_pair.second) ==
                 2);
 
-        SECTION("get types of constructors")
+        SECTION("get target types of constructors")
         {
             auto tt1 = man.constructor_type(*constr_tag_pair.first);
             ++constr_tag_pair.first;
@@ -100,6 +100,32 @@ TEST_CASE("instantiate reflection_manager with type info and constructor info",
 
             REQUIRE(tt1.name() == std::string("int"));
             REQUIRE(tt2.name() == std::string("int"));
+        }
+
+        SECTION("get constructor parameter types")
+        {
+            auto param_pair1 =
+                man.constructor_parameter_types(*constr_tag_pair.first);
+            ++constr_tag_pair.first;
+            auto param_pair2 =
+                man.constructor_parameter_types(*constr_tag_pair.first);
+
+            auto num_params1 =
+                std::distance(param_pair1.first, param_pair1.second);
+            auto num_params2 =
+                std::distance(param_pair2.first, param_pair2.second);
+
+
+            if(num_params1 == 1)
+            {
+                REQUIRE(num_params2 == 0);
+                REQUIRE((*param_pair1.first).name() == std::string("int"));
+            }
+            else
+            {
+                REQUIRE(num_params1 == 0);
+                REQUIRE((*param_pair2.first).name() == std::string("int"));
+            }
         }
     }
 }

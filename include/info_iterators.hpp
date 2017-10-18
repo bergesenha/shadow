@@ -173,17 +173,17 @@ public:
 public:
     ProxyType operator*() const
     {
-        return ProxyType(data_buffer_ + index_buffer_[current_index_]);
+        return ProxyType(*(data_buffer_ + index_buffer_[current_index_]));
     }
 
     ProxyType operator->() const
     {
-        return ProxyType(data_buffer_ + index_buffer_[current_index_]);
+        return ProxyType(*(data_buffer_ + index_buffer_[current_index_]));
     }
 
     ProxyType operator[](difference_type n) const
     {
-        return ProxyType(data_buffer_ + index_buffer_[current_index_ + n]);
+        return ProxyType(*(data_buffer_ + index_buffer_[current_index_ + n]));
     }
 
     indexed_info_iterator_& operator++()
