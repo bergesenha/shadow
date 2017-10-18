@@ -1,6 +1,8 @@
 #pragma once
 
 #include <utility>
+#include <stdexcept>
+#include <vector>
 
 #include <array_view.hpp>
 #include "reflection_info.hpp"
@@ -96,6 +98,12 @@ private:
     check_arguments(Iterator first, Iterator last, const InfoType& info) const;
 
     bool compare_type(const type_tag& tag, std::size_t index) const;
+
+    template <class Iterator, class OutputIterator, class InfoType>
+    void construct_argument_array(Iterator first,
+                                  Iterator last,
+                                  OutputIterator out,
+                                  const InfoType& info) const;
 
 private:
     // array_views of reflection information generated at compile time
@@ -225,6 +233,32 @@ reflection_manager::check_arguments(Iterator first,
 
     return true;
 }
+
+
+template <class Iterator, class OutputIterator, class InfoType>
+inline void
+reflection_manager::construct_argument_array(Iterator first,
+                                             Iterator last,
+                                             OutputIterator out,
+                                             const InfoType& info) const
+{
+    for(auto pointer_flag_ptr = info.parameter_pointer_flags; first != last;
+        ++pointer_flag_ptr, ++first, ++out)
+    {
+        if(*pointer_flag_ptr)
+        {
+            // construct any with pointer to value
+            auto address_bind_point = first->type_info_->address_of_bind_point;
+
+            out = address_bind_point(first->value_);
+        }
+        else
+        {
+            out = first->value_;
+        }
+    }
+}
+
 
 template <class Iterator>
 inline object
