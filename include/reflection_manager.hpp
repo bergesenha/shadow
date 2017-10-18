@@ -74,13 +74,14 @@ public:
     std::size_t type_size(const type_tag& tag) const;
 
 
-    // queries on constructors
+    // returns range of all constructors available
     std::pair<const_constructor_iterator, const_constructor_iterator>
-
     constructors() const;
 
+    // returns the type that the given constructor belongs to
     type_tag constructor_type(const constructor_tag& tag) const;
 
+    // returns range of the types of the parameters of the given constructor
     std::pair<const_indexed_type_iterator, const_indexed_type_iterator>
     constructor_parameter_types(const constructor_tag& tag) const;
 
