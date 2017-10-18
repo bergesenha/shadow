@@ -72,6 +72,7 @@ public:
     // queries on constructors
     std::pair<const_constructor_iterator, const_constructor_iterator>
     constructors() const;
+    type_tag constructor_type(const constructor_tag& tag) const;
 
 private:
     // array_views of reflection information generated at compile time
@@ -149,6 +150,12 @@ reflection_manager::constructors() const
     return std::make_pair(
         const_constructor_iterator(constructor_info_view_.cbegin()),
         const_constructor_iterator(constructor_info_view_.cend()));
+}
+
+inline type_tag
+reflection_manager::constructor_type(const constructor_tag& tag) const
+{
+    return type_tag(type_info_view_[tag.info_ptr_->type_index]);
 }
 
 } // namespace shadow

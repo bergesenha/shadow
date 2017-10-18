@@ -25,6 +25,8 @@ class info_type_aggregate
     template <class Derived>
     friend class comparison_policy;
 
+    friend class reflection_manager;
+
 public:
     info_type_aggregate() = default;
 
