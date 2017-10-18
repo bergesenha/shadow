@@ -107,15 +107,42 @@ typedef info_type_aggregate<type_info,
 
 typedef info_type_aggregate<constructor_info> constructor_tag;
 
+
+class reflection_manager;
+
 class object
 {
+    friend class reflection_manager;
+
+private:
+    // used by reflection_manager
+    object(any value, const type_info* ti, const reflection_manager* man);
+
 public:
+    object();
+
+    type_tag type() const;
+
 private:
     any value_;
+    const type_info* type_info_;
+    const reflection_manager* manager_;
 };
 }
 
 
 namespace shadow
 {
+inline object::object(any value,
+                      const type_info* ti,
+                      const reflection_manager* man)
+    : value_(std::move(value)), type_info_(ti), manager_(man)
+{
+}
+
+inline type_tag
+object::type() const
+{
+    return type_tag(*type_info_);
+}
 }
