@@ -20,9 +20,11 @@ namespace reflection_initialization_detail
 template <class T>
 struct array_selector
 {
-    static helene::array_view<std::remove_pointer_t<T>> initialize(T)
+    static helene::array_view<std::remove_pointer_t<std::remove_const_t<T>>>
+        initialize(T)
     {
-        return helene::array_view<std::remove_pointer_t<T>>();
+        return helene::array_view<
+            std::remove_pointer_t<std::remove_const_t<T>>>();
     }
 };
 
