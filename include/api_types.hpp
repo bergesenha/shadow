@@ -110,12 +110,10 @@ class object
 {
     friend class reflection_manager;
 
-private:
-    // used by reflection_manager
-    object(any value, const type_info* ti, const reflection_manager* man);
-
 public:
     object();
+
+    object(any value, const type_info* ti, const reflection_manager* man);
 
     type_tag type() const;
 
