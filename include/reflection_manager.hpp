@@ -17,25 +17,21 @@ namespace reflection_initialization_detail
 {
 // used to handle cases where reflection_manager is initialized with nullptrs
 // (ie empty) instead of arrays
-template <class ArrayType>
-struct array_selector;
-
-template <class T, std::size_t N>
-struct array_selector<T[N]>
+template <class T>
+struct array_selector
 {
-    static helene::array_view<T> initialize(T (&arr)[N])
+    static helene::array_view<std::remove_pointer_t<T>> initialize(T)
     {
-        return helene::make_array_view(arr);
+        return helene::array_view<std::remove_pointer_t<T>>();
     }
 };
 
-template <class T>
-struct array_selector<T*>
+template <class I, std::size_t N>
+struct array_selector<I[N]>
 {
-    static helene::array_view<T>
-    initialize(T* ptr)
+    static helene::array_view<I> initialize(I (&arr)[N])
     {
-        return helene::array_view<T>();
+        return helene::make_array_view(arr);
     }
 };
 } // namespace reflection_initialization_detail
