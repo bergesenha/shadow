@@ -172,8 +172,8 @@ reflection_manager::type_size(const type_tag& tag) const
     return tag.size();
 }
 
-std::pair<typename reflection_manager::const_constructor_iterator,
-          typename reflection_manager::const_constructor_iterator>
+inline std::pair<typename reflection_manager::const_constructor_iterator,
+                 typename reflection_manager::const_constructor_iterator>
 reflection_manager::constructors() const
 {
     return std::make_pair(
