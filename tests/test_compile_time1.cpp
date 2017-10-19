@@ -93,4 +93,22 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
             REQUIRE(res.type().name() == std::string("tct1_class"));
         }
     }
+
+    SECTION("find all type conversions available")
+    {
+        auto conversions = tct1_space::manager.conversions();
+
+        SECTION("find conversion from int to float")
+        {
+            auto found = std::find_if(
+                conversions.first, conversions.second, [](const auto& cv) {
+                    auto conv_types = tct1_space::manager.conversion_types(cv);
+
+                    return conv_types.first.name() == std::string("int") &&
+                           conv_types.second.name() == std::string("float");
+                });
+
+            REQUIRE(found != conversions.second);
+        }
+    }
 }

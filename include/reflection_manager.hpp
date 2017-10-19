@@ -49,6 +49,9 @@ public:
     typedef info_iterator_<const constructor_info, constructor_tag>
         const_constructor_iterator;
 
+    typedef info_iterator_<const conversion_info, conversion_tag>
+        const_conversion_iterator;
+
 public:
     template <class TypeInfoArray,
               class ConstructorInfoArray,
@@ -89,6 +92,14 @@ public:
     object construct_object(const constructor_tag& tag,
                             Iterator first,
                             Iterator last) const;
+
+
+    // type conversion functions
+    std::pair<const_conversion_iterator, const_conversion_iterator>
+    conversions() const;
+
+    std::pair<type_tag, type_tag>
+    conversion_types(const conversion_tag& tag) const;
 
 private:
     template <class Iterator, class InfoType>
@@ -279,5 +290,22 @@ reflection_manager::construct_object(const constructor_tag& tag,
 
     return object(
         return_value, type_info_view_.data() + tag.info_ptr_->type_index, this);
+}
+
+inline std::pair<reflection_manager::const_conversion_iterator,
+                 reflection_manager::const_conversion_iterator>
+reflection_manager::conversions() const
+{
+    return std::make_pair(
+        const_conversion_iterator(conversion_info_view_.cbegin()),
+        const_conversion_iterator(conversion_info_view_.cend()));
+}
+
+inline std::pair<type_tag, type_tag>
+reflection_manager::conversion_types(const conversion_tag& tag) const
+{
+    return std::make_pair(
+        type_tag(type_info_view_[tag.info_ptr_->from_type_index]),
+        type_tag(type_info_view_[tag.info_ptr_->to_type_index]));
 }
 } // namespace shadow

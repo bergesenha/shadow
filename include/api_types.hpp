@@ -104,6 +104,8 @@ typedef info_type_aggregate<type_info,
 typedef info_type_aggregate<constructor_info> constructor_tag;
 
 
+typedef info_type_aggregate<conversion_info> conversion_tag;
+
 class reflection_manager;
 
 class object
