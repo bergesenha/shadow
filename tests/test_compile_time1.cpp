@@ -109,6 +109,13 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                 });
 
             REQUIRE(found != conversions.second);
+
+            SECTION("convert int to float")
+            {
+                auto res = tct1_space::manager.convert(*found, anint);
+
+                REQUIRE(res.type().name() == std::string("float"));
+            }
         }
     }
 }

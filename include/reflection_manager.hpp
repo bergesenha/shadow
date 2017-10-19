@@ -101,6 +101,8 @@ public:
     std::pair<type_tag, type_tag>
     conversion_types(const conversion_tag& tag) const;
 
+    object convert(const conversion_tag& tag, const object& val) const;
+
 private:
     template <class Iterator, class InfoType>
     bool
@@ -307,5 +309,19 @@ reflection_manager::conversion_types(const conversion_tag& tag) const
     return std::make_pair(
         type_tag(type_info_view_[tag.info_ptr_->from_type_index]),
         type_tag(type_info_view_[tag.info_ptr_->to_type_index]));
+}
+
+inline object
+reflection_manager::convert(const conversion_tag& tag, const object& val) const
+{
+    if(val.type() != type_tag(type_info_view_[tag.info_ptr_->from_type_index]))
+    {
+        throw std::runtime_error(
+            "type of object doesn't match conversion binding");
+    }
+
+    return object(tag.info_ptr_->bind_point(val.value_),
+                  type_info_view_.data() + tag.info_ptr_->to_type_index,
+                  this);
 }
 } // namespace shadow
