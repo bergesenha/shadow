@@ -912,7 +912,18 @@ struct generate_array_of_string_serialization_info_holder
         free_function_info_array_holder::value,                                \
         member_function_info_array_holder::value,                              \
         member_variable_info_array_holder::value,                              \
-        string_serialization_info_array_holder::value};
+        string_serialization_info_array_holder::value};                        \
+                                                                               \
+    template <class T, class... Args>                                          \
+    shadow::object static_construct(Args&&... args)                            \
+    {                                                                          \
+        constexpr auto t_index =                                               \
+            metamusil::t_list::index_of_type_v<type_universe, T>;              \
+        constexpr const shadow::type_info* t_info =                            \
+            type_info_array_holder::value + t_index;                           \
+        return shadow::object(                                                 \
+            shadow::any(T{std::forward<Args>(args)...}), t_info, &manager);    \
+    }
 
 
 #endif

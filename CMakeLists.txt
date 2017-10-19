@@ -35,6 +35,7 @@ if(SHADOW_BUILD_TESTS)
         tests/test_address_of_binding.cpp
         tests/test_reflection_manager.cpp
         tests/test_api_types.cpp
+        tests/test_compile_time1.cpp
         )
 
     add_executable(unit_tests ${SHADOW_TEST_SRC})
