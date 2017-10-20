@@ -135,6 +135,8 @@ public:
     std::pair<const_member_function_iterator, const_member_function_iterator>
     member_functions() const;
 
+    type_tag member_function_class(const member_function_tag& tag) const;
+
 public:
     // unchecked operations
     template <class T>
@@ -478,5 +480,12 @@ reflection_manager::member_functions() const
     return std::make_pair(
         const_member_function_iterator(member_function_info_view_.cbegin()),
         const_member_function_iterator(member_function_info_view_.cend()));
+}
+
+
+inline type_tag
+reflection_manager::member_function_class(const member_function_tag& tag) const
+{
+    return type_tag(type_info_view_[tag.info_ptr_->object_type_index]);
 }
 } // namespace shadow
