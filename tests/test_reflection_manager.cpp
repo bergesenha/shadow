@@ -249,6 +249,14 @@ TEST_CASE(
 
                 REQUIRE(ret_type.name() == std::string("void"));
             }
+
+            SECTION("get parameter types of fun1")
+            {
+                auto param_types = man.free_function_parameter_types(*found);
+
+                REQUIRE(std::distance(param_types.first, param_types.second) ==
+                        0);
+            }
         }
 
         SECTION("find fun2")
@@ -267,6 +275,15 @@ TEST_CASE(
                 auto ret_type = man.free_function_return_type(*found);
 
                 REQUIRE(ret_type.name() == std::string("int"));
+            }
+
+            SECTION("get parameter types of fun2")
+            {
+                auto param_types = man.free_function_parameter_types(*found);
+
+                REQUIRE(std::distance(param_types.first, param_types.second) ==
+                        1);
+                REQUIRE(param_types.first->name() == std::string("int"));
             }
         }
     }

@@ -117,6 +117,11 @@ public:
     // returns return type of function associated with the free_function_tag
     type_tag free_function_return_type(const free_function_tag& tag) const;
 
+    // return range of type tags of parameters of free function associated with
+    // the tag
+    std::pair<const_indexed_type_iterator, const_indexed_type_iterator>
+    free_function_parameter_types(const free_function_tag& tag) const;
+
 public:
     // unchecked operations
     template <class T>
@@ -381,5 +386,19 @@ reflection_manager::free_function_return_type(
     const free_function_tag& tag) const
 {
     return type_tag(type_info_view_[tag.info_ptr_->return_type_index]);
+}
+
+
+inline std::pair<reflection_manager::const_indexed_type_iterator,
+                 reflection_manager::const_indexed_type_iterator>
+reflection_manager::free_function_parameter_types(
+    const free_function_tag& tag) const
+{
+    return std::make_pair(
+        const_indexed_type_iterator(
+            0, tag.info_ptr_->parameter_type_indices, type_info_view_.data()),
+        const_indexed_type_iterator(tag.info_ptr_->num_parameters,
+                                    tag.info_ptr_->parameter_type_indices,
+                                    type_info_view_.data()));
 }
 } // namespace shadow
