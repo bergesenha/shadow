@@ -155,6 +155,8 @@ public:
     std::pair<const_member_variable_iterator, const_member_variable_iterator>
     member_variables() const;
 
+    type_tag member_variable_type(const member_variable_tag& tag) const;
+
 public:
     // unchecked operations
     template <class T>
@@ -565,5 +567,12 @@ reflection_manager::member_variables() const
     return std::make_pair(
         const_member_variable_iterator(member_variable_info_view_.cbegin()),
         const_member_variable_iterator(member_variable_info_view_.cend()));
+}
+
+
+inline type_tag
+reflection_manager::member_variable_type(const member_variable_tag& tag) const
+{
+    return type_tag(type_info_view_[tag.info_ptr_->type_index]);
 }
 } // namespace shadow
