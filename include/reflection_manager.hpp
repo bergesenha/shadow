@@ -159,6 +159,8 @@ public:
 
     type_tag member_variable_class_type(const member_variable_tag& tag) const;
 
+    std::string member_variable_name(const member_variable_tag& tag) const;
+
 public:
     // unchecked operations
     template <class T>
@@ -584,5 +586,12 @@ reflection_manager::member_variable_class_type(
     const member_variable_tag& tag) const
 {
     return type_tag(type_info_view_[tag.info_ptr_->object_type_index]);
+}
+
+
+inline std::string
+reflection_manager::member_variable_name(const member_variable_tag& tag) const
+{
+    return std::string(tag.info_ptr_->name);
 }
 } // namespace shadow
