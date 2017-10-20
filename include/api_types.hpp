@@ -103,8 +103,10 @@ typedef info_type_aggregate<type_info,
 
 typedef info_type_aggregate<constructor_info> constructor_tag;
 
-
 typedef info_type_aggregate<conversion_info> conversion_tag;
+
+
+typedef info_type_aggregate<free_function_info, name_policy> free_function_tag;
 
 class reflection_manager;
 

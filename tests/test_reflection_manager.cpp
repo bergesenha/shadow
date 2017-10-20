@@ -181,3 +181,66 @@ TEST_CASE("instantiate reflection_manager with type info and constructor info",
         }
     }
 }
+
+
+TEST_CASE(
+    "instantiate reflection_manager with some type_info and free_function_info",
+    "[reflection_manager]")
+{
+    const shadow::type_info ti_arr[] = {{"void", 0, nullptr, nullptr},
+                                        {"int", sizeof(int), nullptr, nullptr}};
+
+    const std::size_t constr_params[] = {1};
+    const bool pointer_flags[] = {false};
+
+    const shadow::constructor_info ci_arr[] = {
+        {1,
+         0,
+         nullptr,
+         nullptr,
+         &shadow::constructor_detail::generic_constructor_bind_point<int>},
+        {1,
+         1,
+         static_cast<const std::size_t*>(constr_params),
+         static_cast<const bool*>(pointer_flags),
+         &shadow::constructor_detail::generic_constructor_bind_point<int,
+                                                                     int>}};
+
+    const std::size_t param_arr[] = {1};
+    const bool ptr_arr[] = {false};
+
+    const shadow::free_function_info ff_arr[] = {
+        {"fun1", 0, 0, nullptr, nullptr},
+        {"fun2",
+         1,
+         1,
+         static_cast<const std::size_t*>(param_arr),
+         static_cast<const bool*>(ptr_arr)}};
+
+    const shadow::conversion_info* cvi_arr = nullptr;
+    const shadow::member_function_info* mfi_arr = nullptr;
+    const shadow::member_variable_info* mvi_arr = nullptr;
+    const shadow::string_serialization_info* ssi_arr = nullptr;
+
+    shadow::reflection_manager man(
+        ti_arr, ci_arr, cvi_arr, ff_arr, mfi_arr, mvi_arr, ssi_arr);
+
+
+    SECTION("get all free functions")
+    {
+        auto ffs = man.free_functions();
+
+        REQUIRE(std::distance(ffs.first, ffs.second) == 2);
+
+        SECTION("find fun1")
+        {
+            auto found =
+                std::find_if(ffs.first, ffs.second, [](const auto& ff) {
+                    return ff.name() == std::string("fun1");
+                });
+
+            REQUIRE(found != ffs.second);
+            REQUIRE(found->name() == std::string("fun1"));
+        }
+    }
+}

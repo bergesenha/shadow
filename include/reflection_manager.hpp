@@ -52,6 +52,9 @@ public:
     typedef info_iterator_<const conversion_info, conversion_tag>
         const_conversion_iterator;
 
+    typedef info_iterator_<const free_function_info, free_function_tag>
+        const_free_function_iterator;
+
 public:
     template <class TypeInfoArray,
               class ConstructorInfoArray,
@@ -102,6 +105,11 @@ public:
     conversion_types(const conversion_tag& tag) const;
 
     object convert(const conversion_tag& tag, const object& val) const;
+
+
+    // returns range of tags to all free functions available
+    std::pair<const_free_function_iterator, const_free_function_iterator>
+    free_functions() const;
 
 public:
     // unchecked operations
@@ -333,16 +341,26 @@ reflection_manager::convert(const conversion_tag& tag, const object& val) const
                   this);
 }
 template <class T>
-T&
+inline T&
 reflection_manager::get(object& obj) const
 {
     return obj.value_.get<T>();
 }
 
 template <class T>
-const T&
+inline const T&
 reflection_manager::get(const object& obj) const
 {
     return obj.value_.get<T>();
+}
+
+
+inline std::pair<reflection_manager::const_free_function_iterator,
+                 reflection_manager::const_free_function_iterator>
+reflection_manager::free_functions() const
+{
+    return std::make_pair(
+        const_free_function_iterator(free_function_info_view_.cbegin()),
+        const_free_function_iterator(free_function_info_view_.cend()));
 }
 } // namespace shadow
