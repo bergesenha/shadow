@@ -59,6 +59,9 @@ public:
     typedef info_iterator_<const member_function_info, member_function_tag>
         const_member_function_iterator;
 
+    typedef info_iterator_<const member_variable_info, member_variable_tag>
+        const_member_variable_iterator;
+
 public:
     template <class TypeInfoArray,
               class ConstructorInfoArray,
@@ -147,6 +150,10 @@ public:
                                 const member_function_tag& tag,
                                 Iterator first,
                                 Iterator last) const;
+
+
+    std::pair<const_member_variable_iterator, const_member_variable_iterator>
+    member_variables() const;
 
 public:
     // unchecked operations
@@ -548,5 +555,15 @@ reflection_manager::call_member_function(object& obj,
     return object(return_value,
                   type_info_view_.data() + tag.info_ptr_->return_type_index,
                   this);
+}
+
+
+inline std::pair<reflection_manager::const_member_variable_iterator,
+                 reflection_manager::const_member_variable_iterator>
+reflection_manager::member_variables() const
+{
+    return std::make_pair(
+        const_member_variable_iterator(member_variable_info_view_.cbegin()),
+        const_member_variable_iterator(member_variable_info_view_.cend()));
 }
 } // namespace shadow
