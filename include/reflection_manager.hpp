@@ -103,6 +103,14 @@ public:
 
     object convert(const conversion_tag& tag, const object& val) const;
 
+public:
+    // unchecked operations
+    template <class T>
+    T& get(object& obj) const;
+
+    template <class T>
+    const T& get(const object& obj) const;
+
 private:
     template <class Iterator, class InfoType>
     bool
@@ -323,5 +331,18 @@ reflection_manager::convert(const conversion_tag& tag, const object& val) const
     return object(tag.info_ptr_->bind_point(val.value_),
                   type_info_view_.data() + tag.info_ptr_->to_type_index,
                   this);
+}
+template <class T>
+T&
+reflection_manager::get(object& obj) const
+{
+    return obj.value_.get<T>();
+}
+
+template <class T>
+const T&
+reflection_manager::get(const object& obj) const
+{
+    return obj.value_.get<T>();
 }
 } // namespace shadow
