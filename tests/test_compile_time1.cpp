@@ -95,6 +95,41 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
             REQUIRE(res.type().name() == std::string("tct1_class"));
             REQUIRE(tct1_space2::get_held_value<tct1_class>(res).get_i() == 23);
             REQUIRE(tct1_space::get_held_value<tct1_class>(res).get_i() == 23);
+
+            SECTION("find all free functions from tct1_space")
+            {
+                auto ffs = tct1_space::manager.free_functions();
+
+                REQUIRE(std::distance(ffs.first, ffs.second) > 0);
+
+                SECTION("find free function taking tct1_class as argument")
+                {
+                    auto ff_found =
+                        std::find_if(ffs.first, ffs.second, [](const auto& ff) {
+
+                            auto param_types =
+                                tct1_space::manager
+                                    .free_function_parameter_types(ff);
+
+                            return (std::distance(param_types.first,
+                                                  param_types.second) == 1) &&
+                                   (param_types.first->name() ==
+                                    std::string("tct1_class"));
+
+                        });
+
+                    REQUIRE(ff_found != ffs.second);
+
+                    SECTION("call free function")
+                    {
+                        auto ff_res = tct1_space::manager.call_free_function(
+                            *ff_found, &res, &res + 1);
+
+                        REQUIRE(ff_res.type().name() == std::string("int"));
+                        REQUIRE(tct1_space::get_held_value<int>(ff_res) == 23);
+                    }
+                }
+            }
         }
     }
 
