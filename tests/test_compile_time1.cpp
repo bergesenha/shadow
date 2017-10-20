@@ -40,6 +40,12 @@ private:
     int i_;
 };
 
+struct tct1_struct
+{
+    int i;
+    double d;
+};
+
 
 int
 extract_i(const tct1_class& a)
@@ -70,11 +76,15 @@ namespace tct1_space
 {
 REGISTER_TYPE_BEGIN()
 REGISTER_TYPE(tct1_class)
+REGISTER_TYPE(tct1_struct)
 REGISTER_TYPE_END()
 
 REGISTER_CONSTRUCTOR(tct1_class)
 
 REGISTER_FREE_FUNCTION(extract_i)
+
+REGISTER_MEMBER_VARIABLE(tct1_struct, i)
+REGISTER_MEMBER_VARIABLE(tct1_struct, d)
 
 SHADOW_INIT()
 }
@@ -448,4 +458,12 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
             }
         }
     }
+}
+
+
+TEST_CASE("test member variables", "[reflection_manager]")
+{
+    auto mvs = tct1_space::manager.member_variables();
+
+    REQUIRE(std::distance(mvs.first, mvs.second) == 2);
 }
