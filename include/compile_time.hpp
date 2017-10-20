@@ -923,6 +923,38 @@ struct generate_array_of_string_serialization_info_holder
             type_info_array_holder::value + t_index;                           \
         return shadow::object(                                                 \
             shadow::any(T{std::forward<Args>(args)...}), t_info, &manager);    \
+    }                                                                          \
+                                                                               \
+    template <class T>                                                         \
+    T& get_held_value(shadow::object& obj)                                     \
+    {                                                                          \
+        constexpr auto T_index =                                               \
+            metamusil::t_list::index_of_type_v<type_universe, T>;              \
+                                                                               \
+        if(obj.type() !=                                                       \
+           shadow::type_tag(type_info_array_holder::value[T_index]))           \
+        {                                                                      \
+            throw std::runtime_error(                                          \
+                "attempt to get value of wrong underlying type");              \
+        }                                                                      \
+                                                                               \
+        return manager.get<T>(obj);                                            \
+    }                                                                          \
+                                                                               \
+    template <class T>                                                         \
+    const T& get_held_value(const shadow::object& obj)                         \
+    {                                                                          \
+        constexpr auto T_index =                                               \
+            metamusil::t_list::index_of_type_v<type_universe, T>;              \
+                                                                               \
+        if(obj.type() !=                                                       \
+           shadow::type_tag(type_info_array_holder::value[T_index]))           \
+        {                                                                      \
+            throw std::runtime_error(                                          \
+                "attempt to get value of wrong underlying type");              \
+        }                                                                      \
+                                                                               \
+        return manager.get<T>(obj);                                            \
     }
 
 

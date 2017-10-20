@@ -62,6 +62,7 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
     auto anint = tct1_space::static_construct<int>(23);
 
     REQUIRE(anint.type().name() == std::string("int"));
+    REQUIRE(tct1_space::get_held_value<int>(anint) == 23);
 
     SECTION(
         "find constructor for tct1_class from tct1_space2 namespace manager")
@@ -83,7 +84,8 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
         REQUIRE(std::distance(paramtypes.first, paramtypes.second) == 1);
         REQUIRE(paramtypes.first->name() == std::string("int"));
 
-        SECTION("construct a tct1_class with int from tct1_space namespace")
+        SECTION("construct a tct1_class from tct1_space2 with int from "
+                "tct1_space namespace")
         {
             std::vector<shadow::object> args{anint};
 
@@ -91,6 +93,8 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                 *found, args.begin(), args.end());
 
             REQUIRE(res.type().name() == std::string("tct1_class"));
+            REQUIRE(tct1_space2::get_held_value<tct1_class>(res).get_i() == 23);
+            REQUIRE(tct1_space::get_held_value<tct1_class>(res).get_i() == 23);
         }
     }
 
@@ -115,6 +119,8 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                 auto res = tct1_space::manager.convert(*found, anint);
 
                 REQUIRE(res.type().name() == std::string("float"));
+                REQUIRE(tct1_space::get_held_value<float>(res) ==
+                        Approx(23.0f));
             }
         }
     }
