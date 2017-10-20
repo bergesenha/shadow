@@ -466,4 +466,37 @@ TEST_CASE("test member variables", "[reflection_manager]")
     auto mvs = tct1_space::manager.member_variables();
 
     REQUIRE(std::distance(mvs.first, mvs.second) == 2);
+
+    SECTION("find member variable int tct1_struct::i")
+    {
+        auto found = std::find_if(mvs.first, mvs.second, [](const auto& mv) {
+
+            return tct1_space::manager.member_variable_name(mv) ==
+                       std::string("i") &&
+                   tct1_space::manager.member_variable_class_type(mv).name() ==
+                       std::string("tct1_struct");
+
+        });
+
+        REQUIRE(found != mvs.second);
+        REQUIRE(tct1_space::manager.member_variable_type(*found).name() ==
+                std::string("int"));
+
+        SECTION("get member variable of a tct1_struct")
+        {
+            auto s = tct1_space::static_construct<tct1_struct>(20, 44.2);
+
+            auto mv_value = tct1_space::manager.get_member_variable(s, *found);
+
+            REQUIRE(mv_value.type().name() == std::string("int"));
+
+            SECTION("set member variable of a tct1_struct")
+            {
+                tct1_space::manager.set_member_variable(
+                    s, *found, tct1_space::static_construct<int>(40));
+
+                REQUIRE(tct1_space::get_held_value<tct1_struct>(s).i == 40);
+            }
+        }
+    }
 }

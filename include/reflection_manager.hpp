@@ -161,6 +161,13 @@ public:
 
     std::string member_variable_name(const member_variable_tag& tag) const;
 
+    void set_member_variable(object& obj,
+                             const member_variable_tag& tag,
+                             const object& val) const;
+
+    object get_member_variable(const object& obj,
+                               const member_variable_tag& tag) const;
+
 public:
     // unchecked operations
     template <class T>
@@ -593,5 +600,42 @@ inline std::string
 reflection_manager::member_variable_name(const member_variable_tag& tag) const
 {
     return std::string(tag.info_ptr_->name);
+}
+
+
+inline void
+reflection_manager::set_member_variable(object& obj,
+                                        const member_variable_tag& tag,
+                                        const object& val) const
+{
+    if(val.type() != member_variable_type(tag))
+    {
+        throw std::runtime_error(
+            "attempting to set member variable of wrong type");
+    }
+
+    if(obj.type() != member_variable_class_type(tag))
+    {
+        throw std::runtime_error(
+            "attempting to set member variable belonging to wrong class");
+    }
+
+    tag.info_ptr_->set_bind_point(obj.value_, val.value_);
+}
+
+
+inline object
+reflection_manager::get_member_variable(const object& obj,
+                                        const member_variable_tag& tag) const
+{
+    if(obj.type() != member_variable_class_type(tag))
+    {
+        throw std::runtime_error(
+            "attempting to set member variable belonging to wrong class");
+    }
+
+    return object(tag.info_ptr_->get_bind_point(obj.value_),
+                  type_info_view_.data() + tag.info_ptr_->type_index,
+                  this);
 }
 } // namespace shadow
