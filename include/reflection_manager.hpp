@@ -148,6 +148,12 @@ private:
                                   OutputIterator out,
                                   const InfoType& info) const;
 
+    template <class Iterator, class OutputIterator, class InfoType>
+    void pass_parameters_out(Iterator first,
+                             Iterator last,
+                             OutputIterator out,
+                             const InfoType& info) const;
+
 private:
     // array_views of reflection information generated at compile time
     helene::array_view<const type_info> type_info_view_;
@@ -302,6 +308,27 @@ reflection_manager::construct_argument_array(Iterator first,
     }
 }
 
+template <class Iterator, class OutputIterator, class InfoType>
+inline void
+reflection_manager::pass_parameters_out(Iterator first,
+                                        Iterator last,
+                                        OutputIterator out,
+                                        const InfoType& info) const
+{
+    for(auto ptr_flags = info.parameter_pointer_flags; first != last;
+        ++first, ++out, ++ptr_flags)
+    {
+        if(*ptr_flags)
+        {
+            auto dereference_binding = out->type_info_->dereference_bind_point;
+            out->value_ = dereference_binding(*first);
+        }
+        else
+        {
+            out->value_ = *first;
+        }
+    }
+}
 
 template <class Iterator>
 inline object
@@ -427,6 +454,8 @@ reflection_manager::call_free_function(const free_function_tag& tag,
         first, last, std::back_inserter(args), *tag.info_ptr_);
 
     auto return_value = tag.info_ptr_->bind_point(args.data());
+
+    pass_parameters_out(args.begin(), args.end(), first, *tag.info_ptr_);
 
     return object(return_value,
                   type_info_view_.data() + tag.info_ptr_->return_type_index,
