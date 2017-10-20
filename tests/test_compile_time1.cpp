@@ -18,6 +18,12 @@ public:
         return i_;
     }
 
+    void
+    set_i(int i)
+    {
+        i_ = i;
+    }
+
 private:
     int i_;
 };
@@ -71,6 +77,7 @@ REGISTER_TYPE_END()
 REGISTER_CONSTRUCTOR(tct1_class, int)
 
 REGISTER_MEMBER_FUNCTION(tct1_class, get_i)
+REGISTER_MEMBER_FUNCTION(tct1_class, set_i)
 
 REGISTER_FREE_FUNCTION(mult)
 REGISTER_FREE_FUNCTION(modify)
@@ -269,6 +276,31 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
 
                 REQUIRE(res.type().name() == std::string("void"));
                 REQUIRE(tct1_space::get_held_value<int>(args[0]) == 23 * 3);
+            }
+        }
+    }
+
+    SECTION("get all member functions in tct1_space2")
+    {
+        auto mfs = tct1_space2::manager.member_functions();
+
+        REQUIRE(std::distance(mfs.first, mfs.second) == 2);
+
+        SECTION("find tct1_class::get_i")
+        {
+            auto found =
+                std::find_if(mfs.first, mfs.second, [](const auto& mf) {
+                    return tct1_space2::manager.member_function_name(mf) ==
+                               std::string("get_i") &&
+                           tct1_space2::manager.member_function_class(mf)
+                                   .name() == std::string("tct1_class");
+                });
+
+            REQUIRE(found != mfs.second);
+
+            SECTION("call 'get_i' on an object")
+            {
+                auto obj = tct1_space2::static_construct<tct1_class>(33);
             }
         }
     }
