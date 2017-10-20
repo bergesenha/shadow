@@ -298,9 +298,28 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
 
             REQUIRE(found != mfs.second);
 
-            SECTION("call 'get_i' on an object")
+            SECTION("get parameter types")
             {
-                auto obj = tct1_space2::static_construct<tct1_class>(33);
+                auto param_types =
+                    tct1_space2::manager.member_function_parameter_types(
+                        *found);
+
+                REQUIRE(std::distance(param_types.first, param_types.second) ==
+                        0);
+
+                SECTION(
+                    "call get_i on an ctc1_class object from same namespace")
+                {
+                    auto obj = tct1_space2::static_construct<tct1_class>(33);
+
+                    std::vector<shadow::object> args;
+
+                    auto res = tct1_space2::manager.call_member_function(
+                        obj, *found, args.begin(), args.end());
+
+                    REQUIRE(res.type().name() == std::string("int"));
+                    REQUIRE(tct1_space2::get_held_value<int>(res) == 33);
+                }
             }
         }
     }

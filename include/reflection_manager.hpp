@@ -139,6 +139,15 @@ public:
 
     std::string member_function_name(const member_function_tag& tag) const;
 
+    std::pair<const_indexed_type_iterator, const_indexed_type_iterator>
+    member_function_parameter_types(const member_function_tag& tag) const;
+
+    template <class Iterator>
+    object call_member_function(object& obj,
+                                const member_function_tag& tag,
+                                Iterator first,
+                                Iterator last) const;
+
 public:
     // unchecked operations
     template <class T>
@@ -496,5 +505,48 @@ inline std::string
 reflection_manager::member_function_name(const member_function_tag& tag) const
 {
     return std::string(tag.info_ptr_->name);
+}
+
+
+inline std::pair<reflection_manager::const_indexed_type_iterator,
+                 reflection_manager::const_indexed_type_iterator>
+reflection_manager::member_function_parameter_types(
+    const member_function_tag& tag) const
+{
+    return std::make_pair(
+        const_indexed_type_iterator(
+            0, tag.info_ptr_->parameter_type_indices, type_info_view_.data()),
+        const_indexed_type_iterator(tag.info_ptr_->num_parameters,
+                                    tag.info_ptr_->parameter_type_indices,
+                                    type_info_view_.data()));
+}
+
+
+template <class Iterator>
+inline object
+reflection_manager::call_member_function(object& obj,
+                                         const member_function_tag& tag,
+                                         Iterator first,
+                                         Iterator last) const
+{
+    if(!check_arguments(first, last, *tag.info_ptr_))
+    {
+        throw std::runtime_error(
+            "attempting to call member function with arguments of wrong type");
+    }
+
+    std::vector<shadow::any> args;
+    args.reserve(std::distance(first, last));
+
+    construct_argument_array(
+        first, last, std::back_inserter(args), *tag.info_ptr_);
+
+    auto return_value = tag.info_ptr_->bind_point(obj.value_, args.data());
+
+    pass_parameters_out(args.begin(), args.end(), first, *tag.info_ptr_);
+
+    return object(return_value,
+                  type_info_view_.data() + tag.info_ptr_->return_type_index,
+                  this);
 }
 } // namespace shadow
