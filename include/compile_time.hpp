@@ -915,7 +915,7 @@ struct generate_array_of_string_serialization_info_holder
         string_serialization_info_array_holder::value};                        \
                                                                                \
     template <class T, class... Args>                                          \
-    static shadow::object static_construct(Args&&... args)                     \
+    shadow::object static_construct(Args&&... args)                     \
     {                                                                          \
         constexpr auto t_index =                                               \
             metamusil::t_list::index_of_type_v<type_universe, T>;              \
