@@ -46,6 +46,7 @@ public:
     typedef info_iterator_<const type_info, type_tag> const_type_iterator;
     typedef indexed_info_iterator_<const type_info, type_tag>
         const_indexed_type_iterator;
+
     typedef info_iterator_<const constructor_info, constructor_tag>
         const_constructor_iterator;
 
@@ -54,6 +55,9 @@ public:
 
     typedef info_iterator_<const free_function_info, free_function_tag>
         const_free_function_iterator;
+
+    typedef info_iterator_<const member_function_info, member_function_tag>
+        const_member_function_iterator;
 
 public:
     template <class TypeInfoArray,
@@ -126,6 +130,10 @@ public:
     object call_free_function(const free_function_tag& tag,
                               Iterator first,
                               Iterator last) const;
+
+
+    std::pair<const_member_function_iterator, const_member_function_iterator>
+    member_functions() const;
 
 public:
     // unchecked operations
@@ -460,5 +468,15 @@ reflection_manager::call_free_function(const free_function_tag& tag,
     return object(return_value,
                   type_info_view_.data() + tag.info_ptr_->return_type_index,
                   this);
+}
+
+
+inline std::pair<reflection_manager::const_member_function_iterator,
+                 reflection_manager::const_member_function_iterator>
+reflection_manager::member_functions() const
+{
+    return std::make_pair(
+        const_member_function_iterator(member_function_info_view_.cbegin()),
+        const_member_function_iterator(member_function_info_view_.cend()));
 }
 } // namespace shadow
