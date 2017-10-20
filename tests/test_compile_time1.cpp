@@ -400,11 +400,50 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                 {
                     auto obj = tct1_space2::static_construct<tct1_class>(2000);
 
+                    std::vector<shadow::object> args{anint};
+
                     auto res = tct1_space2::manager.call_member_function(
-                        obj, *found, &anint, &anint + 1);
+                        obj, *found, args.begin(), args.end());
 
                     REQUIRE(res.type().name() == std::string("void"));
-                    REQUIRE(tct1_space::get_held_value<int>(anint) == 2000);
+                    REQUIRE(tct1_space::get_held_value<int>(args[0]) == 2000);
+                }
+            }
+        }
+
+        SECTION("find tct1_class::pointer_out")
+        {
+            auto found =
+                std::find_if(mfs.first, mfs.second, [](const auto& mf) {
+                    return tct1_space2::manager.member_function_name(mf) ==
+                               std::string("output_i") &&
+                           tct1_space2::manager.member_function_class(mf)
+                                   .name() == std::string("tct1_class");
+                });
+
+            REQUIRE(found != mfs.second);
+
+            SECTION("get parameter types")
+            {
+                auto param_types =
+                    tct1_space2::manager.member_function_parameter_types(
+                        *found);
+
+                REQUIRE(std::distance(param_types.first, param_types.second) ==
+                        1);
+                REQUIRE(param_types.first->name() == std::string("int"));
+
+                SECTION("call pointer_out on a ctc1_class object")
+                {
+                    auto obj = tct1_space2::static_construct<tct1_class>(450);
+
+                    std::vector<shadow::object> args{anint};
+
+                    auto res = tct1_space2::manager.call_member_function(
+                        obj, *found, args.begin(), args.end());
+
+                    REQUIRE(res.type().name() == std::string("void"));
+                    REQUIRE(tct1_space::get_held_value<int>(args[0]) == 450);
                 }
             }
         }
