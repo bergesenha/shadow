@@ -229,7 +229,7 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                 REQUIRE(tct1_space2::get_held_value<int>(anint2) == 110);
             }
 
-            SECTION("call mult with anint1 in a vector")
+            SECTION("call mult with anint in a vector")
             {
                 std::vector<shadow::object> args{anint};
 
@@ -238,6 +238,37 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
 
                 REQUIRE(res.type().name() == std::string("void"));
                 REQUIRE(tct1_space2::get_held_value<int>(args[0]) == 33);
+            }
+        }
+
+        SECTION("find function 'triple'")
+        {
+            auto found =
+                std::find_if(ffs.first, ffs.second, [](const auto& ff) {
+                    return tct1_space2::manager.free_function_name(ff) ==
+                           std::string("triple");
+                });
+
+            REQUIRE(found != ffs.second);
+
+            SECTION("call triple with anint2")
+            {
+                auto res = tct1_space2::manager.call_free_function(
+                    *found, &anint2, &anint2 + 1);
+
+                REQUIRE(res.type().name() == std::string("void"));
+                REQUIRE(tct1_space2::get_held_value<int>(anint2) == 300);
+            }
+
+            SECTION("call triple with anint in vector")
+            {
+                std::vector<shadow::object> args{anint};
+
+                auto res = tct1_space2::manager.call_free_function(
+                    *found, args.begin(), args.end());
+
+                REQUIRE(res.type().name() == std::string("void"));
+                REQUIRE(tct1_space::get_held_value<int>(args[0]) == 23 * 3);
             }
         }
     }
