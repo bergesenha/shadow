@@ -157,6 +157,8 @@ public:
 
     type_tag member_variable_type(const member_variable_tag& tag) const;
 
+    type_tag member_variable_class_type(const member_variable_tag& tag) const;
+
 public:
     // unchecked operations
     template <class T>
@@ -574,5 +576,13 @@ inline type_tag
 reflection_manager::member_variable_type(const member_variable_tag& tag) const
 {
     return type_tag(type_info_view_[tag.info_ptr_->type_index]);
+}
+
+
+inline type_tag
+reflection_manager::member_variable_class_type(
+    const member_variable_tag& tag) const
+{
+    return type_tag(type_info_view_[tag.info_ptr_->object_type_index]);
 }
 } // namespace shadow
