@@ -242,6 +242,32 @@ TEST_CASE(
             REQUIRE(found != ffs.second);
             REQUIRE(found->name() == std::string("fun1"));
             REQUIRE(man.free_function_name(*found) == std::string("fun1"));
+
+            SECTION("get return type of fun1")
+            {
+                auto ret_type = man.free_function_return_type(*found);
+
+                REQUIRE(ret_type.name() == std::string("void"));
+            }
+        }
+
+        SECTION("find fun2")
+        {
+            auto found =
+                std::find_if(ffs.first, ffs.second, [](const auto& ff) {
+                    return ff.name() == std::string("fun2");
+                });
+
+            REQUIRE(found != ffs.second);
+            REQUIRE(found->name() == std::string("fun2"));
+            REQUIRE(man.free_function_name(*found) == std::string("fun2"));
+
+            SECTION("get return type of fun2")
+            {
+                auto ret_type = man.free_function_return_type(*found);
+
+                REQUIRE(ret_type.name() == std::string("int"));
+            }
         }
     }
 }

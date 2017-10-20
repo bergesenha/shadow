@@ -114,6 +114,9 @@ public:
     // returns name of function associated with the free_function_tag
     std::string free_function_name(const free_function_tag& tag) const;
 
+    // returns return type of function associated with the free_function_tag
+    type_tag free_function_return_type(const free_function_tag& tag) const;
+
 public:
     // unchecked operations
     template <class T>
@@ -373,4 +376,10 @@ reflection_manager::free_function_name(const free_function_tag& tag) const
     return std::string(tag.info_ptr_->name);
 }
 
+inline type_tag
+reflection_manager::free_function_return_type(
+    const free_function_tag& tag) const
+{
+    return type_tag(type_info_view_[tag.info_ptr_->return_type_index]);
+}
 } // namespace shadow
