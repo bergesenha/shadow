@@ -30,6 +30,24 @@ extract_i(const tct1_class& a)
 }
 
 
+int
+mult(const int* i)
+{
+    return *i * 2;
+}
+
+void
+modify(int* i)
+{
+    *i += 10;
+}
+
+void
+triple(int& i)
+{
+    i *= 3;
+}
+
 namespace tct1_space
 {
 REGISTER_TYPE_BEGIN()
@@ -54,12 +72,17 @@ REGISTER_CONSTRUCTOR(tct1_class, int)
 
 REGISTER_MEMBER_FUNCTION(tct1_class, get_i)
 
+REGISTER_FREE_FUNCTION(mult)
+REGISTER_FREE_FUNCTION(modify)
+REGISTER_FREE_FUNCTION(triple)
+
 SHADOW_INIT()
 }
 
 TEST_CASE("create an int using static_construct", "[static_construct]")
 {
     auto anint = tct1_space::static_construct<int>(23);
+    auto anint2 = tct1_space2::static_construct<int>(100);
 
     REQUIRE(anint.type().name() == std::string("int"));
     REQUIRE(tct1_space::get_held_value<int>(anint) == 23);
@@ -156,6 +179,65 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                 REQUIRE(res.type().name() == std::string("float"));
                 REQUIRE(tct1_space::get_held_value<float>(res) ==
                         Approx(23.0f));
+            }
+        }
+    }
+
+    SECTION("find all functions from tct1_space2")
+    {
+        auto ffs = tct1_space2::manager.free_functions();
+
+        REQUIRE(std::distance(ffs.first, ffs.second) == 3);
+
+        SECTION("find function 'mult'")
+        {
+            auto found =
+                std::find_if(ffs.first, ffs.second, [](const auto& ff) {
+                    return tct1_space2::manager.free_function_name(ff) ==
+                           std::string("mult");
+                });
+
+            REQUIRE(found != ffs.second);
+
+            SECTION("call mult with anint2")
+            {
+                auto res = tct1_space2::manager.call_free_function(
+                    *found, &anint2, &anint2 + 1);
+
+                REQUIRE(res.type().name() == std::string("int"));
+                REQUIRE(tct1_space2::get_held_value<int>(res) == 200);
+                REQUIRE(tct1_space2::get_held_value<int>(anint2) == 100);
+            }
+        }
+
+        SECTION("fund function 'modify'")
+        {
+            auto found =
+                std::find_if(ffs.first, ffs.second, [](const auto& ff) {
+                    return tct1_space2::manager.free_function_name(ff) ==
+                           std::string("modify");
+                });
+
+            REQUIRE(found != ffs.second);
+
+            SECTION("call mult with anint2")
+            {
+                auto res = tct1_space2::manager.call_free_function(
+                    *found, &anint2, &anint2 + 1);
+
+                REQUIRE(res.type().name() == std::string("void"));
+                REQUIRE(tct1_space2::get_held_value<int>(anint2) == 110);
+            }
+
+            SECTION("call mult with anint1 in a vector")
+            {
+                std::vector<shadow::object> args{anint};
+
+                auto res = tct1_space2::manager.call_free_function(
+                    *found, args.begin(), args.end());
+
+                REQUIRE(res.type().name() == std::string("void"));
+                REQUIRE(tct1_space2::get_held_value<int>(args[0]) == 33);
             }
         }
     }
