@@ -5,3 +5,6 @@
 	path = external/metamusil
 	url = https://github.com/bergesenha/metamusil.git
 	branch = master
+[submodule "external/helene"]
+	path = external/helene
+	url = https://github.com/bergesenha/helene.git

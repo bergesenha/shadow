@@ -9,9 +9,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(SHADOW_BUILD_TESTS "Build unit tests" ON)
 
 add_subdirectory(external/metamusil)
+add_subdirectory(external/helene)
 
 add_library(shadow INTERFACE)
-target_link_libraries(shadow INTERFACE metamusil)
+target_link_libraries(shadow INTERFACE metamusil INTERFACE helene)
 target_compile_features(shadow 
     INTERFACE cxx_std_14)
 target_include_directories(shadow
@@ -32,12 +33,9 @@ if(SHADOW_BUILD_TESTS)
         tests/test_constructor_binding.cpp
         tests/test_conversion_binding.cpp
         tests/test_address_of_binding.cpp
-        tests/test_iterators.cpp
-        tests/test_free_function_api.cpp
-        tests/test_member_function_api.cpp
-        tests/test_constructor_api.cpp
-        tests/test_member_variable_api.cpp
-        tests/test_variable_api.cpp
+        tests/test_reflection_manager.cpp
+        tests/test_api_types.cpp
+        tests/test_compile_time1.cpp
         )
 
     add_executable(unit_tests ${SHADOW_TEST_SRC})
