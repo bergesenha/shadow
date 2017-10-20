@@ -111,6 +111,9 @@ public:
     std::pair<const_free_function_iterator, const_free_function_iterator>
     free_functions() const;
 
+    // returns name of function associated with the free_function_tag
+    std::string free_function_name(const free_function_tag& tag) const;
+
 public:
     // unchecked operations
     template <class T>
@@ -363,4 +366,11 @@ reflection_manager::free_functions() const
         const_free_function_iterator(free_function_info_view_.cbegin()),
         const_free_function_iterator(free_function_info_view_.cend()));
 }
+
+inline std::string
+reflection_manager::free_function_name(const free_function_tag& tag) const
+{
+    return std::string(tag.info_ptr_->name);
+}
+
 } // namespace shadow

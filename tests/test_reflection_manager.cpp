@@ -241,6 +241,7 @@ TEST_CASE(
 
             REQUIRE(found != ffs.second);
             REQUIRE(found->name() == std::string("fun1"));
+            REQUIRE(man.free_function_name(*found) == std::string("fun1"));
         }
     }
 }
