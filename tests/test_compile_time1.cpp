@@ -24,6 +24,18 @@ public:
         i_ = i;
     }
 
+    void
+    output_i(int& i)
+    {
+        i = i_;
+    }
+
+    void
+    pointer_out(int* i)
+    {
+        *i = i_;
+    }
+
 private:
     int i_;
 };
@@ -78,6 +90,8 @@ REGISTER_CONSTRUCTOR(tct1_class, int)
 
 REGISTER_MEMBER_FUNCTION(tct1_class, get_i)
 REGISTER_MEMBER_FUNCTION(tct1_class, set_i)
+REGISTER_MEMBER_FUNCTION(tct1_class, output_i)
+REGISTER_MEMBER_FUNCTION(tct1_class, pointer_out)
 
 REGISTER_FREE_FUNCTION(mult)
 REGISTER_FREE_FUNCTION(modify)
@@ -284,7 +298,7 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
     {
         auto mfs = tct1_space2::manager.member_functions();
 
-        REQUIRE(std::distance(mfs.first, mfs.second) == 2);
+        REQUIRE(std::distance(mfs.first, mfs.second) == 4);
 
         SECTION("find tct1_class::get_i")
         {
@@ -356,6 +370,41 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                     REQUIRE(
                         tct1_space2::get_held_value<tct1_class>(obj).get_i() ==
                         23);
+                }
+            }
+        }
+
+        SECTION("find tct1_class::output_i")
+        {
+            auto found =
+                std::find_if(mfs.first, mfs.second, [](const auto& mf) {
+                    return tct1_space2::manager.member_function_name(mf) ==
+                               std::string("output_i") &&
+                           tct1_space2::manager.member_function_class(mf)
+                                   .name() == std::string("tct1_class");
+                });
+
+            REQUIRE(found != mfs.second);
+
+            SECTION("get parameter types")
+            {
+                auto param_types =
+                    tct1_space2::manager.member_function_parameter_types(
+                        *found);
+
+                REQUIRE(std::distance(param_types.first, param_types.second) ==
+                        1);
+                REQUIRE(param_types.first->name() == std::string("int"));
+
+                SECTION("call output_i on a ctc1_class object")
+                {
+                    auto obj = tct1_space2::static_construct<tct1_class>(2000);
+
+                    auto res = tct1_space2::manager.call_member_function(
+                        obj, *found, &anint, &anint + 1);
+
+                    REQUIRE(res.type().name() == std::string("void"));
+                    REQUIRE(tct1_space::get_held_value<int>(anint) == 2000);
                 }
             }
         }
