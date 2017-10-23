@@ -287,6 +287,18 @@ inline reflection_manager::reflection_manager(TypeInfoArray& ti_arr,
                               return info.type_index;
                           }))
 {
+    // sort member variables by offset
+    std::for_each(member_variable_indices_by_type_.begin(),
+                  member_variable_indices_by_type_.end(),
+                  [this](auto& mv_vec) {
+                      std::sort(
+                          mv_vec.begin(),
+                          mv_vec.end(),
+                          [this](std::size_t less, std::size_t more) {
+                              return member_variable_info_view_[less].offset <
+                                     member_variable_info_view_[more].offset;
+                          });
+                  });
 }
 
 inline std::pair<typename reflection_manager::const_type_iterator,
