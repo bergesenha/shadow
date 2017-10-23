@@ -203,6 +203,8 @@ private:
                     std::size_t num_types,
                     InfoExtractor&& extract_info) const;
 
+    std::size_t index_of_type(const type_tag& tag) const;
+
 private:
     // array_views of reflection information generated at compile time
     helene::array_view<const type_info> type_info_view_;
@@ -449,6 +451,22 @@ reflection_manager::indices_by_type(Iterator first,
     }
 
     return out;
+}
+
+inline std::size_t
+reflection_manager::index_of_type(const type_tag& tag) const
+{
+    auto found = std::find_if(
+        type_info_view_.cbegin(),
+        type_info_view_.cend(),
+        [&tag](const type_info& info) { return tag == type_tag(info); });
+
+    if(found == type_info_view_.cend())
+    {
+        throw std::runtime_error("type not registered in reflection_manager");
+    }
+
+    return found - type_info_view_.cbegin();
 }
 
 template <class Iterator>
