@@ -83,8 +83,8 @@ REGISTER_CONSTRUCTOR(tct1_class)
 
 REGISTER_FREE_FUNCTION(extract_i)
 
-REGISTER_MEMBER_VARIABLE(tct1_struct, i)
 REGISTER_MEMBER_VARIABLE(tct1_struct, d)
+REGISTER_MEMBER_VARIABLE(tct1_struct, i)
 
 SHADOW_INIT()
 }
@@ -498,5 +498,24 @@ TEST_CASE("test member variables", "[reflection_manager]")
                 REQUIRE(tct1_space::get_held_value<tct1_struct>(s).i == 40);
             }
         }
+    }
+}
+
+
+TEST_CASE("test member variables by class type",
+          "[reflection_manager::member_variables_by_class_type]")
+{
+    auto anobject = tct1_space::static_construct<tct1_struct>(10, 100.3);
+
+    SECTION("get all member variables belonging to the object")
+    {
+        auto mv_pair =
+            tct1_space::manager.member_variables_by_class_type(anobject.type());
+
+        REQUIRE(std::distance(mv_pair.first, mv_pair.second) == 2);
+        REQUIRE(tct1_space::manager.member_variable_name(*mv_pair.first) ==
+                std::string("i"));
+        REQUIRE(tct1_space::manager.member_variable_name(mv_pair.first[1]) ==
+                std::string("d"));
     }
 }
