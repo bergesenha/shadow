@@ -62,6 +62,9 @@ public:
 
     typedef info_iterator_<const member_variable_info, member_variable_tag>
         const_member_variable_iterator;
+    typedef indexed_info_iterator_<const member_variable_info,
+                                   member_variable_tag>
+        const_indexed_member_variable_iterator;
 
 public:
     template <class TypeInfoArray,
@@ -155,6 +158,10 @@ public:
 
     std::pair<const_member_variable_iterator, const_member_variable_iterator>
     member_variables() const;
+
+    std::pair<const_indexed_member_variable_iterator,
+              const_indexed_member_variable_iterator>
+    member_variables_by_class_type(const type_tag& tag) const;
 
     type_tag member_variable_type(const member_variable_tag& tag) const;
 
@@ -676,6 +683,23 @@ reflection_manager::member_variables() const
     return std::make_pair(
         const_member_variable_iterator(member_variable_info_view_.cbegin()),
         const_member_variable_iterator(member_variable_info_view_.cend()));
+}
+
+
+inline std::pair<reflection_manager::const_indexed_member_variable_iterator,
+                 reflection_manager::const_indexed_member_variable_iterator>
+reflection_manager::member_variables_by_class_type(const type_tag& tag) const
+{
+    const auto index = index_of_type(tag);
+
+    return std::make_pair(const_indexed_member_variable_iterator(
+                              0,
+                              member_variable_indices_by_type_[index].data(),
+                              member_variable_info_view_.data()),
+                          const_indexed_member_variable_iterator(
+                              member_variable_indices_by_type_[index].size(),
+                              member_variable_indices_by_type_[index].data(),
+                              member_variable_info_view_.data()));
 }
 
 
