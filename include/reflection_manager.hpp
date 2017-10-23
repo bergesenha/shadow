@@ -205,6 +205,12 @@ private:
     helene::array_view<const member_variable_info> member_variable_info_view_;
     helene::array_view<const string_serialization_info>
         string_serialization_info_view_;
+
+    std::vector<std::vector<std::size_t>> constructor_indices_by_type_;
+    std::vector<std::vector<std::size_t>> conversion_indices_by_type_;
+    std::vector<std::vector<std::size_t>> member_function_indices_by_type_;
+    std::vector<std::vector<std::size_t>> member_variable_indices_by_type_;
+    std::vector<std::vector<std::size_t>> string_serialization_indices_by_type_;
 };
 } // namespace shadow
 
