@@ -3,6 +3,7 @@
 #include <utility>
 #include <stdexcept>
 #include <vector>
+#include <algorithm>
 
 #include <array_view.hpp>
 #include "reflection_info.hpp"
@@ -195,6 +196,13 @@ private:
                              OutputIterator out,
                              const InfoType& info) const;
 
+    template <class Iterator, class InfoExtractor>
+    std::vector<std::vector<std::size_t>>
+    indices_by_type(Iterator first,
+                    Iterator last,
+                    std::size_t num_types,
+                    InfoExtractor&& extract_info) const;
+
 private:
     // array_views of reflection information generated at compile time
     helene::array_view<const type_info> type_info_view_;
@@ -246,7 +254,38 @@ inline reflection_manager::reflection_manager(TypeInfoArray& ti_arr,
               MemberVariableArray>::initialize(mv_arr)),
       string_serialization_info_view_(
           reflection_initialization_detail::array_selector<
-              StringSerializationArray>::initialize(ss_arr))
+              StringSerializationArray>::initialize(ss_arr)),
+      constructor_indices_by_type_(indices_by_type(
+          constructor_info_view_.cbegin(),
+          constructor_info_view_.cend(),
+          type_info_view_.size(),
+          [](const constructor_info& info) { return info.type_index; })),
+      conversion_indices_by_type_(indices_by_type(
+          conversion_info_view_.cbegin(),
+          conversion_info_view_.cend(),
+          type_info_view_.size(),
+          [](const conversion_info& info) { return info.from_type_index; })),
+      member_function_indices_by_type_(
+          indices_by_type(member_function_info_view_.cbegin(),
+                          member_function_info_view_.cend(),
+                          type_info_view_.size(),
+                          [](const member_function_info& info) {
+                              return info.object_type_index;
+                          })),
+      member_variable_indices_by_type_(
+          indices_by_type(member_variable_info_view_.cbegin(),
+                          member_variable_info_view_.cend(),
+                          type_info_view_.size(),
+                          [](const member_variable_info& info) {
+                              return info.object_type_index;
+                          })),
+      string_serialization_indices_by_type_(
+          indices_by_type(string_serialization_info_view_.cbegin(),
+                          string_serialization_info_view_.cend(),
+                          type_info_view_.size(),
+                          [](const string_serialization_info& info) {
+                              return info.type_index;
+                          }))
 {
 }
 
@@ -375,6 +414,29 @@ reflection_manager::pass_parameters_out(Iterator first,
             out->value_ = *first;
         }
     }
+}
+
+
+template <class Iterator, class InfoExtractor>
+inline std::vector<std::vector<std::size_t>>
+reflection_manager::indices_by_type(Iterator first,
+                                    Iterator last,
+                                    std::size_t num_types,
+                                    InfoExtractor&& extract_info) const
+{
+
+    std::vector<std::vector<std::size_t>> out(num_types);
+    if(num_types == 0)
+    {
+        return out;
+    }
+
+    for(std::size_t index = 0ul; first != last; ++index, ++first)
+    {
+        out[extract_info(*first)].push_back(index);
+    }
+
+    return out;
 }
 
 template <class Iterator>
