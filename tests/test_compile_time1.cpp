@@ -81,6 +81,10 @@ REGISTER_TYPE_END()
 
 REGISTER_CONSTRUCTOR(tct1_class)
 
+REGISTER_CONSTRUCTOR(tct1_struct)
+REGISTER_CONSTRUCTOR(tct1_struct, int)
+REGISTER_CONSTRUCTOR(tct1_struct, int, double)
+
 REGISTER_FREE_FUNCTION(extract_i)
 
 REGISTER_MEMBER_VARIABLE(tct1_struct, d)
@@ -517,5 +521,79 @@ TEST_CASE("test member variables by class type",
                 std::string("i"));
         REQUIRE(tct1_space::manager.member_variable_name(mv_pair.first[1]) ==
                 std::string("d"));
+    }
+}
+
+
+TEST_CASE("test constructors_by_type for tct1_struct",
+          "[reflection_manager::constructors_by_type]")
+{
+    const shadow::reflection_manager& manager = tct1_space::manager;
+
+    auto types = manager.types();
+
+    auto found = std::find_if(types.first, types.second, [](const auto& tt) {
+        return tt.name() == std::string("tct1_struct");
+    });
+
+    REQUIRE(found != types.second);
+
+    SECTION("get all constructors for tct1_struct")
+    {
+        auto constructors = manager.constructors_by_type(*found);
+
+        REQUIRE(std::distance(constructors.first, constructors.second) == 3);
+
+        SECTION("find default constructor")
+        {
+            auto found_const = std::find_if(
+                constructors.first, constructors.second, [](const auto& ctr) {
+                    auto param_types = manager.constructor_parameter_types(ctr);
+
+                    return std::distance(param_types.first,
+                                         param_types.second) == 0;
+                });
+
+            REQUIRE(found_const != constructors.second);
+        }
+
+        SECTION("find constructor taking int")
+        {
+            auto found_const = std::find_if(
+                constructors.first, constructors.second, [](const auto& ctr) {
+                    auto param_types = manager.constructor_parameter_types(ctr);
+
+                    if(std::distance(param_types.first, param_types.second) ==
+                       1)
+                    {
+                        return param_types.first->name() == std::string("int");
+                    }
+
+                    return false;
+                });
+
+            REQUIRE(found_const != constructors.second);
+        }
+
+        SECTION("find constructor taking int and double")
+        {
+            auto found_const = std::find_if(
+                constructors.first, constructors.second, [](const auto& ctr) {
+                    auto param_types = manager.constructor_parameter_types(ctr);
+
+                    if(std::distance(param_types.first, param_types.second) ==
+                       2)
+                    {
+                        return (param_types.first->name() ==
+                                std::string("int")) &&
+                               (param_types.first[1].name() ==
+                                std::string("double"));
+                    }
+
+                    return false;
+                });
+
+            REQUIRE(found_const != constructors.second);
+        }
     }
 }
