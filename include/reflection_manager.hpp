@@ -63,6 +63,9 @@ public:
 
     typedef info_iterator_<const member_function_info, member_function_tag>
         const_member_function_iterator;
+    typedef indexed_info_iterator_<const member_function_info,
+                                   member_function_tag>
+        const_indexed_member_function_iterator;
 
     typedef info_iterator_<const member_variable_info, member_variable_tag>
         const_member_variable_iterator;
@@ -156,6 +159,10 @@ public:
     // return all available member functions
     std::pair<const_member_function_iterator, const_member_function_iterator>
     member_functions() const;
+
+    std::pair<const_indexed_member_function_iterator,
+              const_indexed_member_function_iterator>
+    member_functions_by_class_type(const type_tag& tag) const;
 
     type_tag member_function_class_type(const member_function_tag& tag) const;
 
@@ -664,6 +671,23 @@ reflection_manager::member_functions() const
     return std::make_pair(
         const_member_function_iterator(member_function_info_view_.cbegin()),
         const_member_function_iterator(member_function_info_view_.cend()));
+}
+
+
+inline std::pair<reflection_manager::const_indexed_member_function_iterator,
+                 reflection_manager::const_indexed_member_function_iterator>
+reflection_manager::member_functions_by_class_type(const type_tag& tag) const
+{
+    const auto index = index_of_type(tag);
+
+    return std::make_pair(const_indexed_member_function_iterator(
+                              0,
+                              member_function_indices_by_type_[index].data(),
+                              member_function_info_view_.data()),
+                          const_indexed_member_function_iterator(
+                              member_function_indices_by_type_[index].size(),
+                              member_function_indices_by_type_[index].data(),
+                              member_function_info_view_.data()));
 }
 
 
