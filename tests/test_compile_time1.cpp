@@ -712,3 +712,30 @@ TEST_CASE("string serialization of shadow::object",
         REQUIRE(out.str() == std::string("{4, {1, 3.3}}"));
     }
 }
+
+
+TEST_CASE("deserialization of shadow::object from stream",
+          "[operator>>(..., object& obj)]")
+{
+    SECTION("deserialize int")
+    {
+        std::istringstream in(std::string("1012"));
+
+        auto anint = tct1_space3::static_construct<int>();
+
+        in >> anint;
+
+        REQUIRE(tct1_space3::get_held_value<int>(anint) == 1012);
+    }
+
+    SECTION("deserialize float")
+    {
+        std::istringstream in(std::string("23.5"));
+
+        auto afloat = tct1_space3::static_construct<float>(2.3f);
+
+        in >> afloat;
+
+        REQUIRE(tct1_space3::get_held_value<float>(afloat) == Approx(23.5f));
+    }
+}

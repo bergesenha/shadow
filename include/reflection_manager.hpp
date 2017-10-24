@@ -44,6 +44,7 @@ struct array_selector<I[N]>
 class reflection_manager
 {
     friend std::ostream& operator<<(std::ostream& out, const object& obj);
+    friend std::istream& operator>>(std::istream& in, object& obj);
 
 public:
     typedef info_iterator_<const type_info, type_tag> const_type_iterator;

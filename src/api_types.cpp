@@ -78,4 +78,32 @@ operator<<(std::ostream& out, const object& obj)
     out << '}';
     return out;
 }
+
+std::istream&
+operator>>(std::istream& in, object& obj)
+{
+    if(obj.manager_ == nullptr)
+    {
+        return in;
+    }
+
+    const auto index = obj.manager_->index_of_object(obj);
+    const auto& deserializers = obj.manager_->string_serialization_info_view_;
+
+    auto found = std::find_if(
+        deserializers.cbegin(), deserializers.cend(), [index](const auto& ssi) {
+            return ssi.type_index == index;
+        });
+
+    if(found != deserializers.cend())
+    {
+        std::string str_val;
+        in >> str_val;
+        obj.value_ = found->deserialize_bind_point(str_val);
+
+        return in;
+    }
+
+    return in;
+}
 }
