@@ -130,12 +130,20 @@ private:
     any value_;
     const type_info* type_info_;
     const reflection_manager* manager_;
+
+private:
+    static constexpr const type_info void_info{"void", 0, nullptr, nullptr};
 };
 }
 
 
 namespace shadow
 {
+
+inline object::object() : value_(), type_info_(&void_info), manager_(nullptr)
+{
+}
+
 inline object::object(any value,
                       const type_info* ti,
                       const reflection_manager* man)
