@@ -776,4 +776,23 @@ TEST_CASE("deserialization of shadow::object from stream",
                     Approx(34.23));
         }
     }
+
+    SECTION("deserialize tct1_struct2")
+    {
+        auto astruct2 = tct1_space3::static_construct<tct1_struct2>();
+
+        SECTION("with the string '{10, {33, 42.12}}'")
+        {
+            std::istringstream in(std::string("{10, {33, 42.12}}"));
+
+            in >> astruct2;
+
+            auto astruct2_val =
+                tct1_space3::get_held_value<tct1_struct2>(astruct2);
+
+            REQUIRE(astruct2_val.index == 10);
+            REQUIRE(astruct2_val.the_struct.i == 33);
+            REQUIRE(astruct2_val.the_struct.d == Approx(42.12));
+        }
+    }
 }
