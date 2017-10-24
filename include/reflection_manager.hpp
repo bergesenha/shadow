@@ -55,6 +55,8 @@ public:
 
     typedef info_iterator_<const conversion_info, conversion_tag>
         const_conversion_iterator;
+    typedef indexed_info_iterator_<const conversion_info, conversion_tag>
+        const_indexed_conversion_iterator;
 
     typedef info_iterator_<const free_function_info, free_function_tag>
         const_free_function_iterator;
@@ -118,6 +120,10 @@ public:
     // type conversion functions
     std::pair<const_conversion_iterator, const_conversion_iterator>
     conversions() const;
+
+    std::pair<const_indexed_conversion_iterator,
+              const_indexed_conversion_iterator>
+    conversions_by_from_type(const type_tag& tag) const;
 
     // return pair of types of a conversion, first: from_type, second: to_type
     std::pair<type_tag, type_tag>
@@ -532,6 +538,22 @@ reflection_manager::conversions() const
     return std::make_pair(
         const_conversion_iterator(conversion_info_view_.cbegin()),
         const_conversion_iterator(conversion_info_view_.cend()));
+}
+
+inline std::pair<reflection_manager::const_indexed_conversion_iterator,
+                 reflection_manager::const_indexed_conversion_iterator>
+reflection_manager::conversions_by_from_type(const type_tag& tag) const
+{
+    const auto index = index_of_type(tag);
+
+    return std::make_pair(const_indexed_conversion_iterator(
+                              0,
+                              conversion_indices_by_type_[index].data(),
+                              conversion_info_view_.data()),
+                          const_indexed_conversion_iterator(
+                              conversion_indices_by_type_[index].size(),
+                              conversion_indices_by_type_[index].data(),
+                              conversion_info_view_.data()));
 }
 
 inline std::pair<type_tag, type_tag>

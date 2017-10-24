@@ -122,6 +122,34 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
     REQUIRE(anint.type().name() == std::string("int"));
     REQUIRE(tct1_space::get_held_value<int>(anint) == 23);
 
+    SECTION("find all conversions from type int")
+    {
+        auto conversions =
+            tct1_space::manager.conversions_by_from_type(anint.type());
+
+        REQUIRE(std::distance(conversions.first, conversions.second) > 0);
+
+        SECTION("find the conversion from int to float")
+        {
+            auto found = std::find_if(
+                conversions.first, conversions.second, [](const auto& conv) {
+                    return tct1_space::manager.conversion_types(conv)
+                               .second.name() == std::string("float");
+                });
+
+            REQUIRE(found != conversions.second);
+
+            SECTION("convert anint to a float")
+            {
+                auto res = tct1_space::manager.convert(*found, anint);
+
+                REQUIRE(res.type().name() == std::string("float"));
+                REQUIRE(tct1_space::get_held_value<float>(res) ==
+                        Approx(23.0f));
+            }
+        }
+    }
+
     SECTION(
         "find constructor for tct1_class from tct1_space2 namespace manager")
     {
