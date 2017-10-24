@@ -235,6 +235,7 @@ private:
                     InfoExtractor&& extract_info) const;
 
     std::size_t index_of_type(const type_tag& tag) const;
+    std::size_t index_of_object(const object& obj) const;
 
 private:
     // array_views of reflection information generated at compile time

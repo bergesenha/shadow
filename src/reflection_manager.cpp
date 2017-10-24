@@ -94,6 +94,17 @@ reflection_manager::index_of_type(const type_tag& tag) const
     return found - type_info_view_.cbegin();
 }
 
+std::size_t
+reflection_manager::index_of_object(const object& obj) const
+{
+    if(obj.manager_ == this)
+    {
+        return obj.type_info_ - type_info_view_.data();
+    }
+
+    return index_of_type(obj.type());
+}
+
 
 std::pair<reflection_manager::const_conversion_iterator,
           reflection_manager::const_conversion_iterator>
