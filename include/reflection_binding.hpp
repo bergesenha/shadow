@@ -5,6 +5,7 @@
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <sstream>
 
 #include "any.hpp"
 #include <function_deduction.hpp>
@@ -346,7 +347,9 @@ struct string_serialize_type_selector<
     static std::string
     dispatch(const any& value)
     {
-        return std::to_string(value.get<T>());
+        std::ostringstream out;
+        out << value.get<T>();
+        return out.str();
     }
 };
 
