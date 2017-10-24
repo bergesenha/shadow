@@ -1,6 +1,7 @@
 #include "catch.hpp"
 
 #include <shadow.hpp>
+#include <sstream>
 
 
 class tct1_class
@@ -630,5 +631,33 @@ TEST_CASE("test constructors_by_type for tct1_struct",
 
             REQUIRE(found_const != constructors.second);
         }
+    }
+}
+
+
+TEST_CASE("string serialization of shadow::object",
+          "[operator<<(..., const object& ojb)]")
+{
+    const shadow::reflection_manager& manager = tct1_space::manager;
+
+    std::ostringstream out;
+
+    SECTION("serialize default constructed shadow::object")
+    {
+        shadow::object empty_obj;
+
+
+        out << empty_obj;
+
+        REQUIRE(out.str() == std::string("void"));
+    }
+
+    SECTION("serialize a shadow::object holding an int value")
+    {
+        auto int_obj = tct1_space::static_construct<int>(1024);
+
+        out << int_obj;
+
+        REQUIRE(out.str() == std::string("1024"));
     }
 }

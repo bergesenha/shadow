@@ -4,6 +4,7 @@
 #include <string>
 #include <cstddef>
 #include <cstring>
+#include <ostream>
 
 #include <any.hpp>
 #include <reflection_info.hpp>
@@ -118,6 +119,8 @@ class reflection_manager;
 class object
 {
     friend class reflection_manager;
+
+    friend std::ostream& operator<<(std::ostream& out, const object& obj);
 
 public:
     object();

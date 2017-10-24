@@ -1,4 +1,5 @@
 #include "api_types.hpp"
+#include "reflection_manager.hpp"
 
 
 namespace shadow
@@ -22,4 +23,18 @@ object::type() const
 
 
 constexpr const type_info object::void_info;
+
+
+std::ostream&
+operator<<(std::ostream& out, const object& obj)
+{
+    if(obj.manager_ == nullptr)
+    {
+        out << "void";
+        return out;
+    }
+
+
+    return out;
+}
 }
