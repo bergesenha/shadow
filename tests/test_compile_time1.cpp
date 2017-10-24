@@ -574,13 +574,16 @@ TEST_CASE("test constructors_by_type for tct1_struct",
 
         SECTION("find default constructor")
         {
-            auto found_const = std::find_if(
-                constructors.first, constructors.second, [](const auto& ctr) {
-                    auto param_types = manager.constructor_parameter_types(ctr);
+            auto found_const =
+                std::find_if(constructors.first,
+                             constructors.second,
+                             [&manager](const auto& ctr) {
+                                 auto param_types =
+                                     manager.constructor_parameter_types(ctr);
 
-                    return std::distance(param_types.first,
-                                         param_types.second) == 0;
-                });
+                                 return std::distance(param_types.first,
+                                                      param_types.second) == 0;
+                             });
 
             REQUIRE(found_const != constructors.second);
         }
@@ -588,7 +591,9 @@ TEST_CASE("test constructors_by_type for tct1_struct",
         SECTION("find constructor taking int")
         {
             auto found_const = std::find_if(
-                constructors.first, constructors.second, [](const auto& ctr) {
+                constructors.first,
+                constructors.second,
+                [&manager](const auto& ctr) {
                     auto param_types = manager.constructor_parameter_types(ctr);
 
                     if(std::distance(param_types.first, param_types.second) ==
@@ -606,7 +611,9 @@ TEST_CASE("test constructors_by_type for tct1_struct",
         SECTION("find constructor taking int and double")
         {
             auto found_const = std::find_if(
-                constructors.first, constructors.second, [](const auto& ctr) {
+                constructors.first,
+                constructors.second,
+                [&manager](const auto& ctr) {
                     auto param_types = manager.constructor_parameter_types(ctr);
 
                     if(std::distance(param_types.first, param_types.second) ==
