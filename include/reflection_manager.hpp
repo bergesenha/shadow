@@ -43,6 +43,8 @@ struct array_selector<I[N]>
 // point of interaction with the reflection system
 class reflection_manager
 {
+    friend std::ostream& operator<<(std::ostream& out, const object& obj);
+
 public:
     typedef info_iterator_<const type_info, type_tag> const_type_iterator;
     typedef indexed_info_iterator_<const type_info, type_tag>
@@ -249,7 +251,6 @@ private:
     std::vector<std::vector<std::size_t>> conversion_indices_by_type_;
     std::vector<std::vector<std::size_t>> member_function_indices_by_type_;
     std::vector<std::vector<std::size_t>> member_variable_indices_by_type_;
-    std::vector<std::vector<std::size_t>> string_serialization_indices_by_type_;
 };
 } // namespace shadow
 
@@ -309,13 +310,6 @@ inline reflection_manager::reflection_manager(TypeInfoArray& ti_arr,
                           type_info_view_.size(),
                           [](const member_variable_info& info) {
                               return info.object_type_index;
-                          })),
-      string_serialization_indices_by_type_(
-          indices_by_type(string_serialization_info_view_.cbegin(),
-                          string_serialization_info_view_.cend(),
-                          type_info_view_.size(),
-                          [](const string_serialization_info& info) {
-                              return info.type_index;
                           }))
 {
     // sort member variables by offset
