@@ -48,6 +48,12 @@ struct tct1_struct
 };
 
 
+struct tct1_struct2
+{
+    std::size_t index;
+    tct1_struct the_struct;
+};
+
 int
 extract_i(const tct1_class& a)
 {
@@ -111,6 +117,22 @@ REGISTER_MEMBER_FUNCTION(tct1_class, pointer_out)
 REGISTER_FREE_FUNCTION(mult)
 REGISTER_FREE_FUNCTION(modify)
 REGISTER_FREE_FUNCTION(triple)
+
+SHADOW_INIT()
+}
+
+
+namespace tct1_space3
+{
+REGISTER_TYPE_BEGIN()
+REGISTER_TYPE(tct1_struct)
+REGISTER_TYPE(tct1_struct2)
+REGISTER_TYPE_END()
+
+REGISTER_MEMBER_VARIABLE(tct1_struct, i)
+REGISTER_MEMBER_VARIABLE(tct1_struct, d)
+REGISTER_MEMBER_VARIABLE(tct1_struct2, index)
+REGISTER_MEMBER_VARIABLE(tct1_struct2, the_struct)
 
 SHADOW_INIT()
 }
@@ -669,5 +691,24 @@ TEST_CASE("string serialization of shadow::object",
         out << tct1_struct_object;
 
         REQUIRE(out.str() == std::string("{10, 20.3}"));
+    }
+
+    SECTION("serialize a tct1_class object")
+    {
+        auto tct1_class_object = tct1_space::static_construct<tct1_class>(20);
+
+        out << tct1_class_object;
+
+        REQUIRE(out.str() == std::string("{}"));
+    }
+
+    SECTION("serialize a tct1_struct2")
+    {
+        auto tct1_struct2_object = tct1_space3::static_construct<tct1_struct2>(
+            4ul, tct1_struct{1, 3.3});
+
+        out << tct1_struct2_object;
+
+        REQUIRE(out.str() == std::string("{4, {1, 3.3}}"));
     }
 }
