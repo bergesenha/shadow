@@ -142,7 +142,7 @@ public:
     std::pair<const_member_function_iterator, const_member_function_iterator>
     member_functions() const;
 
-    type_tag member_function_class(const member_function_tag& tag) const;
+    type_tag member_function_class_type(const member_function_tag& tag) const;
 
     std::string member_function_name(const member_function_tag& tag) const;
 
@@ -620,7 +620,8 @@ reflection_manager::member_functions() const
 
 
 inline type_tag
-reflection_manager::member_function_class(const member_function_tag& tag) const
+reflection_manager::member_function_class_type(
+    const member_function_tag& tag) const
 {
     return type_tag(type_info_view_[tag.info_ptr_->object_type_index]);
 }

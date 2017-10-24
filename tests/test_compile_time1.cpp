@@ -316,7 +316,7 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                 std::find_if(mfs.first, mfs.second, [](const auto& mf) {
                     return tct1_space2::manager.member_function_name(mf) ==
                                std::string("get_i") &&
-                           tct1_space2::manager.member_function_class(mf)
+                           tct1_space2::manager.member_function_class_type(mf)
                                    .name() == std::string("tct1_class");
                 });
 
@@ -353,7 +353,7 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                 std::find_if(mfs.first, mfs.second, [](const auto& mf) {
                     return tct1_space2::manager.member_function_name(mf) ==
                                std::string("set_i") &&
-                           tct1_space2::manager.member_function_class(mf)
+                           tct1_space2::manager.member_function_class_type(mf)
                                    .name() == std::string("tct1_class");
                 });
 
@@ -390,7 +390,7 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                 std::find_if(mfs.first, mfs.second, [](const auto& mf) {
                     return tct1_space2::manager.member_function_name(mf) ==
                                std::string("output_i") &&
-                           tct1_space2::manager.member_function_class(mf)
+                           tct1_space2::manager.member_function_class_type(mf)
                                    .name() == std::string("tct1_class");
                 });
 
@@ -427,7 +427,7 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                 std::find_if(mfs.first, mfs.second, [](const auto& mf) {
                     return tct1_space2::manager.member_function_name(mf) ==
                                std::string("output_i") &&
-                           tct1_space2::manager.member_function_class(mf)
+                           tct1_space2::manager.member_function_class_type(mf)
                                    .name() == std::string("tct1_class");
                 });
 
