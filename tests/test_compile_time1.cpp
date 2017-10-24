@@ -660,4 +660,14 @@ TEST_CASE("string serialization of shadow::object",
 
         REQUIRE(out.str() == std::string("1024"));
     }
+
+    SECTION("serialize a tct1_struct object")
+    {
+        auto tct1_struct_object =
+            tct1_space::static_construct<tct1_struct>(10, 20.3);
+
+        out << tct1_struct_object;
+
+        REQUIRE(out.str() == std::string("{10, 20.3}"));
+    }
 }
