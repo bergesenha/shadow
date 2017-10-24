@@ -3,6 +3,7 @@
 #include <utility>
 #include <stdexcept>
 #include <vector>
+#include <algorithm>
 
 #include <array_view.hpp>
 #include "reflection_info.hpp"
@@ -49,18 +50,28 @@ public:
 
     typedef info_iterator_<const constructor_info, constructor_tag>
         const_constructor_iterator;
+    typedef indexed_info_iterator_<const constructor_info, constructor_tag>
+        const_indexed_constructor_iterator;
 
     typedef info_iterator_<const conversion_info, conversion_tag>
         const_conversion_iterator;
+    typedef indexed_info_iterator_<const conversion_info, conversion_tag>
+        const_indexed_conversion_iterator;
 
     typedef info_iterator_<const free_function_info, free_function_tag>
         const_free_function_iterator;
 
     typedef info_iterator_<const member_function_info, member_function_tag>
         const_member_function_iterator;
+    typedef indexed_info_iterator_<const member_function_info,
+                                   member_function_tag>
+        const_indexed_member_function_iterator;
 
     typedef info_iterator_<const member_variable_info, member_variable_tag>
         const_member_variable_iterator;
+    typedef indexed_info_iterator_<const member_variable_info,
+                                   member_variable_tag>
+        const_indexed_member_variable_iterator;
 
 public:
     template <class TypeInfoArray,
@@ -91,6 +102,11 @@ public:
     std::pair<const_constructor_iterator, const_constructor_iterator>
     constructors() const;
 
+    // returns range of all constructors for given type
+    std::pair<const_indexed_constructor_iterator,
+              const_indexed_constructor_iterator>
+    constructors_by_type(const type_tag& tag) const;
+
     // returns the type that the given constructor belongs to
     type_tag constructor_type(const constructor_tag& tag) const;
 
@@ -108,11 +124,16 @@ public:
     std::pair<const_conversion_iterator, const_conversion_iterator>
     conversions() const;
 
+    std::pair<const_indexed_conversion_iterator,
+              const_indexed_conversion_iterator>
+    conversions_by_from_type(const type_tag& tag) const;
+
+    // return pair of types of a conversion, first: from_type, second: to_type
     std::pair<type_tag, type_tag>
     conversion_types(const conversion_tag& tag) const;
 
+    // convert an object to another type according to the given conversion
     object convert(const conversion_tag& tag, const object& val) const;
-
 
     // returns range of tags to all free functions available
     std::pair<const_free_function_iterator, const_free_function_iterator>
@@ -135,10 +156,15 @@ public:
                               Iterator last) const;
 
 
+    // return all available member functions
     std::pair<const_member_function_iterator, const_member_function_iterator>
     member_functions() const;
 
-    type_tag member_function_class(const member_function_tag& tag) const;
+    std::pair<const_indexed_member_function_iterator,
+              const_indexed_member_function_iterator>
+    member_functions_by_class_type(const type_tag& tag) const;
+
+    type_tag member_function_class_type(const member_function_tag& tag) const;
 
     std::string member_function_name(const member_function_tag& tag) const;
 
@@ -154,6 +180,10 @@ public:
 
     std::pair<const_member_variable_iterator, const_member_variable_iterator>
     member_variables() const;
+
+    std::pair<const_indexed_member_variable_iterator,
+              const_indexed_member_variable_iterator>
+    member_variables_by_class_type(const type_tag& tag) const;
 
     type_tag member_variable_type(const member_variable_tag& tag) const;
 
@@ -195,6 +225,15 @@ private:
                              OutputIterator out,
                              const InfoType& info) const;
 
+    template <class Iterator, class InfoExtractor>
+    std::vector<std::vector<std::size_t>>
+    indices_by_type(Iterator first,
+                    Iterator last,
+                    std::size_t num_types,
+                    InfoExtractor&& extract_info) const;
+
+    std::size_t index_of_type(const type_tag& tag) const;
+
 private:
     // array_views of reflection information generated at compile time
     helene::array_view<const type_info> type_info_view_;
@@ -205,6 +244,12 @@ private:
     helene::array_view<const member_variable_info> member_variable_info_view_;
     helene::array_view<const string_serialization_info>
         string_serialization_info_view_;
+
+    std::vector<std::vector<std::size_t>> constructor_indices_by_type_;
+    std::vector<std::vector<std::size_t>> conversion_indices_by_type_;
+    std::vector<std::vector<std::size_t>> member_function_indices_by_type_;
+    std::vector<std::vector<std::size_t>> member_variable_indices_by_type_;
+    std::vector<std::vector<std::size_t>> string_serialization_indices_by_type_;
 };
 } // namespace shadow
 
@@ -240,8 +285,51 @@ inline reflection_manager::reflection_manager(TypeInfoArray& ti_arr,
               MemberVariableArray>::initialize(mv_arr)),
       string_serialization_info_view_(
           reflection_initialization_detail::array_selector<
-              StringSerializationArray>::initialize(ss_arr))
+              StringSerializationArray>::initialize(ss_arr)),
+      constructor_indices_by_type_(indices_by_type(
+          constructor_info_view_.cbegin(),
+          constructor_info_view_.cend(),
+          type_info_view_.size(),
+          [](const constructor_info& info) { return info.type_index; })),
+      conversion_indices_by_type_(indices_by_type(
+          conversion_info_view_.cbegin(),
+          conversion_info_view_.cend(),
+          type_info_view_.size(),
+          [](const conversion_info& info) { return info.from_type_index; })),
+      member_function_indices_by_type_(
+          indices_by_type(member_function_info_view_.cbegin(),
+                          member_function_info_view_.cend(),
+                          type_info_view_.size(),
+                          [](const member_function_info& info) {
+                              return info.object_type_index;
+                          })),
+      member_variable_indices_by_type_(
+          indices_by_type(member_variable_info_view_.cbegin(),
+                          member_variable_info_view_.cend(),
+                          type_info_view_.size(),
+                          [](const member_variable_info& info) {
+                              return info.object_type_index;
+                          })),
+      string_serialization_indices_by_type_(
+          indices_by_type(string_serialization_info_view_.cbegin(),
+                          string_serialization_info_view_.cend(),
+                          type_info_view_.size(),
+                          [](const string_serialization_info& info) {
+                              return info.type_index;
+                          }))
 {
+    // sort member variables by offset
+    std::for_each(member_variable_indices_by_type_.begin(),
+                  member_variable_indices_by_type_.end(),
+                  [this](auto& mv_vec) {
+                      std::sort(
+                          mv_vec.begin(),
+                          mv_vec.end(),
+                          [this](std::size_t less, std::size_t more) {
+                              return member_variable_info_view_[less].offset <
+                                     member_variable_info_view_[more].offset;
+                          });
+                  });
 }
 
 inline std::pair<typename reflection_manager::const_type_iterator,
@@ -271,6 +359,23 @@ reflection_manager::constructors() const
     return std::make_pair(
         const_constructor_iterator(constructor_info_view_.cbegin()),
         const_constructor_iterator(constructor_info_view_.cend()));
+}
+
+
+inline std::pair<reflection_manager::const_indexed_constructor_iterator,
+                 reflection_manager::const_indexed_constructor_iterator>
+reflection_manager::constructors_by_type(const type_tag& tag) const
+{
+    const auto index = index_of_type(tag);
+
+    return std::make_pair(const_indexed_constructor_iterator(
+                              0,
+                              constructor_indices_by_type_[index].data(),
+                              constructor_info_view_.data()),
+                          const_indexed_constructor_iterator(
+                              constructor_indices_by_type_[index].size(),
+                              constructor_indices_by_type_[index].data(),
+                              constructor_info_view_.data()));
 }
 
 inline type_tag
@@ -371,6 +476,45 @@ reflection_manager::pass_parameters_out(Iterator first,
     }
 }
 
+
+template <class Iterator, class InfoExtractor>
+inline std::vector<std::vector<std::size_t>>
+reflection_manager::indices_by_type(Iterator first,
+                                    Iterator last,
+                                    std::size_t num_types,
+                                    InfoExtractor&& extract_info) const
+{
+
+    std::vector<std::vector<std::size_t>> out(num_types);
+    if(num_types == 0)
+    {
+        return out;
+    }
+
+    for(std::size_t index = 0ul; first != last; ++index, ++first)
+    {
+        out[extract_info(*first)].push_back(index);
+    }
+
+    return out;
+}
+
+inline std::size_t
+reflection_manager::index_of_type(const type_tag& tag) const
+{
+    auto found = std::find_if(
+        type_info_view_.cbegin(),
+        type_info_view_.cend(),
+        [&tag](const type_info& info) { return tag == type_tag(info); });
+
+    if(found == type_info_view_.cend())
+    {
+        throw std::runtime_error("type not registered in reflection_manager");
+    }
+
+    return found - type_info_view_.cbegin();
+}
+
 template <class Iterator>
 inline object
 reflection_manager::construct_object(const constructor_tag& tag,
@@ -401,6 +545,22 @@ reflection_manager::conversions() const
     return std::make_pair(
         const_conversion_iterator(conversion_info_view_.cbegin()),
         const_conversion_iterator(conversion_info_view_.cend()));
+}
+
+inline std::pair<reflection_manager::const_indexed_conversion_iterator,
+                 reflection_manager::const_indexed_conversion_iterator>
+reflection_manager::conversions_by_from_type(const type_tag& tag) const
+{
+    const auto index = index_of_type(tag);
+
+    return std::make_pair(const_indexed_conversion_iterator(
+                              0,
+                              conversion_indices_by_type_[index].data(),
+                              conversion_info_view_.data()),
+                          const_indexed_conversion_iterator(
+                              conversion_indices_by_type_[index].size(),
+                              conversion_indices_by_type_[index].data(),
+                              conversion_info_view_.data()));
 }
 
 inline std::pair<type_tag, type_tag>
@@ -514,8 +674,26 @@ reflection_manager::member_functions() const
 }
 
 
+inline std::pair<reflection_manager::const_indexed_member_function_iterator,
+                 reflection_manager::const_indexed_member_function_iterator>
+reflection_manager::member_functions_by_class_type(const type_tag& tag) const
+{
+    const auto index = index_of_type(tag);
+
+    return std::make_pair(const_indexed_member_function_iterator(
+                              0,
+                              member_function_indices_by_type_[index].data(),
+                              member_function_info_view_.data()),
+                          const_indexed_member_function_iterator(
+                              member_function_indices_by_type_[index].size(),
+                              member_function_indices_by_type_[index].data(),
+                              member_function_info_view_.data()));
+}
+
+
 inline type_tag
-reflection_manager::member_function_class(const member_function_tag& tag) const
+reflection_manager::member_function_class_type(
+    const member_function_tag& tag) const
 {
     return type_tag(type_info_view_[tag.info_ptr_->object_type_index]);
 }
@@ -578,6 +756,23 @@ reflection_manager::member_variables() const
     return std::make_pair(
         const_member_variable_iterator(member_variable_info_view_.cbegin()),
         const_member_variable_iterator(member_variable_info_view_.cend()));
+}
+
+
+inline std::pair<reflection_manager::const_indexed_member_variable_iterator,
+                 reflection_manager::const_indexed_member_variable_iterator>
+reflection_manager::member_variables_by_class_type(const type_tag& tag) const
+{
+    const auto index = index_of_type(tag);
+
+    return std::make_pair(const_indexed_member_variable_iterator(
+                              0,
+                              member_variable_indices_by_type_[index].data(),
+                              member_variable_info_view_.data()),
+                          const_indexed_member_variable_iterator(
+                              member_variable_indices_by_type_[index].size(),
+                              member_variable_indices_by_type_[index].data(),
+                              member_variable_info_view_.data()));
 }
 
 

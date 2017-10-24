@@ -81,10 +81,14 @@ REGISTER_TYPE_END()
 
 REGISTER_CONSTRUCTOR(tct1_class)
 
+REGISTER_CONSTRUCTOR(tct1_struct)
+REGISTER_CONSTRUCTOR(tct1_struct, int)
+REGISTER_CONSTRUCTOR(tct1_struct, int, double)
+
 REGISTER_FREE_FUNCTION(extract_i)
 
-REGISTER_MEMBER_VARIABLE(tct1_struct, i)
 REGISTER_MEMBER_VARIABLE(tct1_struct, d)
+REGISTER_MEMBER_VARIABLE(tct1_struct, i)
 
 SHADOW_INIT()
 }
@@ -117,6 +121,34 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
 
     REQUIRE(anint.type().name() == std::string("int"));
     REQUIRE(tct1_space::get_held_value<int>(anint) == 23);
+
+    SECTION("find all conversions from type int")
+    {
+        auto conversions =
+            tct1_space::manager.conversions_by_from_type(anint.type());
+
+        REQUIRE(std::distance(conversions.first, conversions.second) > 0);
+
+        SECTION("find the conversion from int to float")
+        {
+            auto found = std::find_if(
+                conversions.first, conversions.second, [](const auto& conv) {
+                    return tct1_space::manager.conversion_types(conv)
+                               .second.name() == std::string("float");
+                });
+
+            REQUIRE(found != conversions.second);
+
+            SECTION("convert anint to a float")
+            {
+                auto res = tct1_space::manager.convert(*found, anint);
+
+                REQUIRE(res.type().name() == std::string("float"));
+                REQUIRE(tct1_space::get_held_value<float>(res) ==
+                        Approx(23.0f));
+            }
+        }
+    }
 
     SECTION(
         "find constructor for tct1_class from tct1_space2 namespace manager")
@@ -316,7 +348,7 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                 std::find_if(mfs.first, mfs.second, [](const auto& mf) {
                     return tct1_space2::manager.member_function_name(mf) ==
                                std::string("get_i") &&
-                           tct1_space2::manager.member_function_class(mf)
+                           tct1_space2::manager.member_function_class_type(mf)
                                    .name() == std::string("tct1_class");
                 });
 
@@ -353,7 +385,7 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                 std::find_if(mfs.first, mfs.second, [](const auto& mf) {
                     return tct1_space2::manager.member_function_name(mf) ==
                                std::string("set_i") &&
-                           tct1_space2::manager.member_function_class(mf)
+                           tct1_space2::manager.member_function_class_type(mf)
                                    .name() == std::string("tct1_class");
                 });
 
@@ -390,7 +422,7 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                 std::find_if(mfs.first, mfs.second, [](const auto& mf) {
                     return tct1_space2::manager.member_function_name(mf) ==
                                std::string("output_i") &&
-                           tct1_space2::manager.member_function_class(mf)
+                           tct1_space2::manager.member_function_class_type(mf)
                                    .name() == std::string("tct1_class");
                 });
 
@@ -427,7 +459,7 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                 std::find_if(mfs.first, mfs.second, [](const auto& mf) {
                     return tct1_space2::manager.member_function_name(mf) ==
                                std::string("output_i") &&
-                           tct1_space2::manager.member_function_class(mf)
+                           tct1_space2::manager.member_function_class_type(mf)
                                    .name() == std::string("tct1_class");
                 });
 
@@ -497,6 +529,99 @@ TEST_CASE("test member variables", "[reflection_manager]")
 
                 REQUIRE(tct1_space::get_held_value<tct1_struct>(s).i == 40);
             }
+        }
+    }
+}
+
+
+TEST_CASE("test member variables by class type",
+          "[reflection_manager::member_variables_by_class_type]")
+{
+    auto anobject = tct1_space::static_construct<tct1_struct>(10, 100.3);
+
+    SECTION("get all member variables belonging to the object")
+    {
+        auto mv_pair =
+            tct1_space::manager.member_variables_by_class_type(anobject.type());
+
+        REQUIRE(std::distance(mv_pair.first, mv_pair.second) == 2);
+        REQUIRE(tct1_space::manager.member_variable_name(*mv_pair.first) ==
+                std::string("i"));
+        REQUIRE(tct1_space::manager.member_variable_name(mv_pair.first[1]) ==
+                std::string("d"));
+    }
+}
+
+
+TEST_CASE("test constructors_by_type for tct1_struct",
+          "[reflection_manager::constructors_by_type]")
+{
+    const shadow::reflection_manager& manager = tct1_space::manager;
+
+    auto types = manager.types();
+
+    auto found = std::find_if(types.first, types.second, [](const auto& tt) {
+        return tt.name() == std::string("tct1_struct");
+    });
+
+    REQUIRE(found != types.second);
+
+    SECTION("get all constructors for tct1_struct")
+    {
+        auto constructors = manager.constructors_by_type(*found);
+
+        REQUIRE(std::distance(constructors.first, constructors.second) == 3);
+
+        SECTION("find default constructor")
+        {
+            auto found_const = std::find_if(
+                constructors.first, constructors.second, [](const auto& ctr) {
+                    auto param_types = manager.constructor_parameter_types(ctr);
+
+                    return std::distance(param_types.first,
+                                         param_types.second) == 0;
+                });
+
+            REQUIRE(found_const != constructors.second);
+        }
+
+        SECTION("find constructor taking int")
+        {
+            auto found_const = std::find_if(
+                constructors.first, constructors.second, [](const auto& ctr) {
+                    auto param_types = manager.constructor_parameter_types(ctr);
+
+                    if(std::distance(param_types.first, param_types.second) ==
+                       1)
+                    {
+                        return param_types.first->name() == std::string("int");
+                    }
+
+                    return false;
+                });
+
+            REQUIRE(found_const != constructors.second);
+        }
+
+        SECTION("find constructor taking int and double")
+        {
+            auto found_const = std::find_if(
+                constructors.first, constructors.second, [](const auto& ctr) {
+                    auto param_types = manager.constructor_parameter_types(ctr);
+
+                    if(std::distance(param_types.first, param_types.second) ==
+                       2)
+                    {
+                        return (param_types.first->name() ==
+                                std::string("int")) &&
+                               (param_types.first[1].name() ==
+                                std::string("double"));
+                    }
+
+                    return false;
+                });
+
+            REQUIRE(found_const != constructors.second);
         }
     }
 }

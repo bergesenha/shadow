@@ -211,6 +211,7 @@ struct extract_member_variable_info
     static constexpr member_variable_info value = {CTMVI::name,
                                                    CTMVI::object_type_index,
                                                    CTMVI::type_index,
+                                                   CTMVI::offset,
                                                    CTMVI::get_bind_point,
                                                    CTMVI::set_bind_point};
 };
@@ -839,6 +840,8 @@ struct generate_array_of_string_serialization_info_holder
         static const std::size_t object_type_index =                           \
             metamusil::t_list::index_of_type_v<type_universe, class_name>;     \
                                                                                \
+        static const std::size_t offset = offsetof(class_name, variable_name); \
+                                                                               \
         typedef metamusil::deduce_member_variable_type_t<decltype(             \
             &class_name::variable_name)>                                       \
             type_type;                                                         \
@@ -915,7 +918,7 @@ struct generate_array_of_string_serialization_info_holder
         string_serialization_info_array_holder::value};                        \
                                                                                \
     template <class T, class... Args>                                          \
-    shadow::object static_construct(Args&&... args)                     \
+    shadow::object static_construct(Args&&... args)                            \
     {                                                                          \
         constexpr auto t_index =                                               \
             metamusil::t_list::index_of_type_v<type_universe, T>;              \
