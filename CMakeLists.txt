@@ -17,7 +17,8 @@ set(SHADOW_SRC
     )
 
 add_library(shadow ${SHADOW_SRC})
-target_link_libraries(shadow PRIVATE metamusil PRIVATE helene)
+target_link_libraries(shadow PRIVATE metamusil PRIVATE helene INTERFACE
+    metamusil INTERFACE helene)
 target_compile_features(shadow 
     INTERFACE cxx_std_14)
 target_include_directories(shadow
