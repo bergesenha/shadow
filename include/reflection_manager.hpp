@@ -332,13 +332,6 @@ inline reflection_manager::reflection_manager(TypeInfoArray& ti_arr,
                   });
 }
 
-inline std::pair<typename reflection_manager::const_type_iterator,
-                 typename reflection_manager::const_type_iterator>
-reflection_manager::types() const
-{
-    return std::make_pair(const_type_iterator(type_info_view_.cbegin()),
-                          const_type_iterator(type_info_view_.cend()));
-}
 
 inline std::string
 reflection_manager::type_name(const type_tag& tag) const

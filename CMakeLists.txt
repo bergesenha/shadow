@@ -13,6 +13,7 @@ add_subdirectory(external/helene)
 
 set(SHADOW_SRC
     src/api_types.cpp
+    src/reflection_manager.cpp
     )
 
 add_library(shadow ${SHADOW_SRC})
