@@ -719,23 +719,61 @@ TEST_CASE("deserialization of shadow::object from stream",
 {
     SECTION("deserialize int")
     {
-        std::istringstream in(std::string("1012"));
 
         auto anint = tct1_space3::static_construct<int>();
 
-        in >> anint;
+        SECTION("with the string '1012'")
+        {
+            std::istringstream in(std::string("1012"));
 
-        REQUIRE(tct1_space3::get_held_value<int>(anint) == 1012);
+            in >> anint;
+            REQUIRE(tct1_space3::get_held_value<int>(anint) == 1012);
+        }
+
+        SECTION("with the string '101.6'")
+        {
+            std::istringstream in(std::string("101.6"));
+
+            in >> anint;
+            REQUIRE(tct1_space3::get_held_value<int>(anint) == 101);
+        }
     }
 
     SECTION("deserialize float")
     {
-        std::istringstream in(std::string("23.5"));
-
         auto afloat = tct1_space3::static_construct<float>(2.3f);
 
-        in >> afloat;
+        SECTION("with the string '23.5'")
+        {
+            std::istringstream in(std::string("23.5"));
 
-        REQUIRE(tct1_space3::get_held_value<float>(afloat) == Approx(23.5f));
+            in >> afloat;
+            REQUIRE(tct1_space3::get_held_value<float>(afloat) ==
+                    Approx(23.5f));
+        }
+
+        SECTION("with the string '1020'")
+        {
+            std::istringstream in(std::string("1020"));
+
+            in >> afloat;
+            REQUIRE(tct1_space3::get_held_value<float>(afloat) ==
+                    Approx(1020.0f));
+        }
+    }
+
+    SECTION("deserialize tct1_struct")
+    {
+        auto astruct = tct1_space3::static_construct<tct1_struct>();
+
+        SECTION("with the string '{63, 34.23}'")
+        {
+            std::istringstream in(std::string("{63, 34.23}"));
+
+            in >> astruct;
+            REQUIRE(tct1_space3::get_held_value<tct1_struct>(astruct).i == 63);
+            REQUIRE(tct1_space3::get_held_value<tct1_struct>(astruct).d ==
+                    Approx(34.23));
+        }
     }
 }
