@@ -34,6 +34,20 @@ operator<<(std::ostream& out, const object& obj)
         return out;
     }
 
+    const auto index = obj.manager_->index_of_object(obj);
+    const auto& serializers = obj.manager_->string_serialization_info_view_;
+
+    auto found = std::find_if(
+        serializers.cbegin(), serializers.cend(), [index](const auto& ssi) {
+            return ssi.type_index == index;
+        });
+
+    if(found != serializers.cend())
+    {
+        out << found->serialize_bind_point(obj.value_);
+        return out;
+    }
+
 
     return out;
 }
