@@ -712,3 +712,87 @@ TEST_CASE("string serialization of shadow::object",
         REQUIRE(out.str() == std::string("{4, {1, 3.3}}"));
     }
 }
+
+
+TEST_CASE("deserialization of shadow::object from stream",
+          "[operator>>(..., object& obj)]")
+{
+    SECTION("deserialize int")
+    {
+
+        auto anint = tct1_space3::static_construct<int>();
+
+        SECTION("with the string '1012'")
+        {
+            std::istringstream in(std::string("1012"));
+
+            in >> anint;
+            REQUIRE(tct1_space3::get_held_value<int>(anint) == 1012);
+        }
+
+        SECTION("with the string '101.6'")
+        {
+            std::istringstream in(std::string("101.6"));
+
+            in >> anint;
+            REQUIRE(tct1_space3::get_held_value<int>(anint) == 101);
+        }
+    }
+
+    SECTION("deserialize float")
+    {
+        auto afloat = tct1_space3::static_construct<float>(2.3f);
+
+        SECTION("with the string '23.5'")
+        {
+            std::istringstream in(std::string("23.5"));
+
+            in >> afloat;
+            REQUIRE(tct1_space3::get_held_value<float>(afloat) ==
+                    Approx(23.5f));
+        }
+
+        SECTION("with the string '1020'")
+        {
+            std::istringstream in(std::string("1020"));
+
+            in >> afloat;
+            REQUIRE(tct1_space3::get_held_value<float>(afloat) ==
+                    Approx(1020.0f));
+        }
+    }
+
+    SECTION("deserialize tct1_struct")
+    {
+        auto astruct = tct1_space3::static_construct<tct1_struct>();
+
+        SECTION("with the string '{63, 34.23}'")
+        {
+            std::istringstream in(std::string("{63, 34.23}"));
+
+            in >> astruct;
+            REQUIRE(tct1_space3::get_held_value<tct1_struct>(astruct).i == 63);
+            REQUIRE(tct1_space3::get_held_value<tct1_struct>(astruct).d ==
+                    Approx(34.23));
+        }
+    }
+
+    SECTION("deserialize tct1_struct2")
+    {
+        auto astruct2 = tct1_space3::static_construct<tct1_struct2>();
+
+        SECTION("with the string '{10, {33, 42.12}}'")
+        {
+            std::istringstream in(std::string("{10, {33, 42.12}}"));
+
+            in >> astruct2;
+
+            auto astruct2_val =
+                tct1_space3::get_held_value<tct1_struct2>(astruct2);
+
+            REQUIRE(astruct2_val.index == 10);
+            REQUIRE(astruct2_val.the_struct.i == 33);
+            REQUIRE(astruct2_val.the_struct.d == Approx(42.12));
+        }
+    }
+}

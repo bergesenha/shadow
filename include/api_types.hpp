@@ -121,6 +121,7 @@ class object
     friend class reflection_manager;
 
     friend std::ostream& operator<<(std::ostream& out, const object& obj);
+    friend std::istream& operator>>(std::istream& in, object& obj);
 
 public:
     object();

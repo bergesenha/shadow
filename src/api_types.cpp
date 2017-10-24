@@ -1,3 +1,5 @@
+#include <limits>
+
 #include "api_types.hpp"
 #include "reflection_manager.hpp"
 
@@ -77,5 +79,45 @@ operator<<(std::ostream& out, const object& obj)
 
     out << '}';
     return out;
+}
+
+std::istream&
+operator>>(std::istream& in, object& obj)
+{
+    if(obj.manager_ == nullptr)
+    {
+        return in;
+    }
+
+    const auto index = obj.manager_->index_of_object(obj);
+    const auto& deserializers = obj.manager_->string_serialization_info_view_;
+
+    auto found = std::find_if(
+        deserializers.cbegin(), deserializers.cend(), [index](const auto& ssi) {
+            return ssi.type_index == index;
+        });
+
+    if(found != deserializers.cend())
+    {
+        std::string str_val;
+        in >> str_val;
+        obj.value_ = found->deserialize_bind_point(str_val);
+
+        return in;
+    }
+
+    auto mem_vars = obj.manager_->member_variables_by_class_type(obj.type());
+
+    in.ignore(std::numeric_limits<std::streamsize>::max(), '{');
+
+    std::for_each(mem_vars.first, mem_vars.second, [&obj, &in](const auto& mv) {
+        auto mem_val = obj.manager_->get_member_variable(obj, mv);
+        in >> mem_val;
+        obj.manager_->set_member_variable(obj, mv, mem_val);
+    });
+
+    in.ignore(std::numeric_limits<std::streamsize>::max(), '}');
+
+    return in;
 }
 }
