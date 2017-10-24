@@ -37,3 +37,11 @@ TEST_CASE("create a type_tag object", "[type_tag]")
         REQUIRE(t_tag != t_tag2);
     }
 }
+
+
+TEST_CASE("default construction of shadow::object", "[shadow::object]")
+{
+    shadow::object a;
+
+    REQUIRE(a.type().name() == std::string("void"));
+}
