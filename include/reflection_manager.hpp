@@ -50,6 +50,8 @@ public:
 
     typedef info_iterator_<const constructor_info, constructor_tag>
         const_constructor_iterator;
+    typedef indexed_info_iterator_<const constructor_info, constructor_tag>
+        const_indexed_constructor_iterator;
 
     typedef info_iterator_<const conversion_info, conversion_tag>
         const_conversion_iterator;
@@ -95,6 +97,11 @@ public:
     std::pair<const_constructor_iterator, const_constructor_iterator>
     constructors() const;
 
+    // returns range of all constructors for given type
+    std::pair<const_indexed_constructor_iterator,
+              const_indexed_constructor_iterator>
+    constructors_by_type(const type_tag& tag) const;
+
     // returns the type that the given constructor belongs to
     type_tag constructor_type(const constructor_tag& tag) const;
 
@@ -112,11 +119,12 @@ public:
     std::pair<const_conversion_iterator, const_conversion_iterator>
     conversions() const;
 
+    // return pair of types of a conversion, first: from_type, second: to_type
     std::pair<type_tag, type_tag>
     conversion_types(const conversion_tag& tag) const;
 
+    // convert an object to another type according to the given conversion
     object convert(const conversion_tag& tag, const object& val) const;
-
 
     // returns range of tags to all free functions available
     std::pair<const_free_function_iterator, const_free_function_iterator>
@@ -139,6 +147,7 @@ public:
                               Iterator last) const;
 
 
+    // return all available member functions
     std::pair<const_member_function_iterator, const_member_function_iterator>
     member_functions() const;
 
@@ -337,6 +346,23 @@ reflection_manager::constructors() const
     return std::make_pair(
         const_constructor_iterator(constructor_info_view_.cbegin()),
         const_constructor_iterator(constructor_info_view_.cend()));
+}
+
+
+inline std::pair<reflection_manager::const_indexed_constructor_iterator,
+                 reflection_manager::const_indexed_constructor_iterator>
+reflection_manager::constructors_by_type(const type_tag& tag) const
+{
+    const auto index = index_of_type(tag);
+
+    return std::make_pair(const_indexed_constructor_iterator(
+                              0,
+                              constructor_indices_by_type_[index].data(),
+                              constructor_info_view_.data()),
+                          const_indexed_constructor_iterator(
+                              constructor_indices_by_type_[index].size(),
+                              constructor_indices_by_type_[index].data(),
+                              constructor_info_view_.data()));
 }
 
 inline type_tag
