@@ -10,3 +10,6 @@ compile_commands.json
 *.spv
 tags
 Session.vim
+*.srctrlbm
+*.srctrldb
+*.srctrlprj
