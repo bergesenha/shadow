@@ -108,20 +108,6 @@ operator==(const member_variable_info& lhs, const member_variable_info& rhs)
 }
 
 
-struct string_serialization_info
-{
-    std::size_t type_index;
-    string_serialization_signature serialize_bind_point;
-    string_deserialization_signature deserialize_bind_point;
-};
-
-inline bool
-operator==(const string_serialization_info& lhs,
-           const string_serialization_info& rhs)
-{
-    return lhs.serialize_bind_point == rhs.serialize_bind_point &&
-           lhs.deserialize_bind_point == rhs.deserialize_bind_point;
-}
 } // namespace shadow
 
 #endif
