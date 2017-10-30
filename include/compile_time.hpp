@@ -223,6 +223,37 @@ using generate_array_of_mv_info =
                                                 member_variable_info>;
 
 
+template <class Types>
+struct generate_array_of_serialization_info
+{
+    // filter for types that has serialization_type_selector defined
+    template <class T>
+    using is_defined_predicate = metamusil::specialization_defined<
+        serialization_detail::serialization_type_selector,
+        T>;
+
+    typedef metamusil::t_list::filter_t<Types, is_defined_predicate>
+        serializable_types;
+
+    template <class T>
+    struct extract_serialization_info
+    {
+        static constexpr shadow::serialization_info value = {
+            "default",
+            metamusil::t_list::index_of_type_v<Types, T>,
+            &serialization_detail::generic_serialization_bind_point<T>,
+            &serialization_detail::generic_deserialization_bind_point<T>};
+    };
+
+
+    typedef metamusil::t_list::explicit_value_transform<
+        serializable_types,
+        extract_serialization_info,
+        serialization_info>
+        type;
+};
+
+
 } // namespace shadow
 
 
