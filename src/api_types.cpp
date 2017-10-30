@@ -76,4 +76,30 @@ operator<<(std::ostream& out, const object& obj)
 
     return out;
 }
+
+std::istream&
+operator>>(std::istream& in, object& obj)
+{
+    if(obj.manager_ == nullptr)
+    {
+        return in;
+    }
+
+    // find default serialization_info for obj
+    const auto t_index = obj.manager_->index_of_object(obj);
+
+    auto found =
+        std::find_if(obj.manager_->serialization_info_view_.cbegin(),
+                     obj.manager_->serialization_info_view_.cend(),
+                     [t_index](const auto& si) {
+                         return si.type_index == t_index &&
+                                std::string(si.name) == std::string("default");
+                     });
+    if(found != obj.manager_->serialization_info_view_.cend())
+    {
+        return found->deserialization_bind_point(in, obj.value_);
+    }
+
+    return in;
+}
 }

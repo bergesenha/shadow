@@ -43,5 +43,16 @@ main()
 
     std::cout << intobj << '\n';
     std::cout << aobj << '\n';
-    std::cout << bobj << '\n';
+    std::cout << bobj << "\n\n\n";
+
+    std::istringstream data("10 11 12 23");
+
+    data >> intobj;
+    std::cout << intobj << '\n';
+    data >> intobj;
+    std::cout << intobj << '\n';
+    data >> intobj;
+    std::cout << intobj << '\n';
+    data >> intobj;
+    std::cout << intobj << '\n';
 }
