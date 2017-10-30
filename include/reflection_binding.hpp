@@ -32,6 +32,10 @@ typedef any (*conversion_binding_signature)(const any&);
 typedef any (*address_of_signature)(any&);
 // dereference signature
 typedef any (*dereference_signature)(any&);
+// serialization signature
+typedef std::ostream& (*serialization_signature)(std::ostream&, const any&);
+// deserialization signature
+typedef std::istream& (*deserialization_signature)(std::istream&, any&);
 
 
 ////////////////////////////////////////////////////////////////////////////////
