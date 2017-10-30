@@ -82,13 +82,15 @@ public:
               class ConversionInfoArray,
               class FreeFunctionArray,
               class MemberFunctionArray,
-              class MemberVariableArray>
+              class MemberVariableArray,
+              class SerializationInfoArray>
     reflection_manager(TypeInfoArray& ti_arr,
                        ConstructorInfoArray& ci_arr,
                        ConversionInfoArray& cv_arr,
                        FreeFunctionArray& ff_arr,
                        MemberFunctionArray& mf_arr,
-                       MemberVariableArray& mv_arr);
+                       MemberVariableArray& mv_arr,
+                       SerializationInfoArray& si_arr);
 
 
     // queries on types
@@ -244,6 +246,7 @@ private:
     helene::array_view<const free_function_info> free_function_info_view_;
     helene::array_view<const member_function_info> member_function_info_view_;
     helene::array_view<const member_variable_info> member_variable_info_view_;
+    helene::array_view<const serialization_info> serialization_info_view_;
 
     std::vector<std::vector<std::size_t>> constructor_indices_by_type_;
     std::vector<std::vector<std::size_t>> conversion_indices_by_type_;
@@ -259,13 +262,15 @@ template <class TypeInfoArray,
           class ConversionInfoArray,
           class FreeFunctionArray,
           class MemberFunctionArray,
-          class MemberVariableArray>
+          class MemberVariableArray,
+          class SerializationInfoArray>
 inline reflection_manager::reflection_manager(TypeInfoArray& ti_arr,
                                               ConstructorInfoArray& ci_arr,
                                               ConversionInfoArray& cv_arr,
                                               FreeFunctionArray& ff_arr,
                                               MemberFunctionArray& mf_arr,
-                                              MemberVariableArray& mv_arr)
+                                              MemberVariableArray& mv_arr,
+                                              SerializationInfoArray& si_arr)
     : type_info_view_(reflection_initialization_detail::array_selector<
                       TypeInfoArray>::initialize(ti_arr)),
       constructor_info_view_(reflection_initialization_detail::array_selector<
@@ -280,6 +285,8 @@ inline reflection_manager::reflection_manager(TypeInfoArray& ti_arr,
       member_variable_info_view_(
           reflection_initialization_detail::array_selector<
               MemberVariableArray>::initialize(mv_arr)),
+      serialization_info_view_(reflection_initialization_detail::array_selector<
+                               SerializationInfoArray>::initialize(si_arr)),
       constructor_indices_by_type_(indices_by_type(
           constructor_info_view_.cbegin(),
           constructor_info_view_.cend(),

@@ -13,9 +13,10 @@ TEST_CASE(
     const shadow::free_function_info* ffi_arr = nullptr;
     const shadow::member_function_info* mfi_arr = nullptr;
     const shadow::member_variable_info* mvi_arr = nullptr;
+    const shadow::serialization_info* si_arr = nullptr;
 
     shadow::reflection_manager man(
-        ti_arr, ci_arr, cvi_arr, ffi_arr, mfi_arr, mvi_arr);
+        ti_arr, ci_arr, cvi_arr, ffi_arr, mfi_arr, mvi_arr, si_arr);
 
 
     SECTION("retrieve types")
@@ -37,9 +38,10 @@ TEST_CASE("instantiate reflection_manager with only type_info",
     const shadow::free_function_info* ffi_arr = nullptr;
     const shadow::member_function_info* mfi_arr = nullptr;
     const shadow::member_variable_info* mvi_arr = nullptr;
+    const shadow::serialization_info* si_arr = nullptr;
 
     shadow::reflection_manager man(
-        ti_arr, ci_arr, cvi_arr, ffi_arr, mfi_arr, mvi_arr);
+        ti_arr, ci_arr, cvi_arr, ffi_arr, mfi_arr, mvi_arr, si_arr);
 
     SECTION("retrieve types")
     {
@@ -78,9 +80,10 @@ TEST_CASE("instantiate reflection_manager with type info and constructor info",
     const shadow::free_function_info* ffi_arr = nullptr;
     const shadow::member_function_info* mfi_arr = nullptr;
     const shadow::member_variable_info* mvi_arr = nullptr;
+    const shadow::serialization_info* si_arr = nullptr;
 
     shadow::reflection_manager man(
-        ti_arr, ci_arr, cvi_arr, ffi_arr, mfi_arr, mvi_arr);
+        ti_arr, ci_arr, cvi_arr, ffi_arr, mfi_arr, mvi_arr, si_arr);
 
     SECTION("get constructor tags")
     {
@@ -217,9 +220,10 @@ TEST_CASE(
     const shadow::conversion_info* cvi_arr = nullptr;
     const shadow::member_function_info* mfi_arr = nullptr;
     const shadow::member_variable_info* mvi_arr = nullptr;
+    const shadow::serialization_info* si_arr = nullptr;
 
     shadow::reflection_manager man(
-        ti_arr, ci_arr, cvi_arr, ff_arr, mfi_arr, mvi_arr);
+        ti_arr, ci_arr, cvi_arr, ff_arr, mfi_arr, mvi_arr, si_arr);
 
 
     SECTION("get all free functions")

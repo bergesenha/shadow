@@ -253,6 +253,10 @@ struct generate_array_of_serialization_info
         type;
 };
 
+template <class Types>
+using generate_array_of_serialization_info_t =
+    typename generate_array_of_serialization_info<Types>::type;
+
 
 } // namespace shadow
 
@@ -897,6 +901,9 @@ struct generate_array_of_serialization_info
         shadow::conversion_info>                                               \
         conversion_info_array_holder;                                          \
                                                                                \
+    typedef shadow::generate_array_of_serialization_info_t<type_universe>      \
+        default_serialization_info_array_holder;                               \
+                                                                               \
                                                                                \
     const shadow::reflection_manager manager{                                  \
         type_info_array_holder::value,                                         \
@@ -904,7 +911,8 @@ struct generate_array_of_serialization_info
         conversion_info_array_holder::value,                                   \
         free_function_info_array_holder::value,                                \
         member_function_info_array_holder::value,                              \
-        member_variable_info_array_holder::value};                             \
+        member_variable_info_array_holder::value,                              \
+        default_serialization_info_array_holder::value};                       \
                                                                                \
     template <class T, class... Args>                                          \
     shadow::object static_construct(Args&&... args)                            \
