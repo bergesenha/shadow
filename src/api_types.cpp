@@ -30,54 +30,50 @@ constexpr const type_info object::void_info;
 std::ostream&
 operator<<(std::ostream& out, const object& obj)
 {
-    // check for empty condition
     if(obj.manager_ == nullptr)
     {
-        out << "void";
         return out;
     }
 
-    // find string serializer
-    const auto index = obj.manager_->index_of_object(obj);
-    const auto& serializers = obj.manager_->string_serialization_info_view_;
+    // find default serialization_info for obj
+    const auto t_index = obj.manager_->index_of_object(obj);
 
-    auto found = std::find_if(
-        serializers.cbegin(), serializers.cend(), [index](const auto& ssi) {
-            return ssi.type_index == index;
-        });
-
-    if(found != serializers.cend())
+    auto found =
+        std::find_if(obj.manager_->serialization_info_view_.cbegin(),
+                     obj.manager_->serialization_info_view_.cend(),
+                     [t_index](const auto& si) {
+                         return si.type_index == t_index &&
+                                std::string(si.name) == std::string("default");
+                     });
+    if(found != obj.manager_->serialization_info_view_.cend())
     {
-        out << found->serialize_bind_point(obj.value_);
-        return out;
+        return found->serialization_bind_point(out, obj.value_);
     }
 
     out << '{';
 
-    // if no string serializer, recurse through all member variables
-    auto mem_vars = obj.manager_->member_variables_by_class_type(obj.type());
+    // if not, find member variables
+    auto mv_pair = obj.manager_->member_variables_by_class_type(obj.type());
 
-    if(std::distance(mem_vars.first, mem_vars.second) <= 1)
+    if(std::distance(mv_pair.first, mv_pair.second) < 2)
     {
         std::for_each(
-            mem_vars.first, mem_vars.second, [&obj, &out](const auto& mv) {
+            mv_pair.first, mv_pair.second, [&obj, &out](const auto& mv) {
                 out << obj.manager_->get_member_variable(obj, mv);
             });
 
-        out << '}';
         return out;
     }
 
-    out << obj.manager_->get_member_variable(obj, *mem_vars.first);
-    ++mem_vars.first;
+    out << obj.manager_->get_member_variable(obj, *mv_pair.first);
+    ++mv_pair.first;
 
-    std::for_each(
-        mem_vars.first, mem_vars.second, [&obj, &out](const auto& mv) {
-            out << ", ";
-            out << obj.manager_->get_member_variable(obj, mv);
-        });
+    std::for_each(mv_pair.first, mv_pair.second, [&out, &obj](const auto& mv) {
+        out << ", " << obj.manager_->get_member_variable(obj, mv);
+    });
 
     out << '}';
+
     return out;
 }
 
@@ -89,32 +85,53 @@ operator>>(std::istream& in, object& obj)
         return in;
     }
 
-    const auto index = obj.manager_->index_of_object(obj);
-    const auto& deserializers = obj.manager_->string_serialization_info_view_;
+    // find default serialization_info for obj
+    const auto t_index = obj.manager_->index_of_object(obj);
 
-    auto found = std::find_if(
-        deserializers.cbegin(), deserializers.cend(), [index](const auto& ssi) {
-            return ssi.type_index == index;
-        });
+    auto found =
+        std::find_if(obj.manager_->serialization_info_view_.cbegin(),
+                     obj.manager_->serialization_info_view_.cend(),
+                     [t_index](const auto& si) {
+                         return si.type_index == t_index &&
+                                std::string(si.name) == std::string("default");
+                     });
 
-    if(found != deserializers.cend())
+    if(found != obj.manager_->serialization_info_view_.cend())
     {
-        std::string str_val;
-        in >> str_val;
-        obj.value_ = found->deserialize_bind_point(str_val);
+        return found->deserialization_bind_point(in, obj.value_);
+    }
+
+    in.ignore(std::numeric_limits<std::streamsize>::max(), '{');
+
+    auto mv_pair = obj.manager_->member_variables_by_class_type(obj.type());
+
+    if(std::distance(mv_pair.first, mv_pair.second) < 2)
+    {
+        std::for_each(
+            mv_pair.first, mv_pair.second, [&obj, &in](const auto& mv) {
+                auto value = obj.manager_->get_member_variable(obj, mv);
+                in >> value;
+                obj.manager_->set_member_variable(obj, mv, value);
+            });
+
+        in.ignore(std::numeric_limits<std::streamsize>::max(), '}');
 
         return in;
     }
 
-    auto mem_vars = obj.manager_->member_variables_by_class_type(obj.type());
+    std::for_each(
+        mv_pair.first, std::prev(mv_pair.second), [&obj, &in](const auto& mv) {
+            auto value = obj.manager_->get_member_variable(obj, mv);
+            in >> value;
+            obj.manager_->set_member_variable(obj, mv, value);
+            in.ignore(std::numeric_limits<std::streamsize>::max(), ',');
+        });
 
-    in.ignore(std::numeric_limits<std::streamsize>::max(), '{');
+    auto val =
+        obj.manager_->get_member_variable(obj, *(std::prev(mv_pair.second)));
 
-    std::for_each(mem_vars.first, mem_vars.second, [&obj, &in](const auto& mv) {
-        auto mem_val = obj.manager_->get_member_variable(obj, mv);
-        in >> mem_val;
-        obj.manager_->set_member_variable(obj, mv, mem_val);
-    });
+    in >> val;
+    obj.manager_->set_member_variable(obj, *(std::prev(mv_pair.second)), val);
 
     in.ignore(std::numeric_limits<std::streamsize>::max(), '}');
 

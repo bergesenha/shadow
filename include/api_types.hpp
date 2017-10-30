@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <cstring>
 #include <ostream>
+#include <istream>
 
 #include <any.hpp>
 #include <reflection_info.hpp>
@@ -120,7 +121,7 @@ class object
 {
     friend class reflection_manager;
 
-    friend std::ostream& operator<<(std::ostream& out, const object& obj);
+    friend std::ostream& operator<<(std::ostream&, const object&);
     friend std::istream& operator>>(std::istream& in, object& obj);
 
 public:

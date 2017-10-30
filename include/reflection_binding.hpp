@@ -5,7 +5,9 @@
 #include <string>
 #include <type_traits>
 #include <utility>
-#include <sstream>
+#include <istream>
+#include <ostream>
+#include <limits>
 
 #include "any.hpp"
 #include <function_deduction.hpp>
@@ -28,14 +30,14 @@ typedef void (*member_variable_set_binding_signature)(any&, const any&);
 typedef any (*constructor_binding_signature)(any*);
 // conversion signature
 typedef any (*conversion_binding_signature)(const any&);
-// string serialize signature
-typedef std::string (*string_serialization_signature)(const any&);
-// string deserialization signature
-typedef any (*string_deserialization_signature)(const std::string&);
 // address of signature
 typedef any (*address_of_signature)(any&);
 // dereference signature
 typedef any (*dereference_signature)(any&);
+// serialization signature
+typedef std::ostream& (*serialization_signature)(std::ostream&, const any&);
+// deserialization signature
+typedef std::istream& (*deserialization_signature)(std::istream&, any&);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -333,203 +335,6 @@ generic_conversion_bind_point(const any& src)
 } // namespace conversion_detail
 
 
-namespace string_serialization_detail
-{
-
-template <class T, class = void>
-struct string_serialize_type_selector;
-
-template <class T>
-struct string_serialize_type_selector<
-    T,
-    std::enable_if_t<std::is_arithmetic<T>::value>>
-{
-    static std::string
-    dispatch(const any& value)
-    {
-        std::ostringstream out;
-        out << value.get<T>();
-        return out.str();
-    }
-};
-
-template <>
-struct string_serialize_type_selector<std::string>
-{
-    static std::string
-    dispatch(const any& value)
-    {
-        return value.get<std::string>();
-    }
-};
-
-template <>
-struct string_serialize_type_selector<char>
-{
-    static std::string
-    dispatch(const any& value)
-    {
-        std::string out;
-        out.push_back(value.get<char>());
-        return out;
-    }
-};
-
-template <>
-struct string_serialize_type_selector<void>
-{
-    static std::string
-    dispatch(const any&)
-    {
-        return "empty";
-    }
-};
-
-template <class T>
-std::string
-generic_string_serialization_bind_point(const any& value)
-{
-    return string_serialize_type_selector<T>::dispatch(value);
-}
-
-
-template <class T, class = void>
-struct string_deserialize_type_selector;
-
-template <class T>
-struct string_deserialize_type_selector<
-    T,
-    std::enable_if_t<std::is_arithmetic<T>::value>>
-{
-    static any
-    dispatch(const std::string& str_value)
-    {
-        T out = std::stold(str_value);
-        return out;
-    }
-};
-
-
-template <>
-struct string_deserialize_type_selector<char>
-{
-    static any
-    dispatch(const std::string& str_value)
-    {
-        return str_value[0];
-    }
-};
-
-template <>
-struct string_deserialize_type_selector<std::string>
-{
-    static any
-    dispatch(const std::string& str_value)
-    {
-        return str_value;
-    }
-};
-
-template <>
-struct string_deserialize_type_selector<int>
-{
-    static any
-    dispatch(const std::string& str_value)
-    {
-        return std::stoi(str_value);
-    }
-};
-
-template <>
-struct string_deserialize_type_selector<long>
-{
-    static any
-    dispatch(const std::string& str_value)
-    {
-        return std::stol(str_value);
-    }
-};
-
-template <>
-struct string_deserialize_type_selector<long long>
-{
-    static any
-    dispatch(const std::string& str_value)
-    {
-        return std::stoll(str_value);
-    }
-};
-
-template <>
-struct string_deserialize_type_selector<unsigned long>
-{
-    static any
-    dispatch(const std::string& str_value)
-    {
-        return std::stoul(str_value);
-    }
-};
-
-template <>
-struct string_deserialize_type_selector<unsigned long long>
-{
-    static any
-    dispatch(const std::string& str_value)
-    {
-        return std::stoull(str_value);
-    }
-};
-
-template <>
-struct string_deserialize_type_selector<float>
-{
-    static any
-    dispatch(const std::string& str_value)
-    {
-        return std::stof(str_value);
-    }
-};
-
-template <>
-struct string_deserialize_type_selector<double>
-{
-    static any
-    dispatch(const std::string& str_value)
-    {
-        return std::stod(str_value);
-    }
-};
-
-template <>
-struct string_deserialize_type_selector<long double>
-{
-    static any
-    dispatch(const std::string& str_value)
-    {
-        return std::stold(str_value);
-    }
-};
-
-template <>
-struct string_deserialize_type_selector<void>
-{
-    static any
-    dispatch(const std::string&)
-    {
-        return shadow::any();
-    }
-};
-
-
-template <class T>
-any
-generic_string_deserialization_bind_point(const std::string& str_value)
-{
-    return string_deserialize_type_selector<T>::dispatch(str_value);
-}
-} // namespace string_serialization_detail
-
-
 namespace pointer_detail
 {
 template <class T>
@@ -561,6 +366,121 @@ generic_dereference_bind_point<void>(any&)
 }
 
 } // namespace pointer_detail
+
+namespace serialization_detail
+{
+
+
+template <class T, class = void>
+struct serialization_type_selector;
+
+template <>
+struct serialization_type_selector<wchar_t>;
+
+template <>
+struct serialization_type_selector<char16_t>;
+
+template <>
+struct serialization_type_selector<char32_t>;
+
+
+template <class T>
+struct serialization_type_selector<
+    T,
+    std::enable_if_t<std::is_arithmetic<T>::value>>
+{
+    static std::ostream&
+    serialize_dispatch(std::ostream& out, const any& value)
+    {
+        out << value.get<T>();
+        return out;
+    }
+
+    static std::istream&
+    deserialize_dispatch(std::istream& in, any& value)
+    {
+        in >> value.get<T>();
+        return in;
+    }
+};
+
+
+template <>
+struct serialization_type_selector<std::string>
+{
+    static std::ostream&
+    serialize_dispatch(std::ostream& out, const any& value)
+    {
+        out << '"' << value.get<std::string>() << '"';
+        return out;
+    }
+
+    static std::istream&
+    deserialize_dispatch(std::istream& in, any& value)
+    {
+        in.ignore(std::numeric_limits<std::streamsize>::max(), '"');
+
+        std::getline(in, value.get<std::string>(), '"');
+
+        return in;
+    }
+};
+
+
+template <>
+struct serialization_type_selector<bool>
+{
+    static std::ostream&
+    serialize_dispatch(std::ostream& out, const any& value)
+    {
+        if(value.get<bool>())
+        {
+            out << "true";
+        }
+        else
+        {
+            out << "false";
+        }
+
+        return out;
+    }
+
+    static std::istream&
+    deserialize_dispatch(std::istream& in, any& value)
+    {
+        std::string boolstring;
+
+        in >> boolstring;
+
+        if(boolstring == std::string("true"))
+        {
+            value.get<bool>() = true;
+        }
+        else
+        {
+            value.get<bool>() = false;
+        }
+
+        return in;
+    }
+};
+
+
+template <class T>
+std::ostream&
+generic_serialization_bind_point(std::ostream& out, const any& value)
+{
+    return serialization_type_selector<T>::serialize_dispatch(out, value);
+}
+
+
+template <class T>
+std::istream&
+generic_deserialization_bind_point(std::istream& in, any& value)
+{
+    return serialization_type_selector<T>::deserialize_dispatch(in, value);
+}
+}
 
 } // namespace shadow
 

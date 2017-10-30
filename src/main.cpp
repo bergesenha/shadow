@@ -1,65 +1,68 @@
 #include <iostream>
-#include <string>
-#include <vector>
-
+#include <sstream>
 #include <algorithm>
 #include <shadow.hpp>
-#include <array_view.hpp>
+#include <type_traits>
+
+struct a
+{
+    int i;
+    double d;
+};
+
+struct b
+{
+    char key;
+    a value;
+};
 
 namespace myspace
 {
 REGISTER_TYPE_BEGIN()
-
+REGISTER_TYPE(a)
+REGISTER_TYPE(b)
 REGISTER_TYPE_END()
 
+
+REGISTER_MEMBER_VARIABLE(a, i)
+REGISTER_MEMBER_VARIABLE(a, d)
+
+REGISTER_MEMBER_VARIABLE(b, key)
+REGISTER_MEMBER_VARIABLE(b, value)
 
 SHADOW_INIT()
 } // namespace myspace
 
 
-template <class T>
-struct array_pointer_selector
-{
-    static helene::array_view<std::remove_pointer_t<T>> generate_view(T)
-    {
-        return helene::array_view<std::remove_pointer_t<T>>();
-    }
-};
-
-template <class I, std::size_t N>
-struct array_pointer_selector<I[N]>
-{
-    static helene::array_view<I> generate_view(I (&arr)[N])
-    {
-        return helene::array_view<I>(arr);
-    }
-};
-
-
-class holds_array_view
-{
-public:
-    template <class TypeInfoArrayType, class ConstructorInfoArrayType>
-    holds_array_view(TypeInfoArrayType& ti_arr,
-                     ConstructorInfoArrayType& ci_arr)
-        : view_(
-              array_pointer_selector<TypeInfoArrayType>::generate_view(ti_arr)),
-          ci_view_(
-              array_pointer_selector<ConstructorInfoArrayType>::generate_view(
-                  ci_arr))
-    {
-    }
-
-private:
-    helene::array_view<const shadow::type_info> view_;
-    helene::array_view<const shadow::constructor_info> ci_view_;
-};
-
-
 int
 main()
 {
-    std::cout << "\n\n";
-    holds_array_view a{myspace::type_info_array_holder::value,
-                       myspace::constructor_info_array_holder::value};
+    auto intobj = myspace::static_construct<int>(0);
+    auto aobj = myspace::static_construct<a>(0, 0.0);
+    auto bobj = myspace::static_construct<b>('a', a{0, 0.0});
+
+
+    std::istringstream intdata("10 11 12 23");
+
+    intdata >> intobj;
+    std::cout << intobj << '\n';
+    intdata >> intobj;
+    std::cout << intobj << '\n';
+    intdata >> intobj;
+    std::cout << intobj << '\n';
+    intdata >> intobj;
+    std::cout << intobj << '\n';
+
+    std::istringstream adata("{1000, 734.234}");
+
+    adata >> aobj;
+
+    std::cout << aobj << '\n';
+
+
+    std::istringstream bdata("{b, {232, 3.14}}");
+
+    bdata >> bobj;
+
+    std::cout << bobj;
 }
