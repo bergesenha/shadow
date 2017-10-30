@@ -361,6 +361,10 @@ generic_dereference_bind_point<void>(any&)
 
 } // namespace pointer_detail
 
+namespace serialization_detail
+{
+}
+
 } // namespace shadow
 
 #endif
