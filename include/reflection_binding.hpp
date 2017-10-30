@@ -370,8 +370,19 @@ generic_dereference_bind_point<void>(any&)
 namespace serialization_detail
 {
 
+
 template <class T, class = void>
 struct serialization_type_selector;
+
+template <>
+struct serialization_type_selector<wchar_t>;
+
+template <>
+struct serialization_type_selector<char16_t>;
+
+template <>
+struct serialization_type_selector<char32_t>;
+
 
 template <class T>
 struct serialization_type_selector<
@@ -411,23 +422,6 @@ struct serialization_type_selector<std::string>
 
         std::getline(in, value.get<std::string>(), '"');
 
-        return in;
-    }
-};
-
-
-template <>
-struct serialization_type_selector<void>
-{
-    static std::ostream&
-    serialize_dispatch(std::ostream& out, const any& value)
-    {
-        return out;
-    }
-
-    static std::istream&
-    deserialize_dispatch(std::istream& in, any& value)
-    {
         return in;
     }
 };
