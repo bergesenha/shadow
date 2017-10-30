@@ -58,4 +58,11 @@ main()
     adata >> aobj;
 
     std::cout << aobj << '\n';
+
+
+    std::istringstream bdata("{b, {232, 3.14}}");
+
+    bdata >> bobj;
+
+    std::cout << bobj;
 }
