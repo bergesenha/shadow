@@ -37,22 +37,25 @@ SHADOW_INIT()
 int
 main()
 {
-    auto intobj = myspace::static_construct<int>(112);
-    auto aobj = myspace::static_construct<a>(23, 345.146);
-    auto bobj = myspace::static_construct<b>('a', a{40, 23.653});
+    auto intobj = myspace::static_construct<int>(0);
+    auto aobj = myspace::static_construct<a>(0, 0.0);
+    auto bobj = myspace::static_construct<b>('a', a{0, 0.0});
 
+
+    std::istringstream intdata("10 11 12 23");
+
+    intdata >> intobj;
     std::cout << intobj << '\n';
+    intdata >> intobj;
+    std::cout << intobj << '\n';
+    intdata >> intobj;
+    std::cout << intobj << '\n';
+    intdata >> intobj;
+    std::cout << intobj << '\n';
+
+    std::istringstream adata("{1000, 734.234}");
+
+    adata >> aobj;
+
     std::cout << aobj << '\n';
-    std::cout << bobj << "\n\n\n";
-
-    std::istringstream data("10 11 12 23");
-
-    data >> intobj;
-    std::cout << intobj << '\n';
-    data >> intobj;
-    std::cout << intobj << '\n';
-    data >> intobj;
-    std::cout << intobj << '\n';
-    data >> intobj;
-    std::cout << intobj << '\n';
 }

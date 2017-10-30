@@ -95,10 +95,45 @@ operator>>(std::istream& in, object& obj)
                          return si.type_index == t_index &&
                                 std::string(si.name) == std::string("default");
                      });
+
     if(found != obj.manager_->serialization_info_view_.cend())
     {
         return found->deserialization_bind_point(in, obj.value_);
     }
+
+    in.ignore(std::numeric_limits<std::streamsize>::max(), '{');
+
+    auto mv_pair = obj.manager_->member_variables_by_class_type(obj.type());
+
+    if(std::distance(mv_pair.first, mv_pair.second) < 2)
+    {
+        std::for_each(
+            mv_pair.first, mv_pair.second, [&obj, &in](const auto& mv) {
+                auto value = obj.manager_->get_member_variable(obj, mv);
+                in >> value;
+                obj.manager_->set_member_variable(obj, mv, value);
+            });
+
+        in.ignore(std::numeric_limits<std::streamsize>::max(), '}');
+
+        return in;
+    }
+
+    std::for_each(
+        mv_pair.first, std::prev(mv_pair.second), [&obj, &in](const auto& mv) {
+            auto value = obj.manager_->get_member_variable(obj, mv);
+            in >> value;
+            obj.manager_->set_member_variable(obj, mv, value);
+            in.ignore(std::numeric_limits<std::streamsize>::max(), ',');
+        });
+
+    auto val =
+        obj.manager_->get_member_variable(obj, *(std::prev(mv_pair.second)));
+
+    in >> val;
+    obj.manager_->set_member_variable(obj, *(std::prev(mv_pair.second)), val);
+
+    in.ignore(std::numeric_limits<std::streamsize>::max(), '}');
 
     return in;
 }
