@@ -108,6 +108,15 @@ operator==(const member_variable_info& lhs, const member_variable_info& rhs)
 }
 
 
+struct serialization_info
+{
+    const char* name;
+    std::size_t type_index;
+    serialization_signature serialization_bind_point;
+    deserialization_signature deserialization_bind_point;
+};
+
+
 } // namespace shadow
 
 #endif
