@@ -6,7 +6,7 @@ project(shadow CXX)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-option(SHADOW_BUILD_TESTS "Build unit tests" ON)
+option(SHADOW_BUILD_TESTS "Build unit tests" OFF)
 
 add_subdirectory(external/metamusil)
 add_subdirectory(external/helene)
