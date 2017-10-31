@@ -2,6 +2,8 @@
 
 #include <shadow.hpp>
 #include <sstream>
+#include <vector>
+#include <algorithm>
 
 
 class tct1_class
@@ -787,6 +789,62 @@ TEST_CASE("test serialization and deserialization", "[operator<</>>]")
 
             CHECK(tct1_space3::get_held_value<tct1_struct2>(deserialized)
                       .the_struct.d == Approx(432.54));
+        }
+    }
+
+    SECTION("serialize a series of objects")
+    {
+        std::vector<shadow::object> objects;
+        objects.push_back(tct1_space3::static_construct<int>(22));
+        objects.push_back(tct1_space3::static_construct<tct1_struct>(10, 3.2));
+        objects.push_back(tct1_space3::static_construct<float>(42.5f));
+        objects.push_back(tct1_space3::static_construct<tct1_struct2>(
+            44ul, tct1_struct{63, 23.5}));
+
+        std::ostringstream out;
+
+        std::for_each(objects.cbegin(),
+                      objects.cend(),
+                      [&out](const auto& obj) { out << obj << ' '; });
+
+
+        SECTION("deserialize objects")
+        {
+            std::istringstream in(out.str());
+
+            std::vector<shadow::object> deserialized_objects;
+            deserialized_objects.push_back(
+                tct1_space3::static_construct<int>());
+            deserialized_objects.push_back(
+                tct1_space3::static_construct<tct1_struct>());
+            deserialized_objects.push_back(
+                tct1_space3::static_construct<float>());
+            deserialized_objects.push_back(
+                tct1_space3::static_construct<tct1_struct2>());
+
+            std::for_each(deserialized_objects.begin(),
+                          deserialized_objects.end(),
+                          [&in](auto& obj) { in >> obj; });
+
+            CHECK(tct1_space3::get_held_value<int>(deserialized_objects[0]) ==
+                  22);
+            CHECK(tct1_space3::get_held_value<tct1_struct>(
+                      deserialized_objects[1])
+                      .i == 10);
+            CHECK(tct1_space3::get_held_value<tct1_struct>(
+                      deserialized_objects[1])
+                      .d == Approx(3.2));
+            CHECK(tct1_space3::get_held_value<float>(deserialized_objects[2]) ==
+                  Approx(42.5f));
+            CHECK(tct1_space3::get_held_value<tct1_struct2>(
+                      deserialized_objects[3])
+                      .index == 44ul);
+            CHECK(tct1_space3::get_held_value<tct1_struct2>(
+                      deserialized_objects[3])
+                      .the_struct.i == 63);
+            CHECK(tct1_space3::get_held_value<tct1_struct2>(
+                      deserialized_objects[3])
+                      .the_struct.d == Approx(23.5));
         }
     }
 }
