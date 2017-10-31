@@ -487,3 +487,101 @@ shadow::object
 reflection_manager::convert(const conversion_tag& tag,
 const shadow::object& val) const;
 ```
+
+
+### Free Functions
+Free functions are queried and called with the following member functions of
+shadow::reflection_manager:
+```c++
+std::pair<const_free_function_iterator, const_free_function_iterator>
+reflection_manager::free_functions() const;
+
+std::string
+reflection_manager::free_function_name(const free_function_tag& tag) const;
+
+type_tag
+reflection_manager::free_function_return_type(const free_function_tag& tag) const;
+
+std::pair<const_indexed_type_iterator, const_indexed_type_iterator>
+reflection_manager::free_function_parameter_types(const free_function_tag& tag) const;
+
+template <class Iterator>
+shadow::object
+reflection_manager::call_free_function(const free_function_tag& tag,
+            Iterator first,
+            Iterator last) const;
+```
+
+If the arguments supplied through the range Iterator first -> last have types
+different from what is given by `free_function_parameter_types` an exception of
+the type `shadow::argument_error` is thrown (similar to calling constructors).
+In the case that the function is non-returning, the shadow::object returned has
+the type `void` when queried through `type()`.
+
+If the underlying function has out parameters in the form of non-const reference
+or pointer, the modified value will be passed back out through the Iterator
+range supplied.
+
+Shadow doesn't support holding pointers as values in shadow::objects or
+registering pointer types. Because of this, if a function requires a pointer
+parameter, you must pass a shadow::object of the value that a pointer would have
+pointed to. The address of the shadow::object is taken automatically by
+`call_free_function` in the case of pointer parameters. Any modification of the
+value is passed out through the supplied iterator range.
+
+
+### Member Functions
+Member functions are queried and called similarly to free functions, except that
+an object of the class owning the member function is supplied.
+```c++
+std::pair<const_member_function_iterator, const_member_function_iterator>
+reflection_manager::member_functions() const;
+
+std::pair<const_indexed_member_function_iterator, const_indexed_member_function_iterator>
+reflection_manager::member_functions_by_class_type(const type_tag& tag) const;
+
+type_tag
+reflection_manager::member_function_class_type(const member_function_tag& tag) const;
+
+std::string
+reflection_manager::member_function_name(const member_function_tag& tag) const;
+
+std::pair<const_indexed_type_iterator, const_indexed_type_iterator>
+reflection_manager::member_function_parameter_types(const member_function_tag& tag) const;
+```
+
+
+### Member Variables
+Member variables are queried with through the following member functions:
+```c++
+std::pair<const_member_variable_iterator, const_member_variable_iterator>
+reflection_manager::member_variables() const;
+
+std::pair<const_indexed_member_variable_iterator,
+          const_indexed_member_variable_iterator>
+reflection_manager::member_variables_by_class_type(const type_tag& tag) const;
+
+type_tag
+reflection_manager::member_variable_type(const member_variable_tag& tag) const;
+
+type_tag
+reflection_manager::member_variable_class_type(const member_variable_tag& tag) const;
+
+std::string
+reflection_managermember_variable_name(const member_variable_tag& tag) const;
+```
+
+Since member variables aren't held as `shadow::object`s in memory, we can't
+simply access them through a reference. Because of this, access is split into
+two member functions, one for setting and one for getting:
+```c++
+void
+reflection_manager::set_member_variable(object& obj,
+                         const member_variable_tag& tag,
+                         const object& val) const;
+
+shadow::object
+reflection_manager::get_member_variable(const object& obj,
+                           const member_variable_tag& tag) const;
+
+```
