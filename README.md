@@ -362,6 +362,12 @@ Queries generally return iterators to these tag types. Calls to mutate, call
 functions, construct objects etc... take these 'tag type' classes as an argument
 to identify which function, member variable etc... is used.
 
+To hold values of arbitrary types at runtime, Shadow uses the class
+`shadow::object`. It is similar to std::any or boost::any in that it uses type
+erasure to hold any type of object. In addition, `shadow::object` carries with
+it type/reflection information about the currently held value, in the form of a
+pointer to the information.
+
 ### Querying for Types
 ```c++
 std::pair<const_type_iterator, const_type_iterator>
@@ -407,4 +413,77 @@ auto found_constructor = std::find_if(constructors.first, constructors.second,
 // construct an object holding a mystruct instance
 shadow::object holds_mystruct =
     myspace::manager.construct_object(*found_constructor);
+```
+
+The above example additionally finds the default constructor for the type
+`mystruct` and uses it to construct an instance of it, returned within a
+`shadow::object`. Since there are no other values to use as arguments yet we
+demostrate with the default constructor.The
+`shadow::reflection_manager::constructo_object` above is an overload for calling
+default constructors. In general one would use the overload taking two
+additional arguments, templated for any kind of iterator that specify a range of
+shadow::objects to use as arguments. The arguments types (ie. the
+shadow::objects::type()) need to match the parameter types returned by:
+```c++
+std::pair<const_indexed_type_iterator, const_indexed_type_iterator>
+shadow::reflection_manager::constructor_parameter_types(
+        const constructor_tag& tag) const;
+```
+
+If the types don't match, or the wrong number of arguments are passed, an
+exception of type `shadow::argument_error` is thrown (prevents a segfault).
+
+### Types Known at Compile Time
+In addition to the facilites for constructing arbitrary objects at runtime,
+there are utility functions for constructing objects of type known at compile
+time. These utility functions are defined within the namespace where SHADOW_INIT
+is:
+```c++
+template <class T, class... Args>
+shadow::object
+yournamespace::static_construct(Args&&... args);
+
+template <class T>
+shadow::object
+yournamespace::static_make_object(T&& value);
+```
+
+static_construct lets you explicitly specify the type T and forwards the args to
+the constructor of T.
+static_make_object deduces the type T and takes an already existing object of
+type T. In both cases a shadow::object is returned. These functions will fail at
+compile time if the type T is not registered, however, the actual constructor
+invoked doesn't necessarily need to be registered.
+
+To access the value held within the shadow::object the following function
+templates can be used:
+```c++
+template <class T>
+T& yournamespace::get_held_value(shadow::object& obj);
+
+template <class T>
+const T& yournamespace::get_held_value(const shadow::object& obj);
+```
+
+If the value held by obj isn't of the type T, an exception of the type
+`shadow::type_error` is thrown.
+
+
+### Type Conversion at Runtime
+The reflection system has information about implicit conversions between
+registered types. For example, if your custom types has a non-explicit
+constructor with one parameter, the reflection system will pick up on the
+possible implicit conversion from the parameter type to the custom type.
+Conversion of values held in shadow::objects can be queried
+and invoked explicitly through:
+```c++
+std::pair<const_conversion_iterator, const_conversion_iterator>
+reflection_manager::conversions() const;
+
+std::pair<const_indexed_conversion_iterator, const_indexed_conversion_iterator>
+reflection_manager::conversions_by_from_type(const type_tag& tag) const;
+
+shadow::object
+reflection_manager::convert(const conversion_tag& tag,
+const shadow::object& val) const;
 ```
