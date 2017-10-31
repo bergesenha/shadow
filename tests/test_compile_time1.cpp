@@ -848,3 +848,20 @@ TEST_CASE("test serialization and deserialization", "[operator<</>>]")
         }
     }
 }
+
+TEST_CASE("construct shadow::objects using static_make_object",
+          "[static_make_object]")
+{
+    const auto& manager = tct1_space::manager;
+
+    auto intobj = tct1_space::static_make_object(1423);
+    auto structobj = tct1_space::static_make_object(tct1_struct{12, 43.2});
+
+    float f{23.53f};
+    auto floatobj = tct1_space::static_make_object(f);
+
+    CHECK(intobj.type().name() == std::string("int"));
+    CHECK(tct1_space::get_held_value<int>(intobj) == 1423);
+    CHECK(structobj.type().name() == std::string("tct1_struct"));
+    CHECK(floatobj.type().name() == std::string("float"));
+}
