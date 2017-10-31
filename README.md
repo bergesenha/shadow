@@ -604,3 +604,65 @@ reflection_manager::get_member_variable(const object& obj,
                            const member_variable_tag& tag) const;
 
 ```
+
+
+### Built-in Serialization
+Shadow overloads the stream operators for `shadow::object`. The format for
+fundamental types correspond to the operator<< overloads on std::ostream.
+
+```c++
+auto intobj = myspace::static_construct<int>(238);
+
+std::cout << intobj << '\n';
+```
+output:
+```
+238
+$
+```
+
+std::string corresponds to the usual stream overloads, except that the string is
+surrounded by double quotes:
+
+```c++
+auto stringobj = myspace::static_make_object(std::string("hello world"));
+
+std::cout << stringobj << '\n';
+```
+output:
+```
+"hello world"
+$
+```
+
+The format for custom types is a comma separated list of the member variables
+registered surrounded by curly braces:
+```c++
+auto mystructobj = myspace::static_construct<mystruct>(23.4, std::string("foo"));
+
+std::cout << mystructobj << '\n';
+```
+output:
+```
+{23.4, "foo"}
+$
+```
+
+If a member variable is also a custom type, it will be embedded recursively as
+an object within an object:
+ie
+```
+{101, {23.4, "foo"}, c}
+$
+```
+
+The same format can be deserialized to a shadow::object. The target
+shadow::object needs to have the right type matching the input stream:
+```c++
+std::istringstream in(std::string("{432.4, \"bar\"}"));
+
+in >> mystructobj;
+
+assert(myspace::get_held_value<mystruct>(mystructobj).d == Approx(432.4));
+assert(myspace::get_held_value<mystruct>(mystructobj).s == std::string("bar"));
+```
