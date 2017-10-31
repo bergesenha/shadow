@@ -16,6 +16,25 @@ where one could dynamically load objects and functions of unknown types from
 shared binary modules and interact with them in a meaningful way.
 
 
+## Cloning and Compiling
+Make sure to git clone with the --recursive option to pull in the libraries
+'helene' and 'metamusil' as submodules. Alternatively, clone in the normal way
+and the git submodule init and submodule update for each dependency.
+
+Shadow uses CMake as a build system. The root CMakeLists.txt specifies the
+library target 'shadow'. In your projects CMakeLists.txt, simply add:
+```cmake
+add_subdirectory(path/to/shadow_root)
+
+target_link_libraries(your_target shadow)
+```
+
+This also sets up the required include directories for you, so no need to
+explicitly target_include_directories(your_target etc...).
+
+It also respects the cmake variable BUILD_SHARED_LIBS, so the compiled part of
+Shadow will be built as a shared library if this is ON.
+
 ## Registering
 Before anything else you need to register the parts of your existing code that
 you wish to interact with through the reflection system and initialize the
