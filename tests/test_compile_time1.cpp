@@ -656,3 +656,137 @@ TEST_CASE("test constructors_by_type for tct1_struct",
     }
 }
 
+
+TEST_CASE("test serialization and deserialization", "[operator<</>>]")
+{
+    std::ostringstream out;
+
+    SECTION("serialize int")
+    {
+        auto intobj = tct1_space3::static_construct<int>(112);
+
+        out << intobj;
+
+        REQUIRE(out.str() == std::string("112"));
+
+        SECTION("deserialize to int")
+        {
+            auto deserialized_int = tct1_space3::static_construct<int>();
+            std::istringstream in(out.str());
+
+            in >> deserialized_int;
+
+            REQUIRE(tct1_space3::get_held_value<int>(deserialized_int) == 112);
+        }
+    }
+
+    SECTION("serialize float")
+    {
+        auto floatobj = tct1_space3::static_construct<float>(23.53f);
+
+        out << floatobj;
+
+        REQUIRE(out.str() == std::string("23.53"));
+
+        SECTION("deserialize float")
+        {
+            std::istringstream in(out.str());
+
+            auto desfloat = tct1_space3::static_construct<float>();
+
+            in >> desfloat;
+
+            REQUIRE(tct1_space3::get_held_value<float>(desfloat) ==
+                    Approx(23.53f));
+        }
+    }
+
+    SECTION("serialize std::string")
+    {
+        auto stringobj =
+            tct1_space3::static_construct<std::string>("hello world");
+
+        out << stringobj;
+
+        REQUIRE(out.str() == std::string("\"hello world\""));
+
+        SECTION("deserialize std::string")
+        {
+            std::istringstream in(out.str());
+
+            auto deserialized = tct1_space3::static_construct<std::string>();
+
+            in >> deserialized;
+
+            REQUIRE(tct1_space3::get_held_value<std::string>(deserialized) ==
+                    std::string("hello world"));
+        }
+    }
+
+    SECTION("serialize char")
+    {
+        auto charobj = tct1_space3::static_construct<char>('c');
+
+        out << charobj;
+
+        REQUIRE(out.str() == std::string("c"));
+
+        SECTION("deserialize char")
+        {
+            std::istringstream in(out.str());
+        }
+    }
+
+    SECTION("serialize tct1_struct")
+    {
+        auto tct1sobj = tct1_space3::static_construct<tct1_struct>(22, 23.1244);
+
+        out << tct1sobj;
+
+        REQUIRE(out.str() == std::string("{22, 23.1244}"));
+
+        SECTION("deserialize tct1_struct")
+        {
+            std::istringstream in(out.str());
+
+            auto deserialized = tct1_space3::static_construct<tct1_struct>();
+
+            in >> deserialized;
+
+            CHECK(tct1_space3::get_held_value<tct1_struct>(deserialized).i ==
+                  22);
+            CHECK(tct1_space3::get_held_value<tct1_struct>(deserialized).d ==
+                  Approx(23.1244));
+        }
+    }
+
+
+    SECTION("serialize tct1_struct2")
+    {
+        auto tct1s2obj = tct1_space3::static_construct<tct1_struct2>(
+            101ul, tct1_struct{12, 432.54});
+
+        out << tct1s2obj;
+
+        REQUIRE(out.str() == std::string("{101, {12, 432.54}}"));
+
+        SECTION("deserialize tct1_struct2")
+        {
+            std::istringstream in(out.str());
+
+            auto deserialized = tct1_space3::static_construct<tct1_struct2>();
+
+            in >> deserialized;
+
+            CHECK(
+                tct1_space3::get_held_value<tct1_struct2>(deserialized).index ==
+                101);
+
+            CHECK(tct1_space3::get_held_value<tct1_struct2>(deserialized)
+                      .the_struct.i == 12);
+
+            CHECK(tct1_space3::get_held_value<tct1_struct2>(deserialized)
+                      .the_struct.d == Approx(432.54));
+        }
+    }
+}
