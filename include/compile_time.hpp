@@ -929,7 +929,8 @@ using generate_array_of_serialization_info_t =
     shadow::object static_make_object(T&& value)                               \
     {                                                                          \
         constexpr auto t_index =                                               \
-            metamusil::t_list::index_of_type_v<type_universe, T>;              \
+            metamusil::t_list::index_of_type_v<type_universe,                  \
+                                               std::remove_reference_t<T>>;    \
         constexpr const shadow::type_info* t_info =                            \
             type_info_array_holder::value + t_index;                           \
         return shadow::object(                                                 \
