@@ -865,3 +865,44 @@ TEST_CASE("construct shadow::objects using static_make_object",
     CHECK(structobj.type().name() == std::string("tct1_struct"));
     CHECK(floatobj.type().name() == std::string("float"));
 }
+
+
+TEST_CASE("construct shadow::object with default constructors",
+          "[reflection_manager::construct_object]")
+{
+    const auto& manager = tct1_space::manager;
+
+    auto types = manager.types();
+
+    SECTION("find int type")
+    {
+        auto found =
+            std::find_if(types.first, types.second, [](const auto& tp) {
+                return tp.name() == std::string("int");
+            });
+
+        REQUIRE(found != types.second);
+
+        SECTION("find default constructor")
+        {
+            auto constructors = manager.constructors_by_type(*found);
+
+            auto found_constr = std::find_if(
+                constructors.first, constructors.second, [](const auto& ctr) {
+                    auto params =
+                        tct1_space::manager.constructor_parameter_types(ctr);
+                    return std::distance(params.first, params.second) == 0;
+                });
+
+            REQUIRE(found_constr != constructors.second);
+
+            SECTION("call default constructor")
+            {
+                auto res = manager.construct_object(*found_constr);
+
+                REQUIRE(res.type().name() == std::string("int"));
+                CHECK(tct1_space::get_held_value<int>(res) == 0);
+            }
+        }
+    }
+}
