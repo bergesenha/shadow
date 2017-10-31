@@ -122,6 +122,8 @@ public:
                             Iterator first,
                             Iterator last) const;
 
+    object construct_object(const constructor_tag& tag) const;
+
 
     // type conversion functions
     std::pair<const_conversion_iterator, const_conversion_iterator>

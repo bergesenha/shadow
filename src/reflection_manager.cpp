@@ -70,6 +70,19 @@ reflection_manager::constructor_parameter_types(
             tag.info_ptr_->num_parameters, index_buffer, data_buffer));
 }
 
+object
+reflection_manager::construct_object(const constructor_tag& tag) const
+{
+    if(tag.info_ptr_->num_parameters != 0)
+    {
+        throw std::runtime_error("wrong number of arguments");
+    }
+
+    return object(tag.info_ptr_->bind_point(nullptr),
+                  type_info_view_.data() + tag.info_ptr_->type_index,
+                  this);
+}
+
 bool
 reflection_manager::compare_type(const type_tag& tag, std::size_t index) const
 {
