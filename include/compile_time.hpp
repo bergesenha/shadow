@@ -926,6 +926,17 @@ using generate_array_of_serialization_info_t =
     }                                                                          \
                                                                                \
     template <class T>                                                         \
+    shadow::object static_make_object(T&& value)                               \
+    {                                                                          \
+        constexpr auto t_index =                                               \
+            metamusil::t_list::index_of_type_v<type_universe, T>;              \
+        constexpr const shadow::type_info* t_info =                            \
+            type_info_array_holder::value + t_index;                           \
+        return shadow::object(                                                 \
+            shadow::any(std::forward<T>(value)), t_info, &manager);            \
+    }                                                                          \
+                                                                               \
+    template <class T>                                                         \
     T& get_held_value(shadow::object& obj)                                     \
     {                                                                          \
         constexpr auto T_index =                                               \
