@@ -1,5 +1,7 @@
 #include "reflection_manager.hpp"
 
+#include "exceptions.hpp"
+
 
 namespace shadow
 {
@@ -75,7 +77,7 @@ reflection_manager::construct_object(const constructor_tag& tag) const
 {
     if(tag.info_ptr_->num_parameters != 0)
     {
-        throw std::runtime_error("wrong number of arguments");
+        throw argument_error("wrong number of arguments");
     }
 
     return object(tag.info_ptr_->bind_point(nullptr),
@@ -101,7 +103,7 @@ reflection_manager::index_of_type(const type_tag& tag) const
 
     if(found == type_info_view_.cend())
     {
-        throw std::runtime_error("type not registered in reflection_manager");
+        throw type_error("type not registered in reflection_manager");
     }
 
     return found - type_info_view_.cbegin();
@@ -157,8 +159,7 @@ reflection_manager::convert(const conversion_tag& tag, const object& val) const
 {
     if(val.type() != type_tag(type_info_view_[tag.info_ptr_->from_type_index]))
     {
-        throw std::runtime_error(
-            "type of object doesn't match conversion binding");
+        throw type_error("type of object doesn't match conversion binding");
     }
 
     return object(tag.info_ptr_->bind_point(val.value_),
@@ -208,7 +209,7 @@ reflection_manager::call_free_function(const free_function_tag& tag) const
 {
     if(tag.info_ptr_->num_parameters != 0)
     {
-        throw std::runtime_error("wrong number of arguments");
+        throw argument_error("wrong number of arguments");
     }
 
     return object(tag.info_ptr_->bind_point(nullptr),
@@ -279,12 +280,12 @@ reflection_manager::call_member_function(object& obj,
 {
     if(tag.info_ptr_->num_parameters != 0)
     {
-        throw std::runtime_error("wrong number of arguments");
+        throw argument_error("wrong number of arguments");
     }
 
     if(!check_member_class_type(obj, *tag.info_ptr_))
     {
-        throw std::runtime_error("wrong class type for member function");
+        throw type_error("wrong class type for member function");
     }
 
     return object(tag.info_ptr_->bind_point(obj.value_, nullptr),
@@ -349,13 +350,12 @@ reflection_manager::set_member_variable(object& obj,
 {
     if(val.type() != member_variable_type(tag))
     {
-        throw std::runtime_error(
-            "attempting to set member variable of wrong type");
+        throw type_error("attempting to set member variable of wrong type");
     }
 
     if(obj.type() != member_variable_class_type(tag))
     {
-        throw std::runtime_error(
+        throw type_error(
             "attempting to set member variable belonging to wrong class");
     }
 
@@ -369,8 +369,8 @@ reflection_manager::get_member_variable(const object& obj,
 {
     if(obj.type() != member_variable_class_type(tag))
     {
-        throw std::runtime_error(
-            "attempting to set member variable belonging to wrong class");
+        throw type_error(
+            "attempting to get member variable belonging to wrong class");
     }
 
     return object(tag.info_ptr_->get_bind_point(obj.value_),
