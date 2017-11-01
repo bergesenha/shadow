@@ -81,6 +81,12 @@ triple(int& i)
     i *= 3;
 }
 
+int
+make_number()
+{
+    return 4248;
+}
+
 namespace tct1_space
 {
 REGISTER_TYPE_BEGIN()
@@ -95,6 +101,7 @@ REGISTER_CONSTRUCTOR(tct1_struct, int)
 REGISTER_CONSTRUCTOR(tct1_struct, int, double)
 
 REGISTER_FREE_FUNCTION(extract_i)
+REGISTER_FREE_FUNCTION(make_number)
 
 REGISTER_MEMBER_VARIABLE(tct1_struct, d)
 REGISTER_MEMBER_VARIABLE(tct1_struct, i)
@@ -904,5 +911,35 @@ TEST_CASE("construct shadow::object with default constructors",
                 CHECK(tct1_space::get_held_value<int>(res) == 0);
             }
         }
+    }
+}
+
+
+TEST_CASE("call free function taking no arguments",
+          "[reflection_manager::call_free_function")
+{
+    const auto& manager = tct1_space::manager;
+
+    auto funs = manager.free_functions();
+
+    auto found =
+        std::find_if(funs.first, funs.second, [&manager](const auto& ff) {
+
+            auto params = manager.free_function_parameter_types(ff);
+
+            return manager.free_function_name(ff) ==
+                       std::string("make_number") &&
+                   std::distance(params.first, params.second) == 0;
+
+        });
+
+    REQUIRE(found != funs.second);
+
+    SECTION("call the function")
+    {
+        auto res = manager.call_free_function(*found);
+
+        REQUIRE(res.type().name() == std::string("int"));
+        REQUIRE(tct1_space::get_held_value<int>(res) == 4248);
     }
 }
