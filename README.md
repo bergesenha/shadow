@@ -17,6 +17,9 @@ shared binary modules and interact with them in a meaningful way.
 
 
 ## Cloning and Compiling
+Shadow has been tested on Linux with clang and gcc. Currently, Shadow does not
+build with msvc on Windows, however, using Visual Studio with clang should work.
+
 Make sure to git clone with the --recursive option to pull in the libraries
 'helene' and 'metamusil' as submodules. Alternatively, clone in the normal way
 and the git submodule init and submodule update for each dependency.
