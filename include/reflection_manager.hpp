@@ -9,6 +9,7 @@
 #include "reflection_info.hpp"
 #include "api_types.hpp"
 #include "info_iterators.hpp"
+#include "exceptions.hpp"
 
 namespace shadow
 {
@@ -447,7 +448,7 @@ reflection_manager::construct_object(const constructor_tag& tag,
 {
     if(check_arguments(first, last, *tag.info_ptr_) == false)
     {
-        throw std::runtime_error("wrong argument types");
+        throw argument_error("wrong argument types");
     }
 
     std::vector<any> arg_vec;
@@ -485,7 +486,7 @@ reflection_manager::call_free_function(const free_function_tag& tag,
 {
     if(!check_arguments(first, last, *tag.info_ptr_))
     {
-        throw std::runtime_error(
+        throw argument_error(
             "attempting to call free function with arguments of wrong type");
     }
 
@@ -514,7 +515,7 @@ reflection_manager::call_member_function(object& obj,
 {
     if(!check_arguments(first, last, *tag.info_ptr_))
     {
-        throw std::runtime_error(
+        throw argument_error(
             "attempting to call member function with arguments of wrong type");
     }
 

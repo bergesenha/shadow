@@ -11,6 +11,7 @@
 
 #include "reflection_info.hpp"
 #include "reflection_manager.hpp"
+#include "exceptions.hpp"
 
 
 namespace shadow
@@ -946,7 +947,7 @@ using generate_array_of_serialization_info_t =
         if(obj.type() !=                                                       \
            shadow::type_tag(type_info_array_holder::value[T_index]))           \
         {                                                                      \
-            throw std::runtime_error(                                          \
+            throw shadow::type_error(                                          \
                 "attempt to get value of wrong underlying type");              \
         }                                                                      \
                                                                                \
@@ -962,7 +963,7 @@ using generate_array_of_serialization_info_t =
         if(obj.type() !=                                                       \
            shadow::type_tag(type_info_array_holder::value[T_index]))           \
         {                                                                      \
-            throw std::runtime_error(                                          \
+            throw shadow::type_error(                                          \
                 "attempt to get value of wrong underlying type");              \
         }                                                                      \
                                                                                \
