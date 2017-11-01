@@ -253,6 +253,26 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                             tct1_space::manager.call_free_function(*ff_found),
                             shadow::argument_error);
                     }
+
+                    SECTION("attempt to call it with wrong number of arguments")
+                    {
+                        std::vector<shadow::object> args{res, res, res};
+
+                        CHECK_THROWS_AS(
+                            tct1_space::manager.call_free_function(
+                                *ff_found, args.begin(), args.end()),
+                            shadow::argument_error);
+                    }
+
+                    SECTION("attempt to call it with wrong type of argument")
+                    {
+                        auto wrong_arg = tct1_space::static_make_object(23.5f);
+
+                        CHECK_THROWS_AS(
+                            tct1_space::manager.call_free_function(
+                                *ff_found, &wrong_arg, &wrong_arg + 1),
+                            shadow::argument_error);
+                    }
                 }
             }
         }
@@ -430,13 +450,24 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                 {
                     auto obj = tct1_space2::static_construct<tct1_class>(33);
 
-                    std::vector<shadow::object> args;
 
                     auto res =
                         tct1_space2::manager.call_member_function(obj, *found);
 
                     REQUIRE(res.type().name() == std::string("int"));
                     REQUIRE(tct1_space2::get_held_value<int>(res) == 33);
+                }
+
+                SECTION("attempt to call with wrong number of arguments")
+                {
+                    auto obj = tct1_space2::static_construct<tct1_class>(33);
+                    std::vector<shadow::object> args{
+                        tct1_space2::static_make_object(10),
+                        tct1_space2::static_make_object(100ul)};
+
+                    CHECK_THROWS_AS(tct1_space2::manager.call_member_function(
+                                        obj, *found, args.begin(), args.end()),
+                                    shadow::argument_error);
                 }
             }
         }
@@ -460,6 +491,15 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                 CHECK_THROWS_AS(
                     tct1_space2::manager.call_member_function(obj, *found),
                     shadow::argument_error);
+            }
+
+            SECTION("attempt to call it with wrong argument")
+            {
+                auto obj = tct1_space2::static_construct<tct1_class>(33);
+                std::vector<shadow::object> args{obj, obj};
+                CHECK_THROWS_AS(tct1_space::manager.call_member_function(
+                                    obj, *found, args.begin(), args.end()),
+                                shadow::argument_error);
             }
         }
 
