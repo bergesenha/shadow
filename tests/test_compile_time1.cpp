@@ -890,9 +890,9 @@ TEST_CASE("construct shadow::object with default constructors",
 
         REQUIRE(found != types.second);
 
+        auto constructors = manager.constructors_by_type(*found);
         SECTION("find default constructor")
         {
-            auto constructors = manager.constructors_by_type(*found);
 
             auto found_constr = std::find_if(
                 constructors.first, constructors.second, [](const auto& ctr) {
@@ -909,6 +909,30 @@ TEST_CASE("construct shadow::object with default constructors",
 
                 REQUIRE(res.type().name() == std::string("int"));
                 CHECK(tct1_space::get_held_value<int>(res) == 0);
+            }
+        }
+
+        SECTION("find constructor taking int")
+        {
+            auto found_constr = std::find_if(
+                constructors.first, constructors.second, [](const auto& ctr) {
+                    auto params =
+                        tct1_space::manager.constructor_parameter_types(ctr);
+
+                    if(std::distance(params.first, params.second) == 1)
+                    {
+                        return params.first->name() == std::string("int");
+                    }
+                    return false;
+                });
+
+            REQUIRE(found_constr != constructors.second);
+
+            SECTION("attempt to call it as default constructor")
+            {
+                CHECK_THROWS_AS(
+                    tct1_space::manager.construct_object(*found_constr),
+                    shadow::argument_error);
             }
         }
     }
