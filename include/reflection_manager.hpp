@@ -160,6 +160,8 @@ public:
                               Iterator first,
                               Iterator last) const;
 
+    object call_free_function(const free_function_tag& tag) const;
+
 
     // return all available member functions
     std::pair<const_member_function_iterator, const_member_function_iterator>
@@ -181,6 +183,9 @@ public:
                                 const member_function_tag& tag,
                                 Iterator first,
                                 Iterator last) const;
+
+    object call_member_function(object& obj,
+                                const member_function_tag& tag) const;
 
 
     std::pair<const_member_variable_iterator, const_member_variable_iterator>
@@ -215,6 +220,9 @@ private:
     template <class Iterator, class InfoType>
     bool
     check_arguments(Iterator first, Iterator last, const InfoType& info) const;
+
+    template <class InfoType>
+    bool check_member_class_type(const object& obj, const InfoType& info) const;
 
     bool compare_type(const type_tag& tag, std::size_t index) const;
 
@@ -349,6 +357,15 @@ reflection_manager::check_arguments(Iterator first,
     }
 
     return true;
+}
+
+
+template <class InfoType>
+inline bool
+reflection_manager::check_member_class_type(const object& obj,
+                                            const InfoType& info) const
+{
+    return index_of_object(obj) == info.object_type_index;
 }
 
 
