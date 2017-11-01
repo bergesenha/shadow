@@ -402,8 +402,8 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
 
                     std::vector<shadow::object> args;
 
-                    auto res = tct1_space2::manager.call_member_function(
-                        obj, *found, args.begin(), args.end());
+                    auto res =
+                        tct1_space2::manager.call_member_function(obj, *found);
 
                     REQUIRE(res.type().name() == std::string("int"));
                     REQUIRE(tct1_space2::get_held_value<int>(res) == 33);
