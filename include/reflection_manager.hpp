@@ -160,6 +160,8 @@ public:
                               Iterator first,
                               Iterator last) const;
 
+    object call_free_function(const free_function_tag& tag) const;
+
 
     // return all available member functions
     std::pair<const_member_function_iterator, const_member_function_iterator>

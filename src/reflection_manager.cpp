@@ -203,6 +203,19 @@ reflection_manager::free_function_parameter_types(
                                     type_info_view_.data()));
 }
 
+object
+reflection_manager::call_free_function(const free_function_tag& tag) const
+{
+    if(tag.info_ptr_->num_parameters != 0)
+    {
+        throw std::runtime_error("wrong number of arguments");
+    }
+
+    return object(tag.info_ptr_->bind_point(nullptr),
+                  type_info_view_.data() + tag.info_ptr_->return_type_index,
+                  this);
+}
+
 
 std::pair<reflection_manager::const_member_function_iterator,
           reflection_manager::const_member_function_iterator>
