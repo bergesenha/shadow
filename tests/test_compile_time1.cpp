@@ -246,8 +246,38 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                         REQUIRE(ff_res.type().name() == std::string("int"));
                         REQUIRE(tct1_space::get_held_value<int>(ff_res) == 23);
                     }
+
+                    SECTION("attempt to call it with no arguments")
+                    {
+                        CHECK_THROWS_AS(
+                            tct1_space::manager.call_free_function(*ff_found),
+                            shadow::argument_error);
+                    }
                 }
             }
+        }
+
+        SECTION(
+            "attempt to construct a tct1_class with wrong number of arguments")
+        {
+            std::vector<shadow::object> args{
+                tct1_space2::static_make_object(110),
+                tct1_space2::static_make_object(30)};
+
+            CHECK_THROWS_AS(tct1_space2::manager.construct_object(
+                                *found, args.begin(), args.end()),
+                            shadow::argument_error);
+        }
+
+        SECTION(
+            "attempt to construct a tct1_class with wrong number of arguments")
+        {
+            std::vector<shadow::object> args{
+                tct1_space2::static_make_object(110.5)};
+
+            CHECK_THROWS_AS(tct1_space2::manager.construct_object(
+                                *found, args.begin(), args.end()),
+                            shadow::argument_error);
         }
     }
 
@@ -408,6 +438,28 @@ TEST_CASE("create an int using static_construct", "[static_construct]")
                     REQUIRE(res.type().name() == std::string("int"));
                     REQUIRE(tct1_space2::get_held_value<int>(res) == 33);
                 }
+            }
+        }
+
+        SECTION("find member function with arguments")
+        {
+            auto found =
+                std::find_if(mfs.first, mfs.second, [](const auto& mf) {
+                    auto params =
+                        tct1_space2::manager.member_function_parameter_types(
+                            mf);
+
+                    return std::distance(params.first, params.second) > 0;
+                });
+
+            REQUIRE(found != mfs.second);
+
+            SECTION("attempt to call it with no arguments")
+            {
+                auto obj = tct1_space2::static_construct<tct1_class>(33);
+                CHECK_THROWS_AS(
+                    tct1_space2::manager.call_member_function(obj, *found),
+                    shadow::argument_error);
             }
         }
 
