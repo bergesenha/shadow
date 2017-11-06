@@ -7,6 +7,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(SHADOW_BUILD_TESTS "Build unit tests" OFF)
+option(SHADOW_BUILD_EXAMPLES "Build examples" OFF)
 
 add_subdirectory(external/metamusil)
 add_subdirectory(external/helene)
@@ -51,3 +52,7 @@ if(SHADOW_BUILD_TESTS)
         PRIVATE external/Catch/include/
         )
 endif(SHADOW_BUILD_TESTS)
+
+if(SHADOW_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif(SHADOW_BUILD_EXAMPLES)
