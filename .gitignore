@@ -13,3 +13,5 @@ Session.vim
 *.srctrlbm
 *.srctrldb
 *.srctrlprj
+build_gcc_release/
+build_ubsan/
