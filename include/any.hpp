@@ -17,6 +17,7 @@ class holder_base
 {
 public:
     virtual holder_base* clone() const = 0;
+    virtual void placement_clone(holder_base* buffer) const = 0;
     virtual ~holder_base() = default;
 };
 
@@ -40,6 +41,12 @@ public:
         return new holder(value_);
     }
 
+    virtual void
+    placement_clone(holder_base* buffer) const override
+    {
+        new(buffer) holder(value_);
+    }
+
 private:
     T value_;
 };
@@ -54,6 +61,12 @@ public:
     clone() const override
     {
         return new holder();
+    }
+
+    virtual void
+    placement_clone(holder_base* buffer) const override
+    {
+        new(buffer) holder();
     }
 };
 
