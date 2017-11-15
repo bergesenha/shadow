@@ -67,9 +67,7 @@ struct return_type_specializer
     {
         // necessary to remove reference from types as any only stores
         // unqualified types, ie values only
-        return FunctionPointerValue(
-            argument_array[ArgSeq]
-                .get<typename std::remove_reference_t<ArgTypes>>()...);
+        return FunctionPointerValue(argument_array[ArgSeq].get<ArgTypes>()...);
     }
 };
 
@@ -91,9 +89,7 @@ struct return_type_specializer<void>
     {
         // necessary to remove reference from types as any only stores
         // unqualified types, ie values only
-        FunctionPointerValue(
-            argument_array[ArgSeq]
-                .get<typename std::remove_reference_t<ArgTypes>>()...);
+        FunctionPointerValue(argument_array[ArgSeq].get<ArgTypes>()...);
 
         // return empty any, ie 'void'
         return any();
