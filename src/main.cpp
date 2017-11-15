@@ -31,6 +31,16 @@ void void_fun()
 {
 }
 
+double mult(int n, const double& d)
+{
+    return n * d;
+}
+
+double mult(double n, const double& d)
+{
+    return n * d;
+}
+
 namespace myspace
 {
 REGISTER_TYPE_BEGIN()
@@ -41,6 +51,9 @@ REGISTER_TYPE_END()
 REGISTER_FREE_FUNCTION(get_i)
 REGISTER_FREE_FUNCTION(long_function)
 REGISTER_FREE_FUNCTION(void_fun)
+
+REGISTER_FREE_FUNCTION_EXPLICIT(mult, double, int, const double&)
+REGISTER_FREE_FUNCTION_EXPLICIT(mult, double, double, const double&)
 
 REGISTER_MEMBER_VARIABLE(a, i)
 REGISTER_MEMBER_VARIABLE(a, d)

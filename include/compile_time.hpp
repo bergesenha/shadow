@@ -652,25 +652,17 @@ using generate_array_of_serialization_info_t =
                                                                                \
         typedef return_type (*function_pointer_type)(__VA_ARGS__);             \
                                                                                \
-        static const std::size_t return_type_index =                           \
-            metamusil::t_list::index_of_type_v<type_universe, return_type>;    \
+        typedef shadow::generate_type_description<return_type, type_universe>  \
+            return_type_description_holder;                                    \
                                                                                \
         typedef metamusil::t_list::type_list<__VA_ARGS__> parameter_list;      \
                                                                                \
-        typedef metamusil::t_list::type_transform_t<parameter_list,            \
-                                                    metamusil::base_t>         \
-            base_parameter_list;                                               \
+        static const std::size_t num_parameters =                              \
+            metamusil::t_list::length_v<parameter_list>;                       \
                                                                                \
-        typedef metamusil::t_list::order_t<base_parameter_list, type_universe> \
-            parameter_index_sequence;                                          \
-                                                                               \
-        typedef metamusil::int_seq::integer_sequence_to_array<                 \
-            parameter_index_sequence>                                          \
-            parameter_type_indices_holder;                                     \
-                                                                               \
-        typedef metamusil::t_list::value_transform<parameter_list,             \
-                                                   std::is_pointer>            \
-            parameter_pointer_flags_holder;                                    \
+        typedef shadow::generate_array_of_type_descriptions<parameter_list,    \
+                                                            type_universe>     \
+            parameter_type_descriptions_holder;                                \
                                                                                \
         static constexpr shadow::free_function_binding_signature bind_point =  \
             &shadow::free_function_detail::generic_free_function_bind_point<   \
