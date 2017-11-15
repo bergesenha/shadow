@@ -928,72 +928,7 @@ using generate_array_of_serialization_info_t =
         conversion_info_array_holder;                                          \
                                                                                \
     typedef shadow::generate_array_of_serialization_info_t<type_universe>      \
-        default_serialization_info_array_holder;                               \
-                                                                               \
-                                                                               \
-    const shadow::reflection_manager manager{                                  \
-        type_info_array_holder::value,                                         \
-        constructor_info_array_holder::value,                                  \
-        conversion_info_array_holder::value,                                   \
-        free_function_info_array_holder::value,                                \
-        member_function_info_array_holder::value,                              \
-        member_variable_info_array_holder::value,                              \
-        default_serialization_info_array_holder::value};                       \
-                                                                               \
-    template <class T, class... Args>                                          \
-    shadow::object static_construct(Args&&... args)                            \
-    {                                                                          \
-        constexpr auto t_index =                                               \
-            metamusil::t_list::index_of_type_v<type_universe, T>;              \
-        constexpr const shadow::type_info* t_info =                            \
-            type_info_array_holder::value + t_index;                           \
-        return shadow::object(                                                 \
-            shadow::any(T{std::forward<Args>(args)...}), t_info, &manager);    \
-    }                                                                          \
-                                                                               \
-    template <class T>                                                         \
-    shadow::object static_make_object(T&& value)                               \
-    {                                                                          \
-        constexpr auto t_index =                                               \
-            metamusil::t_list::index_of_type_v<type_universe,                  \
-                                               metamusil::base_t<T>>;          \
-        constexpr const shadow::type_info* t_info =                            \
-            type_info_array_holder::value + t_index;                           \
-        return shadow::object(                                                 \
-            shadow::any(std::forward<T>(value)), t_info, &manager);            \
-    }                                                                          \
-                                                                               \
-    template <class T>                                                         \
-    T& get_held_value(shadow::object& obj)                                     \
-    {                                                                          \
-        constexpr auto T_index =                                               \
-            metamusil::t_list::index_of_type_v<type_universe, T>;              \
-                                                                               \
-        if(obj.type() !=                                                       \
-           shadow::type_tag(type_info_array_holder::value[T_index]))           \
-        {                                                                      \
-            throw shadow::type_error(                                          \
-                "attempt to get value of wrong underlying type");              \
-        }                                                                      \
-                                                                               \
-        return manager.get<T>(obj);                                            \
-    }                                                                          \
-                                                                               \
-    template <class T>                                                         \
-    const T& get_held_value(const shadow::object& obj)                         \
-    {                                                                          \
-        constexpr auto T_index =                                               \
-            metamusil::t_list::index_of_type_v<type_universe, T>;              \
-                                                                               \
-        if(obj.type() !=                                                       \
-           shadow::type_tag(type_info_array_holder::value[T_index]))           \
-        {                                                                      \
-            throw shadow::type_error(                                          \
-                "attempt to get value of wrong underlying type");              \
-        }                                                                      \
-                                                                               \
-        return manager.get<T>(obj);                                            \
-    }
+        default_serialization_info_array_holder;
 
 
 #endif
