@@ -71,10 +71,9 @@ operator==(const conversion_info& lhs, const conversion_info& rhs)
 struct free_function_info
 {
     const char* name;
-    std::size_t return_type_index;
+    const type_description* return_type;
     std::size_t num_parameters;
-    const std::size_t* parameter_type_indices;
-    const bool* parameter_pointer_flags;
+    const type_description* parameter_types;
     free_function_binding_signature bind_point;
 };
 
