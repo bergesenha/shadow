@@ -10,7 +10,6 @@
 #include <type_list.hpp>
 
 #include "reflection_info.hpp"
-#include "reflection_manager.hpp"
 #include "exceptions.hpp"
 
 

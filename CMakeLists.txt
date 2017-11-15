@@ -12,19 +12,14 @@ option(SHADOW_BUILD_EXAMPLES "Build examples" OFF)
 add_subdirectory(external/metamusil)
 add_subdirectory(external/helene)
 
-set(SHADOW_SRC
-    src/api_types.cpp
-    src/reflection_manager.cpp
-    )
 
-add_library(shadow ${SHADOW_SRC})
-target_link_libraries(shadow PRIVATE metamusil PRIVATE helene INTERFACE
+add_library(shadow INTERFACE)
+target_link_libraries(shadow INTERFACE
     metamusil INTERFACE helene)
 target_compile_features(shadow 
     INTERFACE cxx_std_14)
 target_include_directories(shadow
     INTERFACE include/
-    PRIVATE include/
     )
 
 add_executable(main src/main.cpp)
