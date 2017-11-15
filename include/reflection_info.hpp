@@ -5,11 +5,14 @@
 #include <cstddef>
 #include <string>
 
+#include <type_descriptor.hpp>
+
 #include "reflection_binding.hpp"
 
 
 namespace shadow
 {
+// info about the base type
 struct type_info
 {
     const char* name;
@@ -23,6 +26,15 @@ operator==(const type_info& lhs, const type_info& rhs)
 {
     return std::string(lhs.name) == std::string(rhs.name);
 }
+
+typedef metamusil::t_descriptor::type_tag type_attribute;
+
+// info about of type and its qualifiers and modifiers
+struct type_description
+{
+    std::size_t type_index;
+    const type_attribute* attributes;
+};
 
 
 struct constructor_info
