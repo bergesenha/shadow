@@ -215,10 +215,9 @@ struct extract_free_function_info
 {
     static constexpr shadow::free_function_info value = {
         CTFFI::name,
-        CTFFI::return_type_index,
-        metamusil::t_list::length_v<typename CTFFI::parameter_list>,
-        CTFFI::parameter_type_indices_holder::value,
-        CTFFI::parameter_pointer_flags_holder::value,
+        &CTFFI::return_type_description_holder::value,
+        CTFFI::num_parameters,
+        CTFFI::parameter_type_descriptions_holder::value,
         CTFFI::bind_point};
 };
 
@@ -619,28 +618,21 @@ using generate_array_of_serialization_info_t =
                                                                                \
         typedef decltype(&function_name) function_pointer_type;                \
                                                                                \
-        static const std::size_t return_type_index =                           \
-            metamusil::t_list::index_of_type_v<                                \
-                type_universe,                                                 \
-                metamusil::deduce_return_type_t<function_pointer_type>>;       \
+        typedef metamusil::deduce_return_type_t<function_pointer_type>         \
+            return_type;                                                       \
                                                                                \
         typedef metamusil::deduce_parameter_types_t<function_pointer_type>     \
             parameter_list;                                                    \
                                                                                \
-        typedef metamusil::t_list::type_transform_t<parameter_list,            \
-                                                    metamusil::base_t>         \
-            base_parameter_list;                                               \
+        typedef shadow::generate_type_description<return_type, type_universe>  \
+            return_type_description_holder;                                    \
                                                                                \
-        typedef metamusil::t_list::order_t<base_parameter_list, type_universe> \
-            parameter_index_sequence;                                          \
+        static const std::size_t num_parameters =                              \
+            metamusil::t_list::length_v<parameter_list>;                       \
                                                                                \
-        typedef metamusil::int_seq::integer_sequence_to_array<                 \
-            parameter_index_sequence>                                          \
-            parameter_type_indices_holder;                                     \
-                                                                               \
-        typedef metamusil::t_list::value_transform<parameter_list,             \
-                                                   std::is_pointer>            \
-            parameter_pointer_flags_holder;                                    \
+        typedef shadow::generate_array_of_type_descriptions<parameter_list,    \
+                                                            type_universe>     \
+            parameter_type_descriptions_holder;                                \
                                                                                \
         static constexpr shadow::free_function_binding_signature bind_point =  \
             &shadow::free_function_detail::generic_free_function_bind_point<   \

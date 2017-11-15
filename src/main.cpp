@@ -16,6 +16,17 @@ struct b
     a value;
 };
 
+int&
+get_i(a& aa)
+{
+    return aa.i;
+}
+
+void
+long_function(int i, const int& ii, int* iii)
+{
+}
+
 namespace myspace
 {
 REGISTER_TYPE_BEGIN()
@@ -23,6 +34,8 @@ REGISTER_TYPE(a)
 REGISTER_TYPE(b)
 REGISTER_TYPE_END()
 
+REGISTER_FREE_FUNCTION(get_i)
+REGISTER_FREE_FUNCTION(long_function)
 
 REGISTER_MEMBER_VARIABLE(a, i)
 REGISTER_MEMBER_VARIABLE(a, d)
@@ -34,17 +47,12 @@ SHADOW_INIT()
 } // namespace myspace
 
 
-typedef shadow::generate_array_of_type_descriptions<
-    metamusil::t_list::type_list<int, const int&, double*>,
-    myspace::type_universe>
-    type_description_array_holder;
-
-
-void p(const shadow::type_description& desc)
+void
+p(const shadow::type_description& desc)
 {
     std::cout << myspace::type_name_array_holder::value[desc.type_index] << ' ';
 
-    for(auto i = 0ul ; i < desc.num_attributes; ++i)
+    for(auto i = 0ul; i < desc.num_attributes; ++i)
     {
         auto att = desc.attributes[i];
 
@@ -67,8 +75,13 @@ void p(const shadow::type_description& desc)
 int
 main()
 {
-    for(const auto& i : type_description_array_holder::value)
+    auto ffinfo = shadow::extract_free_function_info<
+        myspace::compile_time_ff_info<38>>::value;
+
+    std::cout << ffinfo.name << '\n';
+    p(*ffinfo.return_type);
+    for(auto i = 0ul ; i < ffinfo.num_parameters ; ++i)
     {
-        p(i);
+        p(ffinfo.parameter_types[i]);
     }
 }
