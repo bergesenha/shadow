@@ -192,6 +192,24 @@ constexpr type_description generate_type_description_v =
     generate_type_description<T, AllTypesList>::value;
 
 
+// generate array of type_descriptions from type_list
+template <class TypesList, class AllTypesList>
+struct generate_array_of_type_descriptions;
+
+template <class... Types, class AllTypesList>
+struct generate_array_of_type_descriptions<
+    metamusil::t_list::type_list<Types...>,
+    AllTypesList>
+{
+    static constexpr const type_description value[] = {
+        generate_type_description_v<Types, AllTypesList>...};
+};
+
+template <class... Types, class AllTypesList>
+constexpr const type_description
+    generate_array_of_type_descriptions<metamusil::t_list::type_list<Types...>,
+                                        AllTypesList>::value[];
+
 // extract free_function_info from compile_time_ff_info
 template <class CTFFI>
 struct extract_free_function_info
