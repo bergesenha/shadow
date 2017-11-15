@@ -100,4 +100,86 @@ TEST_CASE("", "")
     REQUIRE(found5 != fun_end);
     REQUIRE(found6 != fun_end);
     REQUIRE(found7 != fun_end);
+
+    SECTION("call tctff_fun1")
+    {
+        auto ret = found1->bind_point(nullptr);
+
+        CHECK(ret.has_value() == false);
+    }
+
+    SECTION("call tctff_fun2")
+    {
+        auto ret = found2->bind_point(nullptr);
+
+        REQUIRE(ret.has_value() == true);
+        CHECK(ret.get<int>() == 5);
+    }
+
+    SECTION("call tctff_fun3")
+    {
+        shadow::any args[] = {11};
+
+        auto ret = found3->bind_point(args);
+
+        REQUIRE(ret.has_value() == true);
+        CHECK(ret.get<int>() == 55);
+        REQUIRE(args[0].has_value() == true);
+        CHECK(args[0].get<int>() == 11);
+    }
+
+    SECTION("call tctff_fun4")
+    {
+        const int argvalue = 100;
+        shadow::any args[] = {argvalue};
+
+        auto ret = found4->bind_point(args);
+
+        REQUIRE(ret.has_value() == true);
+        CHECK(ret.get<int>() == 500);
+        REQUIRE(args[0].has_value() == true);
+        CHECK(args[0].get<const int>() == 100);
+    }
+
+    SECTION("call tctff_fun5")
+    {
+        shadow::any args[] = { 10 };
+
+        auto ret = found5->bind_point(args);
+
+        CHECK(ret.has_value() == false);
+        REQUIRE(args[0].has_value() == true);
+        CHECK(args[0].get<int>() == 5);
+    }
+
+    SECTION("call tctff_fun6")
+    {
+        const int num = 10;
+
+        shadow::any args[] = {&num};
+
+        auto ret = found6->bind_point(args);
+
+        REQUIRE(ret.has_value() == true);
+        CHECK(ret.get<int>() == 50);
+        REQUIRE(args[0].has_value() == true);
+        CHECK(args[0].get<const int*>() == &num);
+        CHECK(num == 10);
+    }
+
+    SECTION("call tctff_fun7")
+    {
+        int i = 10;
+
+        shadow::any args[] = {&i};
+
+        auto ret = found7->bind_point(args);
+
+        CHECK(ret.has_value() == false);
+        REQUIRE(args[0].has_value() == true);
+        CHECK(args[0].get<int*>() == &i);
+        CHECK(i == 5);
+    }
+
+
 }
