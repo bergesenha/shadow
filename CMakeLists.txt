@@ -30,14 +30,7 @@ if(SHADOW_BUILD_TESTS)
     set(SHADOW_TEST_SRC
         tests/test_main.cpp
         tests/test_any.cpp
-        tests/test_free_function_binding.cpp
-        tests/test_member_function_binding.cpp
-        tests/test_member_variable_binding.cpp
-        tests/test_constructor_binding.cpp
-        tests/test_conversion_binding.cpp
-        tests/test_address_of_binding.cpp
-        tests/test_reflection_manager.cpp
-        tests/test_api_types.cpp
+        tests/test_compile_time_ff.cpp
         )
 
     add_executable(unit_tests ${SHADOW_TEST_SRC})
