@@ -167,6 +167,26 @@ constexpr conversion_info
     extract_conversion_info<type_pair<To, From>, AllTypesList>::value;
 
 
+// generate type_description from type
+template <class T, class TypeUniverse>
+struct generate_type_description
+{
+    typedef metamusil::t_descriptor::decompose_t<T> decomposed_type;
+
+    typedef metamusil::t_descriptor::array_from_descriptor<decomposed_type>
+        descriptor_array_holder;
+
+    static constexpr type_description value = {
+        metamusil::t_list::index_of_type_v<
+            TypeUniverse,
+            metamusil::t_descriptor::base_type_t<decomposed_type>>,
+        std::extent<decltype(descriptor_array_holder::value)>::value,
+        static_cast<const type_attribute*>(descriptor_array_holder::value)};
+};
+
+template <class T, class TypeUniverse>
+constexpr type_description generate_type_description<T, TypeUniverse>::value;
+
 // extract free_function_info from compile_time_ff_info
 template <class CTFFI>
 struct extract_free_function_info

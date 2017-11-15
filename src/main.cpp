@@ -33,9 +33,37 @@ REGISTER_MEMBER_VARIABLE(b, value)
 SHADOW_INIT()
 } // namespace myspace
 
+typedef shadow::generate_type_description<const int (&)[10], myspace::type_universe>
+    type_description_holder;
 
 int
 main()
 {
-    std::cout << 23 << 45 << '\n';
+    std::cout << myspace::type_name_array_holder::value
+                     [type_description_holder::value.type_index]
+              << ' ';
+
+    for(auto i = 0ul; i < type_description_holder::value.num_attributes; ++i)
+    {
+        auto att = type_description_holder::value.attributes[i];
+        if(att == shadow::type_attribute::const_tag)
+        {
+            std::cout << "const ";
+        }
+        else if(att == shadow::type_attribute::lreference_tag)
+        {
+            std::cout << "& ";
+        }
+        else if(att == shadow::type_attribute::pointer_tag)
+        {
+            std::cout << "* ";
+        }
+        else
+        {
+            std::cout << '[' << att << "] ";
+        }
+
+    }
+
+    std::cout << '\n';
 }

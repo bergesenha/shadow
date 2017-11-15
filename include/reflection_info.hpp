@@ -33,6 +33,7 @@ typedef metamusil::t_descriptor::type_tag type_attribute;
 struct type_description
 {
     std::size_t type_index;
+    std::size_t num_attributes;
     const type_attribute* attributes;
 };
 
