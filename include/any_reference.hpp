@@ -60,7 +60,7 @@ public:
     typename get_specializer<T>::return_type get();
 
     template <class T>
-    const std::decay_t<T> get() const;
+    const typename get_specializer<T>::return_type get() const;
 
 private:
     any value_ptr_;
@@ -86,5 +86,12 @@ any_reference::get()
 {
     return std::forward<typename get_specializer<T>::return_type>(
         get_specializer<T>::get(*this));
+}
+
+template <class T>
+inline const typename any_reference::get_specializer<T>::return_type
+any_reference::get() const
+{
+    return *(value_ptr_.get<T*>());
 }
 }
