@@ -82,7 +82,7 @@ template <class CTCI>
 struct extract_constructor_info
 {
     static constexpr constructor_info value = {
-        CTCI::type_index,
+        &CTCI::constructor_type_description_holder::value,
         CTCI::num_parameters,
         static_cast<const type_description*>(
             CTCI::parameter_type_descriptions_holder::value),
@@ -455,8 +455,8 @@ using generate_array_of_serialization_info_t =
     template <class ResultType, class... ParamTypes>                           \
     struct fundamental_compile_time_constructor_info                           \
     {                                                                          \
-        static const std::size_t type_index =                                  \
-            metamusil::t_list::index_of_type_v<type_universe, ResultType>;     \
+        typedef shadow::generate_type_description<ResultType, type_universe>   \
+            constructor_type_description_holder;                               \
                                                                                \
         typedef metamusil::t_list::type_list<ParamTypes...>                    \
             parameter_type_list;                                               \
@@ -534,8 +534,9 @@ using generate_array_of_serialization_info_t =
         static_assert(                                                         \
             !std::is_reference<type_name>::value,                              \
             "Attempting to register constructor for a reference type");        \
-        static const std::size_t type_index =                                  \
-            metamusil::t_list::index_of_type_v<type_universe, type_name>;      \
+                                                                               \
+        typedef shadow::generate_type_description<type_name, type_universe>    \
+            constructor_type_description_holder;                               \
                                                                                \
         typedef metamusil::t_list::type_list<__VA_ARGS__> parameter_type_list; \
                                                                                \
