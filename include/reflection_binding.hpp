@@ -260,9 +260,7 @@ struct braced_init_selector_impl
     static any
     constructor_dispatch(any* argument_array, std::index_sequence<Seq...>)
     {
-        any out =
-            T{argument_array[Seq]
-                  .get<typename std::remove_reference<ParamTypes>::type>()...};
+        any out = T{argument_array[Seq].get<ParamTypes>()...};
         return out;
     }
 };
@@ -277,9 +275,7 @@ struct braced_init_selector_impl<
     static any
     constructor_dispatch(any* argument_array, std::index_sequence<Seq...>)
     {
-        any out =
-            T(argument_array[Seq]
-                  .get<typename std::remove_reference<ParamTypes>::type>()...);
+        any out = T(argument_array[Seq].get<ParamTypes>()...);
         return out;
     }
 };

@@ -82,11 +82,10 @@ template <class CTCI>
 struct extract_constructor_info
 {
     static constexpr constructor_info value = {
-        CTCI::type_index,
+        &CTCI::constructor_type_description_holder::value,
         CTCI::num_parameters,
-        static_cast<const std::size_t*>(
-            CTCI::parameter_type_indices_holder::value),
-        static_cast<const bool*>(CTCI::parameter_pointer_flags_holder::value),
+        static_cast<const type_description*>(
+            CTCI::parameter_type_descriptions_holder::value),
         CTCI::bind_point};
 };
 
@@ -456,8 +455,8 @@ using generate_array_of_serialization_info_t =
     template <class ResultType, class... ParamTypes>                           \
     struct fundamental_compile_time_constructor_info                           \
     {                                                                          \
-        static const std::size_t type_index =                                  \
-            metamusil::t_list::index_of_type_v<type_universe, ResultType>;     \
+        typedef shadow::generate_type_description<ResultType, type_universe>   \
+            constructor_type_description_holder;                               \
                                                                                \
         typedef metamusil::t_list::type_list<ParamTypes...>                    \
             parameter_type_list;                                               \
@@ -465,16 +464,10 @@ using generate_array_of_serialization_info_t =
         static const std::size_t num_parameters =                              \
             metamusil::t_list::length_v<parameter_type_list>;                  \
                                                                                \
-        typedef metamusil::t_list::order_t<parameter_type_list, type_universe> \
-            parameter_index_sequence;                                          \
-                                                                               \
-        typedef metamusil::int_seq::integer_sequence_to_array<                 \
-            parameter_index_sequence>                                          \
-            parameter_type_indices_holder;                                     \
-                                                                               \
-        typedef metamusil::t_list::value_transform<parameter_type_list,        \
-                                                   std::is_pointer>            \
-            parameter_pointer_flags_holder;                                    \
+        typedef shadow::generate_array_of_type_descriptions<                   \
+            parameter_type_list,                                               \
+            type_universe>                                                     \
+            parameter_type_descriptions_holder;                                \
                                                                                \
         static constexpr shadow::constructor_binding_signature bind_point =    \
             shadow::constructor_bind_point_from_type_list_v<                   \
@@ -538,29 +531,22 @@ using generate_array_of_serialization_info_t =
     template <>                                                                \
     struct compile_time_constructor_info<__LINE__>                             \
     {                                                                          \
-        static const std::size_t type_index =                                  \
-            metamusil::t_list::index_of_type_v<type_universe, type_name>;      \
+        static_assert(                                                         \
+            !std::is_reference<type_name>::value,                              \
+            "Attempting to register constructor for a reference type");        \
+                                                                               \
+        typedef shadow::generate_type_description<type_name, type_universe>    \
+            constructor_type_description_holder;                               \
                                                                                \
         typedef metamusil::t_list::type_list<__VA_ARGS__> parameter_type_list; \
-                                                                               \
-        typedef metamusil::t_list::type_transform_t<parameter_type_list,       \
-                                                    metamusil::base_t>         \
-            base_parameter_type_list;                                          \
                                                                                \
         static const std::size_t num_parameters =                              \
             metamusil::t_list::length_v<parameter_type_list>;                  \
                                                                                \
-        typedef metamusil::t_list::order_t<base_parameter_type_list,           \
-                                           type_universe>                      \
-            parameter_index_sequence;                                          \
-                                                                               \
-        typedef metamusil::int_seq::integer_sequence_to_array<                 \
-            parameter_index_sequence>                                          \
-            parameter_type_indices_holder;                                     \
-                                                                               \
-        typedef metamusil::t_list::value_transform<parameter_type_list,        \
-                                                   std::is_pointer>            \
-            parameter_pointer_flags_holder;                                    \
+        typedef shadow::generate_array_of_type_descriptions<                   \
+            parameter_type_list,                                               \
+            type_universe>                                                     \
+            parameter_type_descriptions_holder;                                \
                                                                                \
         static constexpr shadow::constructor_binding_signature bind_point =    \
             shadow::constructor_bind_point_from_type_list_v<                   \
