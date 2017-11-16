@@ -84,7 +84,8 @@ struct extract_constructor_info
     static constexpr constructor_info value = {
         CTCI::type_index,
         CTCI::num_parameters,
-        static_cast<const type_description*>(CTCI::parameter_type_descriptions_holder::value),
+        static_cast<const type_description*>(
+            CTCI::parameter_type_descriptions_holder::value),
         CTCI::bind_point};
 };
 
@@ -530,6 +531,9 @@ using generate_array_of_serialization_info_t =
     template <>                                                                \
     struct compile_time_constructor_info<__LINE__>                             \
     {                                                                          \
+        static_assert(                                                         \
+            !std::is_reference<type_name>::value,                              \
+            "Attempting to register constructor for a reference type");        \
         static const std::size_t type_index =                                  \
             metamusil::t_list::index_of_type_v<type_universe, type_name>;      \
                                                                                \
