@@ -67,6 +67,43 @@ constexpr bool is_small_buffer_type_v = is_small_buffer_type<T>::value;
 class any
 {
 public:
+    template <class T>
+    struct get_specializer
+    {
+        typedef std::decay_t<T>& return_type;
+
+        static return_type
+        get(any& a)
+        {
+            if(a.on_heap_)
+            {
+                return static_cast<holder<std::decay_t<T>>*>(a.heap)->value_;
+            }
+
+            return reinterpret_cast<holder<std::decay_t<T>>*>(&a.stack)->value_;
+        }
+    };
+
+    template <class T>
+    struct get_specializer<T&&>
+    {
+        typedef std::decay_t<T>&& return_type;
+
+        static return_type
+        get(any& a)
+        {
+            if(a.on_heap_)
+            {
+                return std::move(
+                    static_cast<holder<std::decay_t<T>>*>(a.heap)->value_);
+            }
+
+            return std::move(
+                reinterpret_cast<holder<std::decay_t<T>>*>(&a.stack)->value_);
+        }
+    };
+
+public:
     // construct any without contained object, ie. empty
     any();
 
@@ -116,7 +153,7 @@ public:
     bool on_heap() const;
 
     template <class T>
-    std::decay_t<T>& get();
+    typename get_specializer<T>::return_type get();
 
     template <class T>
     const std::decay_t<T>& get() const;
@@ -259,21 +296,17 @@ any::on_heap() const
 }
 
 template <class T>
-inline std::decay_t<T>&
+inline typename any::get_specializer<T>::return_type
 any::get()
 {
-    if(on_heap_)
-    {
-        return static_cast<holder<std::decay_t<T>>*>(heap)->value_;
-    }
-
-    return reinterpret_cast<holder<std::decay_t<T>>*>(&stack)->value_;
+    return get_specializer<T>::get(*this);
 }
 
 template <class T>
 inline const std::decay_t<T>&
 any::get() const
 {
+    // meaningless to specialize for T&& since 'this' is const
     if(on_heap_)
     {
         return static_cast<const holder<std::decay_t<T>>*>(heap)->value_;

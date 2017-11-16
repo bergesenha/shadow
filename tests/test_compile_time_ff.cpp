@@ -43,7 +43,8 @@ tctff_fun7(int* i)
     *i = 5;
 }
 
-int tctff_fun8(int&& i)
+int
+tctff_fun8(int&& i)
 {
     return i;
 }
@@ -66,7 +67,8 @@ SHADOW_INIT()
 }
 
 
-TEST_CASE("", "")
+TEST_CASE("call free functions through bindings with non-const shadow::any",
+          "[free_function_info]")
 {
     constexpr auto num_functions = std::extent<decltype(
         tctff_space::free_function_info_array_holder::value)>::value;
@@ -98,10 +100,10 @@ TEST_CASE("", "")
         return std::string(fi.name) == std::string("tctff_fun7");
     });
     auto found8 = std::find_if(fun_beg, fun_end, [](const auto& fi) {
-        return std::string(fi.name) == std::string("tctff_fun7");
+    return std::string(fi.name) == std::string("tctff_fun8");
     });
 
-    REQUIRE(num_functions == 8);
+    CHECK(num_functions == 8);
     REQUIRE(found1 != fun_end);
     REQUIRE(found2 != fun_end);
     REQUIRE(found3 != fun_end);
@@ -153,7 +155,7 @@ TEST_CASE("", "")
 
     SECTION("call tctff_fun5")
     {
-        shadow::any args[] = { 10 };
+        shadow::any args[] = {10};
 
         auto ret = found5->bind_point(args);
 
@@ -192,12 +194,11 @@ TEST_CASE("", "")
     }
 
 
-
     SECTION("call tctff_fun8")
     {
         int i = 10;
 
-        shadow::any args[] = {std::move(i)};
+        shadow::any args[] = {i};
 
         auto ret = found8->bind_point(args);
         REQUIRE(ret.has_value() == true);
