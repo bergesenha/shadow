@@ -42,8 +42,7 @@ struct constructor_info
 {
     std::size_t type_index;
     std::size_t num_parameters;
-    const std::size_t* parameter_type_indices;
-    const bool* parameter_pointer_flags;
+    const type_description* parameter_types;
     constructor_binding_signature bind_point;
 };
 

@@ -48,6 +48,8 @@ REGISTER_TYPE(a)
 REGISTER_TYPE(b)
 REGISTER_TYPE_END()
 
+REGISTER_CONSTRUCTOR(a, int, double)
+
 REGISTER_FREE_FUNCTION(get_i)
 REGISTER_FREE_FUNCTION(long_function)
 REGISTER_FREE_FUNCTION(void_fun)
@@ -139,7 +141,5 @@ std::ostream& operator<<(std::ostream& out, const free_function_info& ffi)
 int
 main()
 {
-    std::for_each(std::begin(myspace::free_function_info_array_holder::value),
-                  std::end(myspace::free_function_info_array_holder::value),
-                  [](const auto& td) { std::cout << td << '\n'; });
+    std::cout << std::extent<decltype(myspace::constructor_info_array_holder::value)>::value << '\n';
 }
