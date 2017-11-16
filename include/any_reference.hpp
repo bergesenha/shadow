@@ -20,6 +20,17 @@ public:
     };
 
     template <class T>
+    struct get_specializer<const T>
+    {
+        typedef const std::decay_t<T>& return_type;
+
+        static return_type get(any_reference& ar)
+        {
+            return *(ar.value_ptr_.get<const T*>());
+        }
+    };
+
+    template <class T>
     struct get_specializer<T&&>
     {
         typedef std::decay_t<T>&& return_type;
