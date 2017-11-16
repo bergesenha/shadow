@@ -299,7 +299,8 @@ template <class T>
 inline typename any::get_specializer<T>::return_type
 any::get()
 {
-    return get_specializer<T>::get(*this);
+    return std::forward<typename get_specializer<T>::return_type>(
+        get_specializer<T>::get(*this));
 }
 
 template <class T>
