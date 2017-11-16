@@ -61,7 +61,7 @@ REGISTER_FREE_FUNCTION(tctff_fun4)
 REGISTER_FREE_FUNCTION(tctff_fun5)
 REGISTER_FREE_FUNCTION(tctff_fun6)
 REGISTER_FREE_FUNCTION(tctff_fun7)
-// REGISTER_FREE_FUNCTION(tctff_fun8)
+REGISTER_FREE_FUNCTION(tctff_fun8)
 
 SHADOW_INIT()
 }
@@ -99,11 +99,11 @@ TEST_CASE("call free functions through bindings with non-const shadow::any",
     auto found7 = std::find_if(fun_beg, fun_end, [](const auto& fi) {
         return std::string(fi.name) == std::string("tctff_fun7");
     });
-    // auto found8 = std::find_if(fun_beg, fun_end, [](const auto& fi) {
-    // return std::string(fi.name) == std::string("tctff_fun7");
-    //});
+    auto found8 = std::find_if(fun_beg, fun_end, [](const auto& fi) {
+    return std::string(fi.name) == std::string("tctff_fun8");
+    });
 
-    REQUIRE(num_functions == 7);
+    CHECK(num_functions == 8);
     REQUIRE(found1 != fun_end);
     REQUIRE(found2 != fun_end);
     REQUIRE(found3 != fun_end);
@@ -111,7 +111,7 @@ TEST_CASE("call free functions through bindings with non-const shadow::any",
     REQUIRE(found5 != fun_end);
     REQUIRE(found6 != fun_end);
     REQUIRE(found7 != fun_end);
-    // REQUIRE(found8 != fun_end);
+    REQUIRE(found8 != fun_end);
 
     SECTION("call tctff_fun1")
     {
@@ -198,10 +198,10 @@ TEST_CASE("call free functions through bindings with non-const shadow::any",
     {
         int i = 10;
 
-        shadow::any args[] = {std::move(i)};
+        shadow::any args[] = {i};
 
-        // auto ret = found8->bind_point(args);
-        // REQUIRE(ret.has_value() == true);
-        // CHECK(ret.get<int>() == 10);
+        auto ret = found8->bind_point(args);
+        REQUIRE(ret.has_value() == true);
+        CHECK(ret.get<int>() == 10);
     }
 }
