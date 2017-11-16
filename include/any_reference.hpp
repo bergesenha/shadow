@@ -43,12 +43,14 @@ public:
     };
 
 public:
+
     template <class T>
     any_reference(T& value);
 
     template <class T>
     any_reference(const T& value);
 
+    any_reference() = default;
     any_reference(const any_reference&) = default;
     any_reference(any_reference&&) = default;
     any_reference& operator=(const any_reference&) = default;
