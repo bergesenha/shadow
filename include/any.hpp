@@ -88,6 +88,19 @@ public:
     struct get_specializer<T&&>
     {
         typedef std::decay_t<T>&& return_type;
+
+        static return_type
+        get(any& a)
+        {
+            if(a.on_heap_)
+            {
+                return std::move(
+                    static_cast<holder<std::decay_t<T>>*>(a.heap)->value_);
+            }
+
+            return std::move(
+                reinterpret_cast<holder<std::decay_t<T>>*>(&a.stack)->value_);
+        }
     };
 
 public:

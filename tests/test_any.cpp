@@ -3,6 +3,10 @@
 #include <any.hpp>
 #include <vector>
 
+struct big
+{
+    double a, b, c;
+};
 
 TEST_CASE("test class any", "[any]")
 {
@@ -104,5 +108,113 @@ TEST_CASE("std::vector of any", "[any]")
 
         REQUIRE(a.get<double>() == 23.5);
         REQUIRE(any_vec.front().get<double>() == 23.5);
+    }
+}
+
+
+TEST_CASE("initialize any with small lvalue", "[shadow::any]")
+{
+    int i = 10;
+    shadow::any a(i);
+
+    REQUIRE(a.has_value() == true);
+    CHECK(a.on_heap() == false);
+
+    SECTION("get contained value")
+    {
+        auto ii = a.get<int>();
+
+        CHECK(ii == 10);
+    }
+
+    SECTION("get as reference")
+    {
+        int& ii = a.get<int&>();
+
+        CHECK(ii == 10);
+    }
+
+    SECTION("get as rvalue reference")
+    {
+        int&& ii = a.get<int&&>();
+
+        CHECK(ii == 10);
+    }
+}
+
+TEST_CASE("initialize with large lvalue", "[shadow::any]")
+{
+    big b{1.1, 2.2, 3.3};
+    shadow::any a(b);
+
+    REQUIRE(a.has_value() == true);
+    CHECK(a.on_heap() == true);
+
+    SECTION("get contained value")
+    {
+        auto bb = a.get<big>();
+
+        CHECK(bb.a == Approx(1.1));
+        CHECK(bb.b == Approx(2.2));
+        CHECK(bb.c == Approx(3.3));
+    }
+
+    SECTION("get as reference")
+    {
+        big& bb = a.get<big&>();
+
+        CHECK(bb.a == Approx(1.1));
+        CHECK(bb.b == Approx(2.2));
+        CHECK(bb.c == Approx(3.3));
+    }
+}
+
+TEST_CASE("initialize with small rvalue", "[shadow::any]")
+{
+    int i = 10;
+    shadow::any a(std::move(i));
+
+    REQUIRE(a.has_value() == true);
+    CHECK(a.on_heap() == false);
+
+    SECTION("get contained value")
+    {
+        auto ii = a.get<int>();
+
+        CHECK(ii == 10);
+    }
+
+    SECTION("get as reference")
+    {
+        int& ii = a.get<int&>();
+
+        CHECK(ii == 10);
+    }
+}
+
+TEST_CASE("initialize with big rvalue", "[shadow::any]")
+{
+    big b{1.1, 2.2, 3.3};
+    shadow::any a(std::move(b));
+
+    REQUIRE(a.has_value() == true);
+    CHECK(a.on_heap() == true);
+
+    SECTION("get contained value")
+    {
+        auto bb = a.get<big>();
+
+        CHECK(bb.a == Approx(1.1));
+        CHECK(bb.b == Approx(2.2));
+        CHECK(bb.c == Approx(3.3));
+    }
+
+    SECTION("get as reference")
+    {
+        big& bb = a.get<big&>();
+
+        CHECK(bb.a == Approx(1.1));
+        CHECK(bb.b == Approx(2.2));
+        CHECK(bb.c == Approx(3.3));
     }
 }
