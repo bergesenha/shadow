@@ -15,7 +15,7 @@ public:
         static return_type
         get(any_reference& ar)
         {
-            return *(ar.value_ptr_.get<T*>());
+            return *(ar.ptr_value_.get<T*>());
         }
     };
 
@@ -26,7 +26,7 @@ public:
 
         static return_type get(any_reference& ar)
         {
-            return *(ar.value_ptr_.get<const T*>());
+            return *(ar.ptr_value_.get<const T*>());
         }
     };
 
@@ -38,7 +38,7 @@ public:
         static return_type
         get(any_reference& ar)
         {
-            return std::move(*(ar.value_ptr_.get<T*>()));
+            return std::move(*(ar.ptr_value_.get<T*>()));
         }
     };
 
@@ -65,7 +65,7 @@ public:
     const typename get_specializer<T>::return_type get() const;
 
 private:
-    any value_ptr_;
+    any ptr_value_;
 };
 }
 
@@ -73,12 +73,12 @@ private:
 namespace shadow
 {
 template <class T>
-inline any_reference::any_reference(T& value) : value_ptr_(&value)
+inline any_reference::any_reference(T& value) : ptr_value_(&value)
 {
 }
 
 template <class T>
-inline any_reference::any_reference(const T& value) : value_ptr_(&value)
+inline any_reference::any_reference(const T& value) : ptr_value_(&value)
 {
 }
 
@@ -94,6 +94,6 @@ template <class T>
 inline const typename any_reference::get_specializer<T>::return_type
 any_reference::get() const
 {
-    return *(value_ptr_.get<T*>());
+    return *(ptr_value_.get<T*>());
 }
 }
