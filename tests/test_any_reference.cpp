@@ -9,4 +9,12 @@ TEST_CASE("create any_reference from native types", "[any_reference]")
 
     shadow::any_reference a = i;
     shadow::any_reference b = j;
+
+    SECTION("get referred to value")
+    {
+        auto& ii = a.get<int>();
+
+        CHECK(ii == 20);
+        CHECK(&ii == &i);
+    }
 }
