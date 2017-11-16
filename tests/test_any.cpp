@@ -134,11 +134,42 @@ TEST_CASE("initialize any with small lvalue", "[shadow::any]")
         CHECK(ii == 10);
     }
 
+    SECTION("bind contiained value to const int&")
+    {
+        const int& ii = a.get<const int&>();
+
+        CHECK(ii == 10);
+    }
+
     SECTION("get as rvalue reference")
     {
         int&& ii = a.get<int&&>();
 
         CHECK(ii == 10);
+    }
+}
+
+TEST_CASE("initialize const any with small value", "[shadow::any]")
+{
+    int i = 10;
+    const shadow::any a(i);
+
+    REQUIRE(a.has_value() == true);
+    CHECK(a.on_heap() == false);
+
+    SECTION("bind contained value to int")
+    {
+        int ii = a.get<int>();
+
+        CHECK(ii == 10);
+    }
+
+    SECTION("bind contained value to const int&")
+    {
+        const int& ii = a.get<const int&>();
+
+        CHECK(ii == 10);
+        CHECK(&ii == &(a.get<const int&>()));
     }
 }
 
@@ -167,6 +198,51 @@ TEST_CASE("initialize with large lvalue", "[shadow::any]")
         CHECK(bb.b == Approx(2.2));
         CHECK(bb.c == Approx(3.3));
     }
+
+    SECTION("get as const reference")
+    {
+        const big& bb = a.get<const big&>();
+
+        CHECK(bb.a == Approx(1.1));
+        CHECK(bb.b == Approx(2.2));
+        CHECK(bb.c == Approx(3.3));
+    }
+
+    SECTION("get as rvalue reference")
+    {
+        big&& bb = a.get<big&&>();
+
+        CHECK(bb.a == Approx(1.1));
+        CHECK(bb.b == Approx(2.2));
+        CHECK(bb.c == Approx(3.3));
+    }
+}
+
+TEST_CASE("initialize const any with large value", "[shadow::any]")
+{
+    big b{1.1, 2.2, 3.3};
+    const shadow::any a(b);
+
+    REQUIRE(a.has_value() == true);
+    CHECK(a.on_heap() == true);
+
+    SECTION("bind contained value to big")
+    {
+        big bb = a.get<big>();
+
+        CHECK(bb.a == Approx(1.1));
+        CHECK(bb.b == Approx(2.2));
+        CHECK(bb.c == Approx(3.3));
+    }
+
+    SECTION("bind contained value to const big&")
+    {
+        const big& bb = a.get<const big&>();
+
+        CHECK(bb.a == Approx(1.1));
+        CHECK(bb.b == Approx(2.2));
+        CHECK(bb.c == Approx(3.3));
+    }
 }
 
 TEST_CASE("initialize with small rvalue", "[shadow::any]")
@@ -187,6 +263,13 @@ TEST_CASE("initialize with small rvalue", "[shadow::any]")
     SECTION("get as reference")
     {
         int& ii = a.get<int&>();
+
+        CHECK(ii == 10);
+    }
+
+    SECTION("get as rvalue reference")
+    {
+        int&& ii = a.get<int&&>();
 
         CHECK(ii == 10);
     }

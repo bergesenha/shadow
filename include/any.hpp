@@ -306,6 +306,7 @@ template <class T>
 inline const std::decay_t<T>&
 any::get() const
 {
+    // meaningless to specialize for T&& since 'this' is const
     if(on_heap_)
     {
         return static_cast<const holder<std::decay_t<T>>*>(heap)->value_;
