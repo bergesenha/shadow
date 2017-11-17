@@ -8,6 +8,7 @@
 #include <integer_sequence.hpp>
 #include <sfinae.hpp>
 #include <type_list.hpp>
+#include <function_type_descriptor.hpp>
 
 #include "reflection_info.hpp"
 #include "exceptions.hpp"
@@ -236,6 +237,7 @@ struct extract_member_function_info
         &CTMFI::return_type_description_holder::value,
         CTMFI::num_parameters,
         CTMFI::parameter_type_descriptions_array_holder::value,
+        CTMFI::constness,
         CTMFI::bind_point};
 };
 
@@ -709,6 +711,10 @@ using generate_array_of_serialization_info_t =
         typedef decltype(                                                      \
             &class_name::function_name) member_function_signature_type;        \
                                                                                \
+        typedef metamusil::ft_descriptor::decompose_t<                         \
+            member_function_signature_type>                                    \
+            mem_fun_description;                                               \
+                                                                               \
         typedef shadow::generate_type_description<class_name, type_universe>   \
             object_type_description_holder;                                    \
                                                                                \
@@ -723,15 +729,16 @@ using generate_array_of_serialization_info_t =
             member_function_signature_type>                                    \
             parameter_type_list;                                               \
                                                                                \
+        static const std::size_t num_parameters =                              \
+            metamusil::t_list::length_v<parameter_type_list>;                  \
+                                                                               \
+        static const bool constness =                                          \
+            metamusil::ft_descriptor::is_const_v<mem_fun_description>;         \
+                                                                               \
         typedef shadow::generate_array_of_type_descriptions<                   \
             parameter_type_list,                                               \
             type_universe>                                                     \
             parameter_type_descriptions_array_holder;                          \
-                                                                               \
-                                                                               \
-        static const std::size_t num_parameters =                              \
-            metamusil::t_list::length_v<parameter_type_list>;                  \
-                                                                               \
                                                                                \
         static constexpr shadow::member_function_binding_signature             \
             bind_point = &shadow::member_function_detail::                     \

@@ -123,6 +123,10 @@ std::ostream& operator<<(std::ostream& out, const member_function_info& ffi)
         out << ffi.parameter_types[i] << ", ";
     }
     out << ')';
+    if(ffi.constness)
+    {
+        out << " const";
+    }
     return out;
 }
 }

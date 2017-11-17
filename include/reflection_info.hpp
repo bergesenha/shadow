@@ -67,6 +67,7 @@ struct member_function_info
     const type_description* return_type;
     std::size_t num_parameters;
     const type_description* parameter_types;
+    bool constness;
     member_function_binding_signature bind_point;
 };
 
