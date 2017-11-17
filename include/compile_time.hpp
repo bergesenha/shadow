@@ -232,11 +232,10 @@ struct extract_member_function_info
 {
     static constexpr shadow::member_function_info value = {
         CTMFI::name,
-        CTMFI::object_type_index,
-        CTMFI::return_type_index,
+        &CTMFI::object_type_description_holder::value,
+        &CTMFI::return_type_description_holder::value,
         CTMFI::num_parameters,
-        CTMFI::parameter_type_indices_holder::value,
-        CTMFI::parameter_pointer_flags_holder::value,
+        CTMFI::parameter_type_descriptions_array_holder::value,
         CTMFI::bind_point};
 };
 
@@ -710,37 +709,29 @@ using generate_array_of_serialization_info_t =
         typedef decltype(                                                      \
             &class_name::function_name) member_function_signature_type;        \
                                                                                \
-        static const std::size_t object_type_index =                           \
-            metamusil::t_list::index_of_type_v<type_universe, class_name>;     \
+        typedef shadow::generate_type_description<class_name, type_universe>   \
+            object_type_description_holder;                                    \
                                                                                \
-        static const std::size_t return_type_index =                           \
-            metamusil::t_list::index_of_type_v<                                \
-                type_universe,                                                 \
-                metamusil::deduce_return_type_t<                               \
-                    member_function_signature_type>>;                          \
+        typedef metamusil::deduce_return_type_t<                               \
+            member_function_signature_type>                                    \
+            return_type;                                                       \
+                                                                               \
+        typedef shadow::generate_type_description<return_type, type_universe>  \
+            return_type_description_holder;                                    \
                                                                                \
         typedef metamusil::deduce_parameter_types_t<                           \
             member_function_signature_type>                                    \
             parameter_type_list;                                               \
                                                                                \
-        typedef metamusil::t_list::type_transform_t<parameter_type_list,       \
-                                                    metamusil::base_t>         \
-            base_parameter_type_list;                                          \
+        typedef shadow::generate_array_of_type_descriptions<                   \
+            parameter_type_list,                                               \
+            type_universe>                                                     \
+            parameter_type_descriptions_array_holder;                          \
+                                                                               \
                                                                                \
         static const std::size_t num_parameters =                              \
             metamusil::t_list::length_v<parameter_type_list>;                  \
                                                                                \
-        typedef metamusil::t_list::order_t<base_parameter_type_list,           \
-                                           type_universe>                      \
-            parameter_index_sequence;                                          \
-                                                                               \
-        typedef metamusil::int_seq::integer_sequence_to_array<                 \
-            parameter_index_sequence>                                          \
-            parameter_type_indices_holder;                                     \
-                                                                               \
-        typedef metamusil::t_list::value_transform<parameter_type_list,        \
-                                                   std::is_pointer>            \
-            parameter_pointer_flags_holder;                                    \
                                                                                \
         static constexpr shadow::member_function_binding_signature             \
             bind_point = &shadow::member_function_detail::                     \
