@@ -137,8 +137,7 @@ struct return_type_specializer
              std::index_sequence<ParamSequence...>)
     {
         return (object.get<ObjectType>().*MemFunPointerValue)(
-            argument_array[ParamSequence]
-                .get<std::remove_reference_t<ParamTypes>>()...);
+            argument_array[ParamSequence].get<ParamTypes>()...);
     }
 };
 
@@ -158,8 +157,7 @@ struct return_type_specializer<void>
              std::index_sequence<ParamSequence...>)
     {
         (object.get<ObjectType>().*MemFunPointerValue)(
-            argument_array[ParamSequence]
-                .get<std::remove_reference_t<ParamTypes>>()...);
+            argument_array[ParamSequence].get<ParamTypes>()...);
 
         return any();
     }
