@@ -59,6 +59,13 @@ public:
     {
     }
 
+    any_reference(any_reference&& other) = default;
+
+    any_reference& operator=(any_reference other)
+    {
+        std::swap(reference_, other.reference_);
+        return *this;
+    }
 
 public:
     template <class T>
