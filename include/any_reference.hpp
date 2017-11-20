@@ -15,10 +15,16 @@ public:
     {
     }
 
-    any_reference& operator=(const any& value)
+    any_reference&
+    operator=(const any& value)
     {
         *ref_ = value;
         return *this;
+    }
+
+    operator any()
+    {
+        return *ref_;
     }
 
 public:
