@@ -2,38 +2,39 @@
 #include <any_reference.hpp>
 
 
-TEST_CASE("create any_reference from any", "[any_reference]")
+TEST_CASE("create any_reference from values", "[any_reference]")
 {
-    using shadow::any;
     using shadow::any_reference;
+    int i = 10;
 
-    any a = 10;
+    any_reference ri(i);
+    const any_reference cri(i);
 
-    any_reference ra(a);
 
-    CHECK(ra.get<int>() == 10);
-    CHECK(&ra.get<int>() == &a.get<int>());
+    CHECK(ri.get<int>() == 10);
 
-    SECTION("set a to another value through ra")
+    SECTION("modify value through any_reference")
     {
-        any b = 20;
+        ri.get<int>() = 100;
 
-        ra = b;
-
-        CHECK(a.get<int>() == 20);
-        CHECK(ra.get<int>() == 20);
-        CHECK(&ra.get<int>() == &a.get<int>());
+        CHECK(i == 100);
     }
 
-    SECTION("set a to another value of another type")
+    SECTION("copy construct another any_reference")
     {
-        any b = 20.5;
+        any_reference rii = ri;
+        any_reference crii = cri;
 
-        ra = b;
+        CHECK(rii.get<int>() == 10);
+        CHECK(crii.get<int>() == 10);
 
-        CHECK(a.get<double>() == Approx(20.5));
-        CHECK(ra.get<double>() == Approx(20.5));
-        CHECK(&ra.get<double>() == &a.get<double>());
+        SECTION("modify value through new any_reference")
+        {
+            rii.get<int>() = 100;
+
+            CHECK(rii.get<int>() == 100);
+            CHECK(&rii.get<int>() == &i);
+        }
     }
 }
 
