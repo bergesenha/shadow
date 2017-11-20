@@ -124,6 +124,24 @@ public:
         return out;
     }
 
+    any_reference&
+    operator=(const any& other)
+    {
+        if(has_reference())
+        {
+            if(other.on_heap())
+            {
+                reference_->assign_from_holder(other.heap);
+            }
+            else
+            {
+                reference_->assign_from_holder(
+                    reinterpret_cast<const holder_base*>(&other.stack));
+            }
+        }
+        return *this;
+    }
+
 public:
     template <class T>
     std::decay_t<T>&

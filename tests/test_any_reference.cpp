@@ -72,6 +72,17 @@ TEST_CASE("create any_reference from values", "[any_reference]")
 
         CHECK(ri.has_reference() == false);
     }
+
+    SECTION("modify value referenced by an any of same type")
+    {
+        any has_int(100);
+
+        ri = has_int;
+
+        REQUIRE(ri.has_reference() == true);
+        REQUIRE(ri.get<int>() == 100);
+        REQUIRE(i == 100);
+    }
 }
 
 TEST_CASE("default construct an any_reference")
