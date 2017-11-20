@@ -74,8 +74,12 @@ public:
     {
     }
 
-    any_reference(any_reference& other) : reference_(other.reference_->copy())
+    any_reference(any_reference& other) : reference_()
     {
+        if(other.has_reference())
+        {
+            reference_.reset(other.reference_->copy());
+        }
     }
 
     any_reference(const any_reference& other)
@@ -96,15 +100,18 @@ public:
     {
         any out;
 
-        if(reference_->fits_on_stack())
+        if(has_reference())
         {
-            reference_->make_stack_value(&out.stack);
-            out.on_heap_ = false;
-        }
-        else
-        {
-            out.heap = reference_->make_heap_value();
-            out.on_heap_ = true;
+            if(reference_->fits_on_stack())
+            {
+                reference_->make_stack_value(&out.stack);
+                out.on_heap_ = false;
+            }
+            else
+            {
+                out.heap = reference_->make_heap_value();
+                out.on_heap_ = true;
+            }
         }
 
         return out;
@@ -123,6 +130,12 @@ public:
     get() const
     {
         return *(static_cast<ptr_holder<T>*>(reference_.get())->ptr_value_);
+    }
+
+    bool
+    has_reference() const
+    {
+        return bool(reference_);
     }
 
 private:
