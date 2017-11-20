@@ -16,6 +16,7 @@ public:
     virtual void make_stack_value(
         std::aligned_storage_t<sizeof(holder_base*)>* buffer) const = 0;
     virtual bool fits_on_stack() const = 0;
+    virtual void assign_from_holder(const holder_base*) = 0;
 };
 
 template <class T>
@@ -57,6 +58,12 @@ public:
     fits_on_stack() const override
     {
         return is_small_buffer_type<T>::value;
+    }
+
+    virtual void
+    assign_from_holder(const holder_base* h) override
+    {
+        *ptr_value_ = static_cast<const holder<T>*>(h)->get_value();
     }
 
 private:

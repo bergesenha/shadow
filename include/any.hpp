@@ -47,6 +47,11 @@ public:
         new(buffer) holder<T>(value_);
     }
 
+    T get_value() const
+    {
+        return value_;
+    }
+
 private:
     T value_;
 };
