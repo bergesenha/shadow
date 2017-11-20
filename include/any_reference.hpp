@@ -42,6 +42,20 @@ public:
         return ref_->get<T>();
     }
 
+    bool has_reference() const
+    {
+        return ref_ != nullptr;
+    }
+
+    bool has_value() const
+    {
+        return ref_->has_value();
+    }
+
+    bool on_heap() const
+    {
+        return ref_->on_heap();
+    }
 private:
     any* ref_;
 };
