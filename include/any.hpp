@@ -66,6 +66,7 @@ constexpr bool is_small_buffer_type_v = is_small_buffer_type<T>::value;
 // type erasure wrapper for value of any type
 class any
 {
+    friend class any_reference;
 public:
     template <class T>
     struct get_specializer
