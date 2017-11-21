@@ -75,11 +75,10 @@ struct member_function_info
 struct member_variable_info
 {
     const char* name;
-    std::size_t object_type_index;
-    std::size_t type_index;
+    const type_description* object_type;
+    const type_description* type;
     std::size_t offset;
-    member_variable_get_binding_signature get_bind_point;
-    member_variable_set_binding_signature set_bind_point;
+    member_variable_binding_signature bind_point;
 };
 
 

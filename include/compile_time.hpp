@@ -250,12 +250,12 @@ using generate_array_of_mf_info =
 template <class CTMVI>
 struct extract_member_variable_info
 {
-    static constexpr member_variable_info value = {CTMVI::name,
-                                                   CTMVI::object_type_index,
-                                                   CTMVI::type_index,
-                                                   CTMVI::offset,
-                                                   CTMVI::get_bind_point,
-                                                   CTMVI::set_bind_point};
+    static constexpr member_variable_info value = {
+        CTMVI::name,
+        &CTMVI::object_type_description_holder::value,
+        &CTMVI::type_type_description_holder::value,
+        CTMVI::offset,
+        CTMVI::bind_point};
 };
 
 template <class CompileTimeMvInfoList>
@@ -885,29 +885,25 @@ using generate_array_of_serialization_info_t =
     {                                                                          \
         static constexpr char name[] = #variable_name;                         \
                                                                                \
-        static const std::size_t object_type_index =                           \
-            metamusil::t_list::index_of_type_v<type_universe, class_name>;     \
-                                                                               \
-        static const std::size_t offset = offsetof(class_name, variable_name); \
+        typedef shadow::generate_type_description<class_name, type_universe>   \
+            object_type_description_holder;                                    \
                                                                                \
         typedef metamusil::deduce_member_variable_type_t<decltype(             \
             &class_name::variable_name)>                                       \
             type_type;                                                         \
                                                                                \
-        static const std::size_t type_index =                                  \
-            metamusil::t_list::index_of_type_v<type_universe, type_type>;      \
+        typedef shadow::generate_type_description<type_type, type_universe>    \
+            type_type_description_holder;                                      \
                                                                                \
-        static constexpr shadow::member_variable_get_binding_signature         \
-            get_bind_point = &shadow::member_variable_detail::                 \
-                                 generic_member_variable_get_bind_point<       \
-                                     decltype(&class_name::variable_name),     \
-                                     &class_name::variable_name>;              \
                                                                                \
-        static constexpr shadow::member_variable_set_binding_signature         \
-            set_bind_point = &shadow::member_variable_detail::                 \
-                                 generic_member_variable_set_bind_point<       \
-                                     decltype(&class_name::variable_name),     \
-                                     &class_name::variable_name>;              \
+        static const std::size_t offset = offsetof(class_name, variable_name); \
+                                                                               \
+                                                                               \
+        static constexpr shadow::member_variable_binding_signature             \
+            bind_point = &shadow::member_variable_detail::                     \
+                             generic_member_variable_bind_point<               \
+                                 decltype(&class_name::variable_name),         \
+                                 &class_name::variable_name>;                  \
     };                                                                         \
                                                                                \
     constexpr char compile_time_mv_info<__LINE__>::name[];
