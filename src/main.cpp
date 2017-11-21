@@ -160,28 +160,8 @@ std::ostream& operator<<(std::ostream& out, const member_function_info& ffi)
 int
 main()
 {
-    for(auto& i : myspace::member_variable_info_array_holder::value)
+    for(auto i = myspace::manager.types() ; i.first != i.second ; ++i.first)
     {
-        std::cout << *i.type << " " << *i.object_type << "::";
-        std::cout << i.name << '\n';
+        std::cout << i.first->name << '\n';
     }
-
-    shadow::any ana(a{12, 3.14});
-
-    auto member_i = myspace::member_variable_info_array_holder::value[0].bind_point(ana);
-    auto member_d = myspace::member_variable_info_array_holder::value[1].bind_point(ana);
-
-    std::cout << member_i.get<int>() << '\n';
-    std::cout << member_d.get<double>() << '\n';
-    std::cout << ana.get<a>().i << '\n';
-    std::cout << ana.get<a>().d << '\n';
-
-    member_i = shadow::any(10);
-    member_d = shadow::any(1.3);
-
-
-    std::cout << member_i.get<int>() << '\n';
-    std::cout << member_d.get<double>() << '\n';
-    std::cout << ana.get<a>().i << '\n';
-    std::cout << ana.get<a>().d << '\n';
 }
