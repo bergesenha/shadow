@@ -111,65 +111,7 @@ SHADOW_INIT()
 } // namespace myspace
 
 
-namespace shadow
-{
-std::ostream&
-operator<<(std::ostream& out, const type_description& td)
-{
-    out << myspace::type_name_array_holder::value[td.type_index] << " ";
-    for(auto i = 0ul ; i < td.num_attributes; ++i)
-    {
-        auto att = td.attributes[i];
-
-        if(att == type_attribute::const_tag)
-        {
-            out << "const ";
-        }
-        if(att == type_attribute::pointer_tag)
-        {
-            out << "* ";
-        }
-        if(att == type_attribute::lreference_tag)
-        {
-            out << "& ";
-        }
-        if(att == type_attribute::rreference_tag)
-        {
-            out << "&& ";
-        }
-    }
-    return out;
-}
-
-std::ostream& operator<<(std::ostream& out, const member_function_info& ffi)
-{
-    out << *ffi.return_type << ' ' << ffi.name << '(';
-    for(auto i = 0ul ; i < ffi.num_parameters ; ++i)
-    {
-        out << ffi.parameter_types[i] << ", ";
-    }
-    out << ')';
-    if(ffi.constness)
-    {
-        out << " const";
-    }
-    return out;
-}
-}
-
-template <class T>
-void p(T&)
-{
-    puts(__PRETTY_FUNCTION__);
-}
-
 int
 main()
 {
-    for(auto i = myspace::manager.types() ; i.first != i.second ; ++i.first)
-    {
-        std::cout << i.first->name << '\n';
-    }
-
-    p(myspace::type_info_array_holder::value);
 }
