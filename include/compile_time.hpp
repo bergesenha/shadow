@@ -953,7 +953,8 @@ using generate_array_of_serialization_info_t =
     typedef shadow::generate_array_of_serialization_info_t<type_universe>      \
         default_serialization_info_array_holder;                               \
                                                                                \
-    const shadow::reflection_manager manager{type_info_array_holder::value};
+    const shadow::reflection_manager manager{                                  \
+        type_info_array_holder::value, constructor_info_array_holder::value};
 
 
 #endif

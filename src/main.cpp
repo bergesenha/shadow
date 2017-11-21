@@ -157,6 +157,12 @@ std::ostream& operator<<(std::ostream& out, const member_function_info& ffi)
 }
 }
 
+template <class T>
+void p(T&)
+{
+    puts(__PRETTY_FUNCTION__);
+}
+
 int
 main()
 {
@@ -164,4 +170,6 @@ main()
     {
         std::cout << i.first->name << '\n';
     }
+
+    p(myspace::type_info_array_holder::value);
 }
