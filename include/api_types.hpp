@@ -73,6 +73,25 @@ public:
     }
 };
 
-typedef info_type_aggregate<type_info, name_policy, size_policy>
-    type_id;
+typedef info_type_aggregate<type_info, name_policy, size_policy> type_id;
+
+
+inline std::ostream& operator<<(std::ostream& out, const type_description& td)
+{
+    return out;
+}
+
+template <class Derived>
+class instance_name_policy
+{
+public:
+    std::string name() const
+    {
+        std::string out;
+
+        out << static_cast<const Derived*>(this)->info_ptr_->type;
+    }
+};
+
+typedef info_type_aggregate<type_description> instance_type_id;
 }
