@@ -101,11 +101,11 @@ REGISTER_MEMBER_FUNCTION_EXPLICIT(b, overload1, double, double)
 REGISTER_MEMBER_FUNCTION_EXPLICIT(b, get_key, char&)
 REGISTER_CONST_MEMBER_FUNCTION_EXPLICIT(b, get_key, const char&)
 
-//REGISTER_MEMBER_VARIABLE(a, i)
-//REGISTER_MEMBER_VARIABLE(a, d)
+REGISTER_MEMBER_VARIABLE(a, i)
+REGISTER_MEMBER_VARIABLE(a, d)
 
-//REGISTER_MEMBER_VARIABLE(b, key)
-//REGISTER_MEMBER_VARIABLE(b, value)
+REGISTER_MEMBER_VARIABLE(b, key)
+REGISTER_MEMBER_VARIABLE(b, value)
 
 SHADOW_INIT()
 } // namespace myspace
@@ -160,8 +160,9 @@ std::ostream& operator<<(std::ostream& out, const member_function_info& ffi)
 int
 main()
 {
-    for(auto& i : myspace::member_function_info_array_holder::value)
+    for(auto& i : myspace::member_variable_info_array_holder::value)
     {
-        std::cout << i << '\n';
+        std::cout << *i.type << " " << *i.object_type << "::";
+        std::cout << i.name << '\n';
     }
 }
