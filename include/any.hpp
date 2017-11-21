@@ -449,6 +449,22 @@ public:
 
     any_reference(any_reference&& other) = default;
 
+    any_reference(any& value) : reference_()
+    {
+        if(value.has_value())
+        {
+            if(value.on_heap())
+            {
+                reference_.reset(value.heap->make_value_ptr());
+            }
+            else
+            {
+                reference_.reset(reinterpret_cast<holder_base*>(&value.stack)
+                                     ->make_value_ptr());
+            }
+        }
+    }
+
     any_reference&
     operator=(any_reference other)
     {
