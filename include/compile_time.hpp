@@ -12,6 +12,7 @@
 
 #include "reflection_info.hpp"
 #include "exceptions.hpp"
+#include "reflection_manager.hpp"
 
 
 namespace shadow
