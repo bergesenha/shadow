@@ -25,22 +25,26 @@ struct b
 {
     char key;
     a value;
-    const char& get_key() const
+    const char&
+    get_key() const
     {
         return key;
     }
 
-    char& get_key()
+    char&
+    get_key()
     {
         return key;
     }
 
-    double overload1(int i)
+    double
+    overload1(int i)
     {
         return static_cast<double>(i * 10);
     }
 
-    double overload1(double d)
+    double
+    overload1(double d)
     {
         return d * 10.0;
     }
@@ -114,4 +118,43 @@ SHADOW_INIT()
 int
 main()
 {
+    for(auto i = myspace::manager.types(); i.first != i.second; ++i.first)
+    {
+        std::cout << '.';
+    }
+    std::cout << '\n';
+
+    for(auto i = myspace::manager.constructors(); i.first != i.second;
+        ++i.first)
+    {
+        std::cout << '.';
+    }
+    std::cout << '\n';
+
+    for(auto i = myspace::manager.conversions(); i.first != i.second; ++i.first)
+    {
+        std::cout << '.';
+    }
+    std::cout << '\n';
+
+    for(auto i = myspace::manager.free_functions(); i.first != i.second;
+        ++i.first)
+    {
+        std::cout << '.';
+    }
+    std::cout << '\n';
+
+    for(auto i = myspace::manager.member_functions(); i.first != i.second;
+        ++i.first)
+    {
+        std::cout << '.';
+    }
+    std::cout << '\n';
+
+    for(auto i = myspace::manager.member_variables(); i.first != i.second;
+        ++i.first)
+    {
+        std::cout << '.';
+    }
+    std::cout << '\n';
 }

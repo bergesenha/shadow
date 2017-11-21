@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include <array_view.hpp>
 #include "reflection_info.hpp"
 #include "api_types.hpp"
@@ -78,6 +80,18 @@ public:
 
 
 public:
+    std::pair<type_id_iterator, type_id_iterator> types() const;
+    std::pair<constructor_id_iterator, constructor_id_iterator>
+    constructors() const;
+    std::pair<conversion_id_iterator, conversion_id_iterator>
+    conversions() const;
+    std::pair<free_function_id_iterator, free_function_id_iterator>
+    free_functions() const;
+    std::pair<member_function_id_iterator, member_function_id_iterator>
+    member_functions() const;
+    std::pair<member_variable_id_iterator, member_variable_id_iterator>
+    member_variables() const;
+
 private:
     helene::array_view<const type_info> type_info_view_;
     helene::array_view<const constructor_info> constructor_info_view_;
@@ -91,4 +105,61 @@ private:
 
 namespace shadow
 {
+inline std::pair<reflection_manager::type_id_iterator,
+                 reflection_manager::type_id_iterator>
+reflection_manager::types() const
+{
+    return std::make_pair(
+        type_id_iterator(type_info_view_.data()),
+        type_id_iterator(type_info_view_.data() + type_info_view_.size()));
+}
+
+inline std::pair<reflection_manager::constructor_id_iterator,
+                 reflection_manager::constructor_id_iterator>
+reflection_manager::constructors() const
+{
+    return std::make_pair(
+        constructor_id_iterator(constructor_info_view_.data()),
+        constructor_id_iterator(constructor_info_view_.data() +
+                                constructor_info_view_.size()));
+}
+
+inline std::pair<reflection_manager::conversion_id_iterator,
+                 reflection_manager::conversion_id_iterator>
+reflection_manager::conversions() const
+{
+    return std::make_pair(conversion_id_iterator(conversion_info_view_.data()),
+                          conversion_id_iterator(conversion_info_view_.data() +
+                                                 conversion_info_view_.size()));
+}
+
+inline std::pair<reflection_manager::free_function_id_iterator,
+                 reflection_manager::free_function_id_iterator>
+reflection_manager::free_functions() const
+{
+    return std::make_pair(
+        free_function_id_iterator(free_function_info_view_.data()),
+        free_function_id_iterator(free_function_info_view_.data() +
+                                  free_function_info_view_.size()));
+}
+
+inline std::pair<reflection_manager::member_function_id_iterator,
+                 reflection_manager::member_function_id_iterator>
+reflection_manager::member_functions() const
+{
+    return std::make_pair(
+        member_function_id_iterator(member_function_info_view_.data()),
+        member_function_id_iterator(member_function_info_view_.data() +
+                                    member_function_info_view_.size()));
+}
+
+inline std::pair<reflection_manager::member_variable_id_iterator,
+                 reflection_manager::member_variable_id_iterator>
+reflection_manager::member_variables() const
+{
+    return std::make_pair(
+        member_variable_id_iterator(member_variable_info_view_.data()),
+        member_variable_id_iterator(member_variable_info_view_.data() +
+                                    member_variable_info_view_.size()));
+}
 }
