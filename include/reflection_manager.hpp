@@ -36,6 +36,16 @@ class reflection_manager
 {
 public:
     typedef info_iterator_<const type_info, type_id> type_id_iterator;
+    typedef info_iterator_<const constructor_info, constructor_id>
+        constructor_id_iterator;
+    typedef info_iterator_<const conversion_info, conversion_id>
+        conversion_id_iterator;
+    typedef info_iterator_<const free_function_info, free_function_id>
+        free_function_id_iterator;
+    typedef info_iterator_<const member_function_info, member_function_id>
+        member_function_id_iterator;
+    typedef info_iterator_<const member_variable_info, member_variable_id>
+        member_variable_id_iterator;
 
 public:
     reflection_manager() = default;
@@ -68,7 +78,6 @@ public:
 
 
 public:
-
 private:
     helene::array_view<const type_info> type_info_view_;
     helene::array_view<const constructor_info> constructor_info_view_;
