@@ -22,10 +22,8 @@ namespace shadow
 typedef any (*free_function_binding_signature)(any*);
 // member function signature
 typedef any (*member_function_binding_signature)(any&, any*);
-// member variable getter
-typedef any (*member_variable_get_binding_signature)(const any&);
-// member variable setter
-typedef void (*member_variable_set_binding_signature)(any&, const any&);
+// member variable signature
+typedef any_reference (*member_variable_binding_signature)(any&);
 // constructor signature
 typedef any (*constructor_binding_signature)(any*);
 // conversion signature
