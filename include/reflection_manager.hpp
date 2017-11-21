@@ -3,6 +3,7 @@
 #include <array_view.hpp>
 #include "reflection_info.hpp"
 #include "api_types.hpp"
+#include "info_iterators.hpp"
 
 
 namespace shadow
@@ -34,6 +35,9 @@ struct array_specializer<const T[N]>
 class reflection_manager
 {
 public:
+    typedef info_iterator_<const type_info, type_id> type_id_iterator;
+
+public:
     reflection_manager() = default;
 
     template <class TypeInfoArray,
@@ -57,12 +61,14 @@ public:
               array_specializer<FreeFunctionInfoArray>::initialize(ff_arr)),
           member_function_info_view_(
               array_specializer<MemberFunctionInfoArray>::initialize(mf_arr)),
-          member_variable_info_view_(array_specializer<MemberVariableInfoArray>::initialize(mv_arr))
+          member_variable_info_view_(
+              array_specializer<MemberVariableInfoArray>::initialize(mv_arr))
     {
     }
 
 
 public:
+    std::pair<type_id_iterator, type_id_iterator> types() const;
 
 private:
     helene::array_view<const type_info> type_info_view_;
@@ -72,4 +78,17 @@ private:
     helene::array_view<const member_function_info> member_function_info_view_;
     helene::array_view<const member_variable_info> member_variable_info_view_;
 };
+}
+
+
+namespace shadow
+{
+inline std::pair<reflection_manager::type_id_iterator,
+                 reflection_manager::type_id_iterator>
+reflection_manager::types() const
+{
+    return std::make_pair(
+        type_id_iterator(type_info_view_.data()),
+        type_id_iterator(type_info_view_.data() + type_info_view_.size()));
+}
 }

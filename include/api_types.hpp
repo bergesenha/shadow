@@ -72,4 +72,7 @@ public:
         return static_cast<const Derived*>(this)->info_ptr_->size;
     }
 };
+
+typedef info_type_aggregate<type_info, name_policy, size_policy>
+    type_id;
 }
