@@ -189,57 +189,25 @@ generic_member_function_bind_point(any& object, any* argument_array)
 
 namespace member_variable_detail
 {
-
 template <class MemVarPointerType,
           MemVarPointerType MemVarPointerValue,
-          class ObjectType,
-          class MemVarType>
-any
-get_dispatch(const any& object)
+          class ObjectType>
+any_reference
+member_variable_dispatch(any& object)
 {
     return (object.get<ObjectType>().*MemVarPointerValue);
 }
 
-template <class MemVarPointerType,
-          MemVarPointerType MemVarPointerValue,
-          class ObjectType,
-          class MemVarType>
-void
-set_dispatch(any& object, const any& value)
-{
-    (object.get<ObjectType>().*MemVarPointerValue) = value.get<MemVarType>();
-}
-
-
 template <class MemVarPointerType, MemVarPointerType MemVarPointerValue>
-any
-generic_member_variable_get_bind_point(const any& object)
+any_reference
+generic_member_variable_bind_point(any& object)
 {
     typedef metamusil::deduce_member_variable_object_type_t<MemVarPointerType>
         object_type;
-    typedef metamusil::deduce_member_variable_type_t<MemVarPointerType>
-        member_variable_type;
 
-    return get_dispatch<MemVarPointerType,
-                        MemVarPointerValue,
-                        object_type,
-                        member_variable_type>(object);
-}
-
-
-template <class MemVarPointerType, MemVarPointerType MemVarPointerValue>
-void
-generic_member_variable_set_bind_point(any& object, const any& value)
-{
-    typedef metamusil::deduce_member_variable_object_type_t<MemVarPointerType>
-        object_type;
-    typedef metamusil::deduce_member_variable_type_t<MemVarPointerType>
-        member_variable_type;
-
-    return set_dispatch<MemVarPointerType,
-                        MemVarPointerValue,
-                        object_type,
-                        member_variable_type>(object, value);
+    return member_variable_dispatch<MemVarPointerType,
+                                    MemVarPointerValue,
+                                    object_type>(object);
 }
 } // namespace member_variable_detail
 
