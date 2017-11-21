@@ -9,6 +9,9 @@
 
 namespace shadow
 {
+class ptr_holder_base;
+
+
 // abstract base class providing interface to held value
 class holder_base
 {
@@ -17,6 +20,7 @@ public:
     virtual void placement_copy(
         std::aligned_storage_t<sizeof(holder_base*)>* buffer) const = 0;
     virtual ~holder_base() = default;
+    virtual ptr_holder_base* make_value_ptr() = 0;
 };
 
 
@@ -48,10 +52,13 @@ public:
         new(buffer) holder<T>(value_);
     }
 
-    T get_value() const
+    T
+    get_value() const
     {
         return value_;
     }
+
+    virtual ptr_holder_base* make_value_ptr() override;
 
 private:
     T value_;
@@ -73,6 +80,7 @@ constexpr bool is_small_buffer_type_v = is_small_buffer_type<T>::value;
 class any
 {
     friend class any_reference;
+
 public:
     template <class T>
     struct get_specializer
@@ -342,7 +350,6 @@ swap(shadow::any& lhs, shadow::any& rhs)
 }
 
 
-
 namespace shadow
 {
 
@@ -408,6 +415,13 @@ public:
 private:
     T* ptr_value_;
 };
+
+template <class T>
+inline ptr_holder_base*
+holder<T>::make_value_ptr()
+{
+    return new ptr_holder<T>(value_);
+}
 
 
 class any_reference
