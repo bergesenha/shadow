@@ -114,8 +114,4 @@ SHADOW_INIT()
 int
 main()
 {
-    for(auto i = myspace::manager.types() ; i.first != i.second ; ++i.first)
-    {
-        std::cout << i.first->name() << " " << i.first->size() << '\n';
-    }
 }

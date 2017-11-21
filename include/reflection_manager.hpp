@@ -68,7 +68,6 @@ public:
 
 
 public:
-    std::pair<type_id_iterator, type_id_iterator> types() const;
 
 private:
     helene::array_view<const type_info> type_info_view_;
@@ -83,12 +82,4 @@ private:
 
 namespace shadow
 {
-inline std::pair<reflection_manager::type_id_iterator,
-                 reflection_manager::type_id_iterator>
-reflection_manager::types() const
-{
-    return std::make_pair(
-        type_id_iterator(type_info_view_.data()),
-        type_id_iterator(type_info_view_.data() + type_info_view_.size()));
-}
 }

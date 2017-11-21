@@ -14,21 +14,9 @@
 namespace shadow
 {
 
-template <class InfoType, template <class> class... Policies>
+template <class InfoType>
 class info_type_aggregate
-    : public Policies<info_type_aggregate<InfoType, Policies...>>...
 {
-    template <class Derived>
-    friend class name_policy;
-
-    template <class Derived>
-    friend class size_policy;
-
-    template <class Derived>
-    friend class comparison_policy;
-
-    friend class reflection_manager;
-
 public:
     info_type_aggregate() = default;
 
@@ -51,47 +39,13 @@ private:
 };
 
 
-template <class Derived>
-class name_policy
-{
-public:
-    std::string
-    name() const
-    {
-        return std::string(static_cast<const Derived*>(this)->info_ptr_->name);
-    }
-};
-
-template <class Derived>
-class size_policy
-{
-public:
-    std::size_t
-    size() const
-    {
-        return static_cast<const Derived*>(this)->info_ptr_->size;
-    }
-};
-
-typedef info_type_aggregate<type_info, name_policy, size_policy> type_id;
 
 
-inline std::ostream& operator<<(std::ostream& out, const type_description& td)
-{
-    return out;
-}
-
-template <class Derived>
-class instance_name_policy
-{
-public:
-    std::string name() const
-    {
-        std::string out;
-
-        out << static_cast<const Derived*>(this)->info_ptr_->type;
-    }
-};
-
+typedef info_type_aggregate<type_info> type_id;
 typedef info_type_aggregate<type_description> instance_type_id;
+typedef info_type_aggregate<constructor_info> constructor_id;
+typedef info_type_aggregate<conversion_info> conversion_id;
+typedef info_type_aggregate<free_function_info> free_function_id;
+typedef info_type_aggregate<member_function_info> member_function_id;
+typedef info_type_aggregate<member_variable_info> member_variable_id;
 }
