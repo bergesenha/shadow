@@ -110,6 +110,8 @@ public:
     std::string type_name(const type_id& id) const;
     type_id base_type(const type_id& id) const;
 
+    type_id constructor_type(const constructor_id& id) const;
+
 private:
     // views of raw compile time generated information
     helene::array_view<const type_info> type_info_view_;
@@ -196,5 +198,11 @@ inline type_id
 reflection_manager::base_type(const type_id& id) const
 {
     return type_id(base_type_descriptions_[id.info_ptr_->type_index]);
+}
+
+inline type_id
+reflection_manager::constructor_type(const constructor_id& id) const
+{
+    return type_id(*id.info_ptr_->type);
 }
 }
