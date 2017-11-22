@@ -135,6 +135,14 @@ public:
 
     bool member_function_is_const(const member_function_id& id) const;
 
+    std::string member_variable_name(const member_variable_id& id) const;
+
+    type_id member_variable_type(const member_variable_id& id) const;
+
+    type_id member_variable_object_type(const member_variable_id& id) const;
+
+    std::size_t member_variable_offset(const member_variable_id& id) const;
+
 private:
     // views of raw compile time generated information
     helene::array_view<const type_info> type_info_view_;
@@ -314,9 +322,37 @@ reflection_manager::member_function_parameter_types(
                           type_id_iterator(id.info_ptr_->parameter_types +
                                            id.info_ptr_->num_parameters));
 }
+
 inline bool
 reflection_manager::member_function_is_const(const member_function_id& id) const
 {
     return id.info_ptr_->constness;
+}
+
+
+inline std::string
+reflection_manager::member_variable_name(const member_variable_id& id) const
+{
+    return id.info_ptr_->name;
+}
+
+inline type_id
+reflection_manager::member_variable_type(const member_variable_id& id) const
+{
+    return type_id(*id.info_ptr_->type);
+}
+
+
+inline type_id
+reflection_manager::member_variable_object_type(
+    const member_variable_id& id) const
+{
+    return type_id(*id.info_ptr_->object_type);
+}
+
+inline std::size_t
+reflection_manager::member_variable_offset(const member_variable_id& id) const
+{
+    return id.info_ptr_->offset;
 }
 }

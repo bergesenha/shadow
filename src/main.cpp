@@ -190,11 +190,17 @@ main()
         }
         std::cout << '\n';
     }
+    std::cout << '\n';
 
     for(auto i = myspace::manager.member_variables(); i.first != i.second;
         ++i.first)
     {
-        std::cout << '.';
+        std::cout << myspace::manager.type_name(
+                         myspace::manager.member_variable_type(*i.first))
+                  << ' '
+                  << myspace::manager.type_name(
+                         myspace::manager.member_variable_object_type(*i.first))
+                  << "::" << myspace::manager.member_variable_name(*i.first) << " offset=" << myspace::manager.member_variable_offset(*i.first) << '\n';
     }
     std::cout << '\n';
 }
