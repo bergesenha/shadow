@@ -59,8 +59,20 @@ class object
 public:
     object() = default;
 
+    bool has_value() const;
+
 private:
     any value_;
     const reflection_manager* manager_;
 };
+}
+
+
+namespace shadow
+{
+inline bool
+object::has_value() const
+{
+    return value_.has_value();
+}
 }
