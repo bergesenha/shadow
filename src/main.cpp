@@ -176,9 +176,15 @@ main()
                   << myspace::manager.type_name(
                          myspace::manager.member_function_object_type(*i.first))
                   << "::" << myspace::manager.member_function_name(*i.first)
-                  << '\n';
+                  << '(';
+        for(auto j = myspace::manager.member_function_parameter_types(*i.first);
+            j.first != j.second;
+            ++j.first)
+        {
+            std::cout << myspace::manager.type_name(*j.first) << ", ";
+        }
+        std::cout << ")\n";
     }
-    std::cout << '\n';
 
     for(auto i = myspace::manager.member_variables(); i.first != i.second;
         ++i.first)

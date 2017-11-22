@@ -127,7 +127,11 @@ public:
     std::string member_function_name(const member_function_id& id) const;
 
     type_id member_function_return_type(const member_function_id& id) const;
+
     type_id member_function_object_type(const member_function_id& id) const;
+
+    std::pair<type_id_iterator, type_id_iterator>
+    member_function_parameter_types(const member_function_id& id) const;
 
 private:
     // views of raw compile time generated information
@@ -297,5 +301,15 @@ reflection_manager::member_function_object_type(
     const member_function_id& id) const
 {
     return type_id(*id.info_ptr_->object_type);
+}
+
+inline std::pair<reflection_manager::type_id_iterator,
+                 reflection_manager::type_id_iterator>
+reflection_manager::member_function_parameter_types(
+    const member_function_id& id) const
+{
+    return std::make_pair(type_id_iterator(id.info_ptr_->parameter_types),
+                          type_id_iterator(id.info_ptr_->parameter_types +
+                                           id.info_ptr_->num_parameters));
 }
 }
