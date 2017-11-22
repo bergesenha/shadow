@@ -16,8 +16,9 @@ namespace shadow
 
 class reflection_manager;
 
-template <class InfoType>
+template <class InfoType, template <class> class... Policies>
 class info_type_aggregate
+    : Policies<info_type_aggregate<InfoType, Policies...>>...
 {
     friend class reflection_manager;
 

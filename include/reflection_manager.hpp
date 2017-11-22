@@ -166,6 +166,11 @@ private:
 };
 }
 
+namespace shadow
+{
+
+}
+
 
 namespace shadow
 {
