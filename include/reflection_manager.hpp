@@ -108,6 +108,7 @@ public:
 
 
     std::string type_name(const type_id& id) const;
+    type_id base_type(const type_id& id) const;
 
 private:
     // views of raw compile time generated information
@@ -189,5 +190,11 @@ inline std::string
 reflection_manager::type_name(const type_id& id) const
 {
     return type_info_view_[id.info_ptr_->type_index].name;
+}
+
+inline type_id
+reflection_manager::base_type(const type_id& id) const
+{
+    return type_id(base_type_descriptions_[id.info_ptr_->type_index]);
 }
 }
