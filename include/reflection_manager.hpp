@@ -307,7 +307,7 @@ reflection_manager::construct_object(const constructor_id& id,
                    std::back_inserter(args),
                    [](const auto& obj) { return obj.value_; });
 
-    return object(bind_point(args.data()), id.info_ptr_->type, this);
+    return object(bind_point(args.data()), id.info_ptr_->type);
 }
 
 inline object
@@ -319,7 +319,7 @@ reflection_manager::construct_object(const constructor_id& id) const
             "non-zero-parameter bind point called with no arguments");
     }
 
-    return object(id.info_ptr_->bind_point(nullptr), id.info_ptr_->type, this);
+    return object(id.info_ptr_->bind_point(nullptr), id.info_ptr_->type);
 }
 
 

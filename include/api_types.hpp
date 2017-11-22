@@ -14,6 +14,8 @@
 namespace shadow
 {
 
+class reflection_manager;
+
 template <class InfoType>
 class info_type_aggregate
 {
@@ -38,6 +40,7 @@ public:
 
 private:
     const InfoType* info_ptr_;
+    const reflection_manager* manager_;
 };
 
 
@@ -50,15 +53,13 @@ typedef info_type_aggregate<member_function_info> member_function_id;
 typedef info_type_aggregate<member_variable_info> member_variable_id;
 
 
-class reflection_manager;
 
 class object
 {
     friend class reflection_manager;
 
     object(const any& value,
-           const type_description* type,
-           const reflection_manager* manager);
+           const type_description* type);
 
 public:
     object() = default;
@@ -68,7 +69,6 @@ public:
 private:
     any value_;
     const type_description* type_;
-    const reflection_manager* manager_;
 };
 }
 
@@ -76,9 +76,8 @@ private:
 namespace shadow
 {
 inline object::object(const any& value,
-                      const type_description* type,
-                      const reflection_manager* manager)
-    : value_(value), type_(type), manager_(manager)
+                      const type_description* type)
+    : value_(value), type_(type)
 {
 }
 
