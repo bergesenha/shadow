@@ -56,6 +56,8 @@ class object
 {
     friend class reflection_manager;
 
+    object(const any& value, const reflection_manager* manager);
+
 public:
     object() = default;
 
@@ -70,6 +72,11 @@ private:
 
 namespace shadow
 {
+inline object::object(const any& value, const reflection_manager* manager)
+    : value_(value), manager_(manager)
+{
+}
+
 inline bool
 object::has_value() const
 {
