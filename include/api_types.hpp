@@ -24,7 +24,8 @@ class info_type_aggregate
 public:
     info_type_aggregate() = default;
 
-    info_type_aggregate(const InfoType& info) : info_ptr_(&info)
+    info_type_aggregate(const InfoType& info, const reflection_manager& man)
+        : info_ptr_(&info), manager_(&man)
     {
     }
 
@@ -53,13 +54,11 @@ typedef info_type_aggregate<member_function_info> member_function_id;
 typedef info_type_aggregate<member_variable_info> member_variable_id;
 
 
-
 class object
 {
     friend class reflection_manager;
 
-    object(const any& value,
-           const type_description* type);
+    object(const any& value, const type_description* type);
 
 public:
     object() = default;
@@ -75,8 +74,7 @@ private:
 
 namespace shadow
 {
-inline object::object(const any& value,
-                      const type_description* type)
+inline object::object(const any& value, const type_description* type)
     : value_(value), type_(type)
 {
 }
