@@ -211,16 +211,14 @@ typedef info_type_aggregate<conversion_info> conversion_id;
 typedef info_type_aggregate<free_function_info,
                             name_policy,
                             return_type_policy,
-                            parameter_types_policy,
-                            equal_policy>
+                            parameter_types_policy>
     free_function_id;
 typedef info_type_aggregate<member_function_info,
                             name_policy,
                             return_type_policy,
                             parameter_types_policy,
                             object_type_policy,
-                            member_function_is_const_policy,
-                            equal_policy>
+                            member_function_is_const_policy>
     member_function_id;
 typedef info_type_aggregate<member_variable_info,
                             name_policy,
