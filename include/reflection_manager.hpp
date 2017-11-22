@@ -108,6 +108,7 @@ public:
     std::pair<member_variable_id_iterator, member_variable_id_iterator>
     member_variables() const;
 
+    type_id object_type(const object& obj) const;
 
     std::string type_name(const type_id& id) const;
     type_id base_type(const type_id& id) const;
@@ -116,6 +117,11 @@ public:
 
     std::pair<type_id_iterator, type_id_iterator>
     constructor_parameter_types(const constructor_id& id) const;
+
+    template <class Iterator>
+    object construct_object(const constructor_id& id,
+                            Iterator arg_first,
+                            Iterator arg_last) const;
 
     std::string free_function_name(const free_function_id& id) const;
 
@@ -218,6 +224,18 @@ reflection_manager::member_variables() const
                                     member_variable_info_view_.size()));
 }
 
+inline type_id
+reflection_manager::object_type(const object& obj) const
+{
+    if(obj.has_value())
+    {
+        return type_id(*obj.type_);
+    }
+    else
+    {
+        return type_id(base_type_descriptions_[0]);
+    }
+}
 
 inline std::string
 reflection_manager::type_name(const type_id& id) const
@@ -268,6 +286,16 @@ reflection_manager::constructor_parameter_types(const constructor_id& id) const
     return std::make_pair(type_id_iterator(id.info_ptr_->parameter_types),
                           type_id_iterator(id.info_ptr_->parameter_types +
                                            id.info_ptr_->num_parameters));
+}
+
+template <class Iterator>
+object
+reflection_manager::construct_object(const constructor_id& id,
+                                     Iterator arg_first,
+                                     Iterator arg_last) const
+{
+    const auto bind_point = id.info_ptr_->bind_point;
+    // TODO: check arguments
 }
 
 inline std::string
