@@ -18,9 +18,12 @@ class reflection_manager;
 
 template <class InfoType, template <class> class... Policies>
 class info_type_aggregate
-    : Policies<info_type_aggregate<InfoType, Policies...>>...
+    : public Policies<info_type_aggregate<InfoType, Policies...>>...
 {
     friend class reflection_manager;
+
+    template <class Derived>
+    friend struct type_name_policy;
 
 public:
     info_type_aggregate() = default;
@@ -46,8 +49,18 @@ private:
 };
 
 
-typedef info_type_aggregate<type_description> type_id;
-typedef info_type_aggregate<type_description> instance_type_id;
+template <class Derived>
+struct type_name_policy
+{
+    std::string
+    name() const
+    {
+        return static_cast<const Derived*>(this)->manager_.type_info_view
+            [static_cast<const Derived*>(this)->info_ptr_->type_index];
+    }
+};
+
+typedef info_type_aggregate<type_description, type_name_policy> type_id;
 typedef info_type_aggregate<constructor_info> constructor_id;
 typedef info_type_aggregate<conversion_info> conversion_id;
 typedef info_type_aggregate<free_function_info> free_function_id;

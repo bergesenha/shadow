@@ -132,8 +132,8 @@ main()
     for(auto i = myspace::manager.constructors(); i.first != i.second;
         ++i.first)
     {
-        std::cout << myspace::manager.type_name(
-                         myspace::manager.constructor_type(*i.first))
+        std::cout << 
+                         myspace::manager.constructor_type(*i.first).name()
                   << ": ";
 
         for(auto j = myspace::manager.constructor_parameter_types(*i.first);

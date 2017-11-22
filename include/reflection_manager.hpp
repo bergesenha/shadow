@@ -42,6 +42,9 @@ struct array_specializer<const T[N]>
 
 class reflection_manager
 {
+    template <class Derived>
+    friend struct type_name_policy;
+
 public:
     typedef info_iterator_<const type_description, type_id> type_id_iterator;
     typedef info_iterator_<const constructor_info, constructor_id>
