@@ -133,6 +133,8 @@ public:
     std::pair<type_id_iterator, type_id_iterator>
     member_function_parameter_types(const member_function_id& id) const;
 
+    bool member_function_is_const(const member_function_id& id) const;
+
 private:
     // views of raw compile time generated information
     helene::array_view<const type_info> type_info_view_;
@@ -311,5 +313,10 @@ reflection_manager::member_function_parameter_types(
     return std::make_pair(type_id_iterator(id.info_ptr_->parameter_types),
                           type_id_iterator(id.info_ptr_->parameter_types +
                                            id.info_ptr_->num_parameters));
+}
+inline bool
+reflection_manager::member_function_is_const(const member_function_id& id) const
+{
+    return id.info_ptr_->constness;
 }
 }

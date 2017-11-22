@@ -183,7 +183,12 @@ main()
         {
             std::cout << myspace::manager.type_name(*j.first) << ", ";
         }
-        std::cout << ")\n";
+        std::cout << ")";
+        if(myspace::manager.member_function_is_const(*i.first))
+        {
+            std::cout << " const";
+        }
+        std::cout << '\n';
     }
 
     for(auto i = myspace::manager.member_variables(); i.first != i.second;
