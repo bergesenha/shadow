@@ -25,6 +25,9 @@ class info_type_aggregate
     template <class Derived>
     friend struct type_name_policy;
 
+    template <class Derived>
+    friend struct name_policy;
+
 public:
     info_type_aggregate() = default;
 
@@ -43,7 +46,7 @@ public:
         return this;
     }
 
-private:
+protected:
     const InfoType* info_ptr_;
     const reflection_manager* manager_;
 };
@@ -55,17 +58,29 @@ struct type_name_policy
     std::string
     name() const
     {
-        return static_cast<const Derived*>(this)->manager_.type_info_view
-            [static_cast<const Derived*>(this)->info_ptr_->type_index];
+        return static_cast<const Derived*>(this)->manager_->type_info_view_
+            [static_cast<const Derived*>(this)->info_ptr_->type_index].name;
+    }
+};
+
+template <class Derived>
+struct name_policy
+{
+    std::string
+    name() const
+    {
+        return static_cast<const Derived*>(this)->info_ptr_->name;
     }
 };
 
 typedef info_type_aggregate<type_description, type_name_policy> type_id;
 typedef info_type_aggregate<constructor_info> constructor_id;
 typedef info_type_aggregate<conversion_info> conversion_id;
-typedef info_type_aggregate<free_function_info> free_function_id;
-typedef info_type_aggregate<member_function_info> member_function_id;
-typedef info_type_aggregate<member_variable_info> member_variable_id;
+typedef info_type_aggregate<free_function_info, name_policy> free_function_id;
+typedef info_type_aggregate<member_function_info, name_policy>
+    member_function_id;
+typedef info_type_aggregate<member_variable_info, name_policy>
+    member_variable_id;
 
 
 class object
