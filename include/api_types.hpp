@@ -43,6 +43,10 @@ class info_type_aggregate
 
     template <class Derived>
     friend struct member_function_is_const_policy;
+
+    template <class Derived>
+    friend struct offset_policy;
+
 public:
     info_type_aggregate() = default;
 
@@ -158,6 +162,16 @@ struct member_function_is_const_policy
     }
 };
 
+template <class Derived>
+struct offset_policy
+{
+    std::size_t
+    offset() const
+    {
+        return static_cast<const Derived*>(this)->info_ptr_->offset;
+    }
+};
+
 typedef info_type_aggregate<constructor_info,
                             type_policy,
                             parameter_types_policy>
@@ -178,7 +192,8 @@ typedef info_type_aggregate<member_function_info,
 typedef info_type_aggregate<member_variable_info,
                             name_policy,
                             type_policy,
-                            object_type_policy>
+                            object_type_policy,
+                            offset_policy>
     member_variable_id;
 
 

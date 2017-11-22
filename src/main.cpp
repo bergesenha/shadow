@@ -183,8 +183,7 @@ main()
     {
         std::cout << i.first->type().name() << ' '
                   << i.first->object_type().name() << "::" << i.first->name()
-                  << " offset="
-                  << myspace::manager.member_variable_offset(*i.first) << '\n';
+                  << " offset=" << i.first->offset() << '\n';
     }
     std::cout << '\n';
 
