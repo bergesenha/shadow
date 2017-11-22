@@ -40,6 +40,7 @@ struct array_specializer<const T[N]>
 class reflection_manager
 {
 public:
+    typedef info_iterator_<const type_description, type_id> type_id_iterator;
     typedef info_iterator_<const constructor_info, constructor_id>
         constructor_id_iterator;
     typedef info_iterator_<const conversion_info, conversion_id>
@@ -93,6 +94,7 @@ public:
 
 
 public:
+    std::pair<type_id_iterator, type_id_iterator> types() const;
     std::pair<constructor_id_iterator, constructor_id_iterator>
     constructors() const;
     std::pair<conversion_id_iterator, conversion_id_iterator>
@@ -103,6 +105,9 @@ public:
     member_functions() const;
     std::pair<member_variable_id_iterator, member_variable_id_iterator>
     member_variables() const;
+
+
+    std::string type_name(const type_id& id) const;
 
 private:
     // views of raw compile time generated information
@@ -121,6 +126,15 @@ private:
 
 namespace shadow
 {
+inline std::pair<reflection_manager::type_id_iterator,
+                 reflection_manager::type_id_iterator>
+reflection_manager::types() const
+{
+    return std::make_pair(type_id_iterator(base_type_descriptions_.data()),
+                          type_id_iterator(base_type_descriptions_.data() +
+                                           base_type_descriptions_.size()));
+}
+
 inline std::pair<reflection_manager::constructor_id_iterator,
                  reflection_manager::constructor_id_iterator>
 reflection_manager::constructors() const
@@ -168,5 +182,12 @@ reflection_manager::member_variables() const
         member_variable_id_iterator(member_variable_info_view_.data()),
         member_variable_id_iterator(member_variable_info_view_.data() +
                                     member_variable_info_view_.size()));
+}
+
+
+inline std::string
+reflection_manager::type_name(const type_id& id) const
+{
+    return type_info_view_[id.info_ptr_->type_index].name;
 }
 }

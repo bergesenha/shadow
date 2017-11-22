@@ -17,6 +17,7 @@ namespace shadow
 template <class InfoType>
 class info_type_aggregate
 {
+    friend class reflection_manager;
 public:
     info_type_aggregate() = default;
 
@@ -41,7 +42,7 @@ private:
 
 
 
-typedef info_type_aggregate<type_info> type_id;
+typedef info_type_aggregate<type_description> type_id;
 typedef info_type_aggregate<type_description> instance_type_id;
 typedef info_type_aggregate<constructor_info> constructor_id;
 typedef info_type_aggregate<conversion_info> conversion_id;
