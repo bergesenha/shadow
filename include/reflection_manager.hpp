@@ -1,8 +1,11 @@
 #pragma once
 
 #include <utility>
+#include <vector>
+#include <numeric>
 
 #include <array_view.hpp>
+#include <member_iterator.hpp>
 #include "reflection_info.hpp"
 #include "api_types.hpp"
 #include "info_iterators.hpp"
@@ -37,7 +40,6 @@ struct array_specializer<const T[N]>
 class reflection_manager
 {
 public:
-    typedef info_iterator_<const type_info, type_id> type_id_iterator;
     typedef info_iterator_<const constructor_info, constructor_id>
         constructor_id_iterator;
     typedef info_iterator_<const conversion_info, conversion_id>
@@ -74,13 +76,23 @@ public:
           member_function_info_view_(
               array_specializer<MemberFunctionInfoArray>::initialize(mf_arr)),
           member_variable_info_view_(
-              array_specializer<MemberVariableInfoArray>::initialize(mv_arr))
+              array_specializer<MemberVariableInfoArray>::initialize(mv_arr)),
+          base_type_descriptions_(type_info_view_.size(), {0, 0, nullptr})
     {
+        typedef helene::member_iterator<std::size_t,
+                                        type_description,
+                                        std::vector<type_description>::iterator,
+                                        &type_description::type_index>
+            td_index_iter;
+
+        auto first_td = td_index_iter(base_type_descriptions_.begin());
+        auto last_td = td_index_iter(base_type_descriptions_.end());
+
+        std::iota(first_td, last_td, 0);
     }
 
 
 public:
-    std::pair<type_id_iterator, type_id_iterator> types() const;
     std::pair<constructor_id_iterator, constructor_id_iterator>
     constructors() const;
     std::pair<conversion_id_iterator, conversion_id_iterator>
@@ -93,27 +105,22 @@ public:
     member_variables() const;
 
 private:
+    // views of raw compile time generated information
     helene::array_view<const type_info> type_info_view_;
     helene::array_view<const constructor_info> constructor_info_view_;
     helene::array_view<const conversion_info> conversion_info_view_;
     helene::array_view<const free_function_info> free_function_info_view_;
     helene::array_view<const member_function_info> member_function_info_view_;
     helene::array_view<const member_variable_info> member_variable_info_view_;
+
+    // processed information
+    std::vector<type_description> base_type_descriptions_;
 };
 }
 
 
 namespace shadow
 {
-inline std::pair<reflection_manager::type_id_iterator,
-                 reflection_manager::type_id_iterator>
-reflection_manager::types() const
-{
-    return std::make_pair(
-        type_id_iterator(type_info_view_.data()),
-        type_id_iterator(type_info_view_.data() + type_info_view_.size()));
-}
-
 inline std::pair<reflection_manager::constructor_id_iterator,
                  reflection_manager::constructor_id_iterator>
 reflection_manager::constructors() const
