@@ -6,6 +6,8 @@
 #include <cstring>
 #include <ostream>
 #include <istream>
+#include <sstream>
+#include <algorithm>
 
 #include "any.hpp"
 #include "reflection_info.hpp"
@@ -47,6 +49,9 @@ class info_type_aggregate
     template <class Derived>
     friend struct offset_policy;
 
+    template <class Derived>
+    friend struct equal_policy;
+
 public:
     info_type_aggregate() = default;
 
@@ -77,11 +82,23 @@ struct type_name_policy
     std::string
     name() const
     {
-        return static_cast<const Derived*>(this)
-            ->manager_
-            ->type_info_view_[static_cast<const Derived*>(this)
-                                  ->info_ptr_->type_index]
-            .name;
+        std::ostringstream out;
+        out << static_cast<const Derived*>(this)
+                   ->manager_
+                   ->type_info_view_[static_cast<const Derived*>(this)
+                                         ->info_ptr_->type_index]
+                   .name;
+
+        auto att_begin =
+            static_cast<const Derived*>(this)->info_ptr_->attributes;
+        auto att_end =
+            static_cast<const Derived*>(this)->info_ptr_->attributes +
+            static_cast<const Derived*>(this)->info_ptr_->num_attributes;
+
+        std::for_each(
+            att_begin, att_end, [&out](auto att) { out << ' ' << att; });
+
+        return out.str();
     }
 };
 
@@ -95,8 +112,20 @@ struct name_policy
     }
 };
 
+template <class Derived>
+struct equal_policy
+{
+    bool
+    operator==(const Derived& other) const
+    {
+        const Derived& derived = *static_cast<const Derived*>(this);
 
-typedef info_type_aggregate<type_description, type_name_policy> type_id;
+        return derived.name() == other.name();
+    }
+};
+
+typedef info_type_aggregate<type_description, type_name_policy, equal_policy>
+    type_id;
 
 typedef info_iterator_<const type_description, type_id> type_id_iterator;
 
@@ -176,24 +205,29 @@ typedef info_type_aggregate<constructor_info,
                             type_policy,
                             parameter_types_policy>
     constructor_id;
+
 typedef info_type_aggregate<conversion_info> conversion_id;
+
 typedef info_type_aggregate<free_function_info,
                             name_policy,
                             return_type_policy,
-                            parameter_types_policy>
+                            parameter_types_policy,
+                            equal_policy>
     free_function_id;
 typedef info_type_aggregate<member_function_info,
                             name_policy,
                             return_type_policy,
                             parameter_types_policy,
                             object_type_policy,
-                            member_function_is_const_policy>
+                            member_function_is_const_policy,
+                            equal_policy>
     member_function_id;
 typedef info_type_aggregate<member_variable_info,
                             name_policy,
                             type_policy,
                             object_type_policy,
-                            offset_policy>
+                            offset_policy,
+                            equal_policy>
     member_variable_id;
 
 
