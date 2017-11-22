@@ -114,6 +114,9 @@ public:
 
     type_id constructor_type(const constructor_id& id) const;
 
+    std::pair<type_id_iterator, type_id_iterator>
+    constructor_parameter_types(const constructor_id& id) const;
+
 private:
     // views of raw compile time generated information
     helene::array_view<const type_info> type_info_view_;
@@ -198,24 +201,24 @@ reflection_manager::type_name(const type_id& id) const
     std::for_each(id.info_ptr_->attributes,
                   id.info_ptr_->attributes + id.info_ptr_->num_attributes,
                   [&sout](const auto att) {
-                  
-                  if(att == type_attribute::const_tag)
-                  {
-                    sout << " const";
-                  }
-                  if(att == type_attribute::pointer_tag)
-                  {
-                        sout << "*";
-                  }
-                  if(att == type_attribute::lreference_tag)
-                  {
-                        sout << "&";
-                  }
-                  if(att == type_attribute::rreference_tag)
-                  {
-                        sout << "&&";
-                  }
-                  
+
+                      if(att == type_attribute::const_tag)
+                      {
+                          sout << " const";
+                      }
+                      if(att == type_attribute::pointer_tag)
+                      {
+                          sout << "*";
+                      }
+                      if(att == type_attribute::lreference_tag)
+                      {
+                          sout << "&";
+                      }
+                      if(att == type_attribute::rreference_tag)
+                      {
+                          sout << "&&";
+                      }
+
                   });
     return sout.str();
 }
@@ -230,5 +233,14 @@ inline type_id
 reflection_manager::constructor_type(const constructor_id& id) const
 {
     return type_id(*id.info_ptr_->type);
+}
+
+inline std::pair<reflection_manager::type_id_iterator,
+          reflection_manager::type_id_iterator>
+reflection_manager::constructor_parameter_types(const constructor_id& id) const
+{
+    return std::make_pair(type_id_iterator(id.info_ptr_->parameter_types),
+                          type_id_iterator(id.info_ptr_->parameter_types +
+                                           id.info_ptr_->num_parameters));
 }
 }

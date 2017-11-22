@@ -127,7 +127,17 @@ main()
     {
         std::cout << myspace::manager.type_name(
                          myspace::manager.constructor_type(*i.first))
-                  << '\n';
+                  << ": ";
+
+        for(auto j = myspace::manager.constructor_parameter_types(*i.first);
+            j.first != j.second;
+            ++j.first)
+        {
+            std::cout << myspace::manager.type_name(*j.first) << ", ";
+        }
+
+        std::cout << "\n\n";
+
     }
     std::cout << '\n';
 
