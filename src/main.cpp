@@ -23,6 +23,11 @@ struct a
 
 struct b
 {
+    b() = default;
+    b(char k, const a& v) : key(k), value(v)
+    {
+    }
+
     char key;
     a value;
     const char&
@@ -88,6 +93,8 @@ REGISTER_TYPE_END()
 
 REGISTER_CONSTRUCTOR(a, int, double)
 REGISTER_CONSTRUCTOR(a*, a*)
+REGISTER_CONSTRUCTOR(b)
+REGISTER_CONSTRUCTOR(b, char, const a&)
 
 REGISTER_FREE_FUNCTION(get_i)
 REGISTER_FREE_FUNCTION(long_function)
@@ -120,41 +127,80 @@ main()
 {
     for(auto i = myspace::manager.types(); i.first != i.second; ++i.first)
     {
-        std::cout << '.';
+        // std::cout << myspace::manager.type_name(*i.first) << '\n';
     }
-    std::cout << '\n';
-
     for(auto i = myspace::manager.constructors(); i.first != i.second;
         ++i.first)
     {
-        std::cout << '.';
+        std::cout << myspace::manager.type_name(
+                         myspace::manager.constructor_type(*i.first))
+                  << ": ";
+
+        for(auto j = myspace::manager.constructor_parameter_types(*i.first);
+            j.first != j.second;
+            ++j.first)
+        {
+            std::cout << myspace::manager.type_name(*j.first) << ", ";
+        }
+
+        std::cout << "\n\n";
     }
     std::cout << '\n';
 
-    for(auto i = myspace::manager.conversions(); i.first != i.second; ++i.first)
-    {
-        std::cout << '.';
-    }
-    std::cout << '\n';
 
     for(auto i = myspace::manager.free_functions(); i.first != i.second;
         ++i.first)
     {
-        std::cout << '.';
+        std::cout << myspace::manager.type_name(
+                         myspace::manager.free_function_return_type(*i.first))
+                  << ' ' << myspace::manager.free_function_name(*i.first)
+                  << '(';
+
+        for(auto j = myspace::manager.free_function_parameter_types(*i.first);
+            j.first != j.second;
+            ++j.first)
+        {
+            std::cout << myspace::manager.type_name(*j.first) << ", ";
+        }
+
+        std::cout << '\n';
     }
     std::cout << '\n';
 
     for(auto i = myspace::manager.member_functions(); i.first != i.second;
         ++i.first)
     {
-        std::cout << '.';
+        std::cout << myspace::manager.type_name(
+                         myspace::manager.member_function_return_type(*i.first))
+                  << " "
+                  << myspace::manager.type_name(
+                         myspace::manager.member_function_object_type(*i.first))
+                  << "::" << myspace::manager.member_function_name(*i.first)
+                  << '(';
+        for(auto j = myspace::manager.member_function_parameter_types(*i.first);
+            j.first != j.second;
+            ++j.first)
+        {
+            std::cout << myspace::manager.type_name(*j.first) << ", ";
+        }
+        std::cout << ")";
+        if(myspace::manager.member_function_is_const(*i.first))
+        {
+            std::cout << " const";
+        }
+        std::cout << '\n';
     }
     std::cout << '\n';
 
     for(auto i = myspace::manager.member_variables(); i.first != i.second;
         ++i.first)
     {
-        std::cout << '.';
+        std::cout << myspace::manager.type_name(
+                         myspace::manager.member_variable_type(*i.first))
+                  << ' '
+                  << myspace::manager.type_name(
+                         myspace::manager.member_variable_object_type(*i.first))
+                  << "::" << myspace::manager.member_variable_name(*i.first) << " offset=" << myspace::manager.member_variable_offset(*i.first) << '\n';
     }
     std::cout << '\n';
 }
