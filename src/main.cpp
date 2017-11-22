@@ -200,7 +200,32 @@ main()
                   << ' '
                   << myspace::manager.type_name(
                          myspace::manager.member_variable_object_type(*i.first))
-                  << "::" << myspace::manager.member_variable_name(*i.first) << " offset=" << myspace::manager.member_variable_offset(*i.first) << '\n';
+                  << "::" << myspace::manager.member_variable_name(*i.first)
+                  << " offset="
+                  << myspace::manager.member_variable_offset(*i.first) << '\n';
     }
     std::cout << '\n';
+
+
+    auto constructor_range = myspace::manager.constructors();
+    std::vector<shadow::constructor_id> default_constructors;
+
+    std::copy_if(constructor_range.first,
+                 constructor_range.second,
+                 std::back_inserter(default_constructors),
+                 [](const auto& id) {
+                     auto arg_pair =
+                         myspace::manager.constructor_parameter_types(id);
+
+                     return std::distance(arg_pair.first, arg_pair.second) == 0;
+                 });
+
+    std::vector<shadow::object> default_constructed_objects;
+    default_constructed_objects.reserve(default_constructors.size());
+
+    std::transform(
+        default_constructors.begin(),
+        default_constructors.end(),
+        std::back_inserter(default_constructed_objects),
+        [](const auto& id) { return myspace::manager.construct_object(id); });
 }

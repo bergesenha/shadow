@@ -11,6 +11,7 @@
 #include "reflection_info.hpp"
 #include "api_types.hpp"
 #include "info_iterators.hpp"
+#include "exceptions.hpp"
 
 
 namespace shadow
@@ -122,6 +123,8 @@ public:
     object construct_object(const constructor_id& id,
                             Iterator arg_first,
                             Iterator arg_last) const;
+
+    object construct_object(const constructor_id& id) const;
 
     std::string free_function_name(const free_function_id& id) const;
 
@@ -289,14 +292,36 @@ reflection_manager::constructor_parameter_types(const constructor_id& id) const
 }
 
 template <class Iterator>
-object
+inline object
 reflection_manager::construct_object(const constructor_id& id,
                                      Iterator arg_first,
                                      Iterator arg_last) const
 {
     const auto bind_point = id.info_ptr_->bind_point;
     // TODO: check arguments
+    // create argument array
+    std::vector<any> args;
+    args.reserve(std::distance(arg_first, arg_last));
+    std::transform(arg_first,
+                   arg_last,
+                   std::back_inserter(args),
+                   [](const auto& obj) { return obj.value_; });
+
+    return object(bind_point(args.data()), id.info_ptr_->type, this);
 }
+
+inline object
+reflection_manager::construct_object(const constructor_id& id) const
+{
+    if(id.info_ptr_->num_parameters != 0)
+    {
+        throw argument_error(
+            "non-zero-parameter bind point called with no arguments");
+    }
+
+    return object(id.info_ptr_->bind_point(nullptr), id.info_ptr_->type, this);
+}
+
 
 inline std::string
 reflection_manager::free_function_name(const free_function_id& id) const
