@@ -18,6 +18,7 @@ template <class InfoType>
 class info_type_aggregate
 {
     friend class reflection_manager;
+
 public:
     info_type_aggregate() = default;
 
@@ -40,8 +41,6 @@ private:
 };
 
 
-
-
 typedef info_type_aggregate<type_description> type_id;
 typedef info_type_aggregate<type_description> instance_type_id;
 typedef info_type_aggregate<constructor_info> constructor_id;
@@ -49,4 +48,19 @@ typedef info_type_aggregate<conversion_info> conversion_id;
 typedef info_type_aggregate<free_function_info> free_function_id;
 typedef info_type_aggregate<member_function_info> member_function_id;
 typedef info_type_aggregate<member_variable_info> member_variable_id;
+
+
+class reflection_manager;
+
+class object
+{
+    friend class reflection_manager;
+
+public:
+    object() = default;
+
+private:
+    any value_;
+    const reflection_manager* manager_;
+};
 }
