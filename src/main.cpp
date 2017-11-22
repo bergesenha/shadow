@@ -170,7 +170,13 @@ main()
     for(auto i = myspace::manager.member_functions(); i.first != i.second;
         ++i.first)
     {
-        std::cout << '.';
+        std::cout << myspace::manager.type_name(
+                         myspace::manager.member_function_return_type(*i.first))
+                  << " "
+                  << myspace::manager.type_name(
+                         myspace::manager.member_function_object_type(*i.first))
+                  << "::" << myspace::manager.member_function_name(*i.first)
+                  << '\n';
     }
     std::cout << '\n';
 
