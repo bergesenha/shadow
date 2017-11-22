@@ -118,15 +118,16 @@ SHADOW_INIT()
 int
 main()
 {
-    for(auto i = myspace::manager.types(); i.first != i.second;
-        ++i.first)
+    for(auto i = myspace::manager.types(); i.first != i.second; ++i.first)
     {
-        std::cout << myspace::manager.type_name(*i.first) << '\n';
+        // std::cout << myspace::manager.type_name(*i.first) << '\n';
     }
     for(auto i = myspace::manager.constructors(); i.first != i.second;
         ++i.first)
     {
-        std::cout << '.';
+        std::cout << myspace::manager.type_name(
+                         myspace::manager.constructor_type(*i.first))
+                  << '\n';
     }
     std::cout << '\n';
 

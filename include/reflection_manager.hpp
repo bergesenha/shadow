@@ -3,6 +3,8 @@
 #include <utility>
 #include <vector>
 #include <numeric>
+#include <algorithm>
+#include <sstream>
 
 #include <array_view.hpp>
 #include <member_iterator.hpp>
@@ -191,7 +193,31 @@ reflection_manager::member_variables() const
 inline std::string
 reflection_manager::type_name(const type_id& id) const
 {
-    return type_info_view_[id.info_ptr_->type_index].name;
+    std::ostringstream sout;
+    sout << type_info_view_[id.info_ptr_->type_index].name;
+    std::for_each(id.info_ptr_->attributes,
+                  id.info_ptr_->attributes + id.info_ptr_->num_attributes,
+                  [&sout](const auto att) {
+                  
+                  if(att == type_attribute::const_tag)
+                  {
+                    sout << " const";
+                  }
+                  if(att == type_attribute::pointer_tag)
+                  {
+                        sout << "*";
+                  }
+                  if(att == type_attribute::lreference_tag)
+                  {
+                        sout << "&";
+                  }
+                  if(att == type_attribute::rreference_tag)
+                  {
+                        sout << "&&";
+                  }
+                  
+                  });
+    return sout.str();
 }
 
 inline type_id
