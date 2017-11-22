@@ -132,7 +132,7 @@ main()
     for(auto i = myspace::manager.constructors(); i.first != i.second;
         ++i.first)
     {
-        std::cout << myspace::manager.constructor_type(*i.first).name() << ": ";
+        std::cout << i.first->type().name() << ": ";
 
         for(auto j = myspace::manager.constructor_parameter_types(*i.first);
             j.first != j.second;
@@ -166,9 +166,7 @@ main()
     for(auto i = myspace::manager.member_functions(); i.first != i.second;
         ++i.first)
     {
-        std::cout << myspace::manager.type_name(
-                         myspace::manager.member_function_return_type(*i.first))
-                  << " "
+        std::cout << i.first->return_type().name() << " "
                   << myspace::manager.type_name(
                          myspace::manager.member_function_object_type(*i.first))
                   << "::" << myspace::manager.member_function_name(*i.first)
@@ -191,9 +189,7 @@ main()
     for(auto i = myspace::manager.member_variables(); i.first != i.second;
         ++i.first)
     {
-        std::cout << myspace::manager.type_name(
-                         myspace::manager.member_variable_type(*i.first))
-                  << ' '
+        std::cout << i.first->type().name() << ' '
                   << myspace::manager.type_name(
                          myspace::manager.member_variable_object_type(*i.first))
                   << "::" << myspace::manager.member_variable_name(*i.first)

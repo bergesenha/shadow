@@ -31,6 +31,9 @@ class info_type_aggregate
     template <class Derived>
     friend struct return_type_policy;
 
+    template <class Derived>
+    friend struct type_policy;
+
 public:
     info_type_aggregate() = default;
 
@@ -94,7 +97,18 @@ struct return_type_policy
     }
 };
 
-typedef info_type_aggregate<constructor_info> constructor_id;
+template <class Derived>
+struct type_policy
+{
+    type_id
+    type() const
+    {
+        return type_id(*(static_cast<const Derived*>(this)->info_ptr_->type),
+                       *(static_cast<const Derived*>(this)->manager_));
+    }
+};
+
+typedef info_type_aggregate<constructor_info, type_policy> constructor_id;
 typedef info_type_aggregate<conversion_info> conversion_id;
 typedef info_type_aggregate<free_function_info, name_policy, return_type_policy>
     free_function_id;
@@ -102,7 +116,7 @@ typedef info_type_aggregate<member_function_info,
                             name_policy,
                             return_type_policy>
     member_function_id;
-typedef info_type_aggregate<member_variable_info, name_policy>
+typedef info_type_aggregate<member_variable_info, name_policy, type_policy>
     member_variable_id;
 
 
