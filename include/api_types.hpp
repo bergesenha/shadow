@@ -41,6 +41,8 @@ class info_type_aggregate
     template <class Derived>
     friend struct object_type_policy;
 
+    template <class Derived>
+    friend struct member_function_is_const_policy;
 public:
     info_type_aggregate() = default;
 
@@ -146,6 +148,16 @@ struct object_type_policy
     }
 };
 
+template <class Derived>
+struct member_function_is_const_policy
+{
+    bool
+    is_const() const
+    {
+        return static_cast<const Derived*>(this)->info_ptr_->constness;
+    }
+};
+
 typedef info_type_aggregate<constructor_info,
                             type_policy,
                             parameter_types_policy>
@@ -160,7 +172,8 @@ typedef info_type_aggregate<member_function_info,
                             name_policy,
                             return_type_policy,
                             parameter_types_policy,
-                            object_type_policy>
+                            object_type_policy,
+                            member_function_is_const_policy>
     member_function_id;
 typedef info_type_aggregate<member_variable_info,
                             name_policy,

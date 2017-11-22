@@ -170,7 +170,7 @@ main()
             std::cout << j.first->name() << ", ";
         }
         std::cout << ")";
-        if(myspace::manager.member_function_is_const(*i.first))
+        if(i.first->is_const())
         {
             std::cout << " const";
         }
