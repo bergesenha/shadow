@@ -25,7 +25,8 @@ struct b
 {
     b() = default;
     b(char k, const a& v) : key(k), value(v)
-    {}
+    {
+    }
 
     char key;
     a value;
@@ -143,7 +144,6 @@ main()
         }
 
         std::cout << "\n\n";
-
     }
     std::cout << '\n';
 
@@ -151,7 +151,17 @@ main()
     for(auto i = myspace::manager.free_functions(); i.first != i.second;
         ++i.first)
     {
-        std::cout << myspace::manager.type_name(myspace::manager.free_function_return_type(*i.first)) << ' ';
+        std::cout << myspace::manager.type_name(
+                         myspace::manager.free_function_return_type(*i.first))
+                  << ' ';
+
+        for(auto j = myspace::manager.free_function_parameter_types(*i.first);
+            j.first != j.second;
+            ++j.first)
+        {
+            std::cout << myspace::manager.type_name(*j.first) << ", ";
+        }
+
         std::cout << '\n';
     }
     std::cout << '\n';

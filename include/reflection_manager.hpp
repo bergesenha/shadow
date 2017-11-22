@@ -119,6 +119,9 @@ public:
 
     type_id free_function_return_type(const free_function_id& id) const;
 
+    std::pair<type_id_iterator, type_id_iterator>
+    free_function_parameter_types(const free_function_id& id) const;
+
 private:
     // views of raw compile time generated information
     helene::array_view<const type_info> type_info_view_;
@@ -250,5 +253,15 @@ inline type_id
 reflection_manager::free_function_return_type(const free_function_id& id) const
 {
     return type_id(*id.info_ptr_->return_type);
+}
+
+inline std::pair<reflection_manager::type_id_iterator,
+                 reflection_manager::type_id_iterator>
+reflection_manager::free_function_parameter_types(
+    const free_function_id& id) const
+{
+    return std::make_pair(type_id_iterator(id.info_ptr_->parameter_types),
+                          type_id_iterator(id.info_ptr_->parameter_types +
+                                           id.info_ptr_->num_parameters));
 }
 }
