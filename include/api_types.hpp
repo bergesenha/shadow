@@ -56,7 +56,9 @@ class object
 {
     friend class reflection_manager;
 
-    object(const any& value, const reflection_manager* manager);
+    object(const any& value,
+           const type_description* type,
+           const reflection_manager* manager);
 
 public:
     object() = default;
@@ -65,6 +67,7 @@ public:
 
 private:
     any value_;
+    const type_description* type_;
     const reflection_manager* manager_;
 };
 }
@@ -72,8 +75,10 @@ private:
 
 namespace shadow
 {
-inline object::object(const any& value, const reflection_manager* manager)
-    : value_(value), manager_(manager)
+inline object::object(const any& value,
+                      const type_description* type,
+                      const reflection_manager* manager)
+    : value_(value), type_(type), manager_(manager)
 {
 }
 

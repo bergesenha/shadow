@@ -108,6 +108,7 @@ public:
     std::pair<member_variable_id_iterator, member_variable_id_iterator>
     member_variables() const;
 
+    type_id object_type(const object& obj) const;
 
     std::string type_name(const type_id& id) const;
     type_id base_type(const type_id& id) const;
@@ -218,6 +219,18 @@ reflection_manager::member_variables() const
                                     member_variable_info_view_.size()));
 }
 
+inline type_id
+reflection_manager::object_type(const object& obj) const
+{
+    if(obj.has_value())
+    {
+        return type_id(*obj.type_);
+    }
+    else
+    {
+        return type_id(base_type_descriptions_[0]);
+    }
+}
 
 inline std::string
 reflection_manager::type_name(const type_id& id) const
