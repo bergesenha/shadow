@@ -118,6 +118,11 @@ public:
     std::pair<type_id_iterator, type_id_iterator>
     constructor_parameter_types(const constructor_id& id) const;
 
+    template <class Iterator>
+    object construct_object(const constructor_id& id,
+                            Iterator arg_first,
+                            Iterator arg_last) const;
+
     std::string free_function_name(const free_function_id& id) const;
 
     type_id free_function_return_type(const free_function_id& id) const;
@@ -281,6 +286,16 @@ reflection_manager::constructor_parameter_types(const constructor_id& id) const
     return std::make_pair(type_id_iterator(id.info_ptr_->parameter_types),
                           type_id_iterator(id.info_ptr_->parameter_types +
                                            id.info_ptr_->num_parameters));
+}
+
+template <class Iterator>
+object
+reflection_manager::construct_object(const constructor_id& id,
+                                     Iterator arg_first,
+                                     Iterator arg_last) const
+{
+    const auto bind_point = id.info_ptr_->bind_point;
+    // TODO: check arguments
 }
 
 inline std::string
