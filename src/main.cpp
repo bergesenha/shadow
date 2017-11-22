@@ -23,6 +23,10 @@ struct a
 
 struct b
 {
+    b() = default;
+    b(char k, const a& v) : key(k), value(v)
+    {}
+
     char key;
     a value;
     const char&
@@ -88,6 +92,8 @@ REGISTER_TYPE_END()
 
 REGISTER_CONSTRUCTOR(a, int, double)
 REGISTER_CONSTRUCTOR(a*, a*)
+REGISTER_CONSTRUCTOR(b)
+REGISTER_CONSTRUCTOR(b, char, const a&)
 
 REGISTER_FREE_FUNCTION(get_i)
 REGISTER_FREE_FUNCTION(long_function)
@@ -141,16 +147,12 @@ main()
     }
     std::cout << '\n';
 
-    for(auto i = myspace::manager.conversions(); i.first != i.second; ++i.first)
-    {
-        std::cout << '.';
-    }
-    std::cout << '\n';
 
     for(auto i = myspace::manager.free_functions(); i.first != i.second;
         ++i.first)
     {
-        std::cout << '.';
+        std::cout << myspace::manager.type_name(myspace::manager.free_function_return_type(*i.first)) << ' ';
+        std::cout << '\n';
     }
     std::cout << '\n';
 
