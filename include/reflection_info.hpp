@@ -4,6 +4,7 @@
 
 #include <cstddef>
 #include <string>
+#include <ostream>
 
 #include <type_descriptor.hpp>
 
@@ -31,6 +32,31 @@ struct type_description
     std::size_t num_attributes;
     const type_attribute* attributes;
 };
+
+inline std::ostream&
+operator<<(std::ostream& out, type_attribute att)
+{
+    switch(att)
+    {
+        case type_attribute::const_tag:
+            out << "const";
+            break;
+        case type_attribute::pointer_tag:
+            out << "*";
+            break;
+        case type_attribute::lreference_tag:
+            out << "&";
+            break;
+        case type_attribute::rreference_tag:
+            out << "&&";
+            break;
+        case type_attribute::array_tag:
+            out << "[]";
+            break;
+    }
+
+    return out;
+}
 
 
 struct constructor_info

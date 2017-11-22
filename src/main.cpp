@@ -132,15 +132,11 @@ main()
     for(auto i = myspace::manager.constructors(); i.first != i.second;
         ++i.first)
     {
-        std::cout << myspace::manager.type_name(
-                         myspace::manager.constructor_type(*i.first))
-                  << ": ";
+        std::cout << i.first->type().name() << ": ";
 
-        for(auto j = myspace::manager.constructor_parameter_types(*i.first);
-            j.first != j.second;
-            ++j.first)
+        for(auto j = i.first->parameter_types(); j.first != j.second; ++j.first)
         {
-            std::cout << myspace::manager.type_name(*j.first) << ", ";
+            std::cout << j.first->name() << ", ";
         }
 
         std::cout << "\n\n";
@@ -151,16 +147,12 @@ main()
     for(auto i = myspace::manager.free_functions(); i.first != i.second;
         ++i.first)
     {
-        std::cout << myspace::manager.type_name(
-                         myspace::manager.free_function_return_type(*i.first))
-                  << ' ' << myspace::manager.free_function_name(*i.first)
+        std::cout << i.first->return_type().name() << ' ' << i.first->name()
                   << '(';
 
-        for(auto j = myspace::manager.free_function_parameter_types(*i.first);
-            j.first != j.second;
-            ++j.first)
+        for(auto j = i.first->parameter_types(); j.first != j.second; ++j.first)
         {
-            std::cout << myspace::manager.type_name(*j.first) << ", ";
+            std::cout << j.first->name() << ", ";
         }
 
         std::cout << '\n';
@@ -170,21 +162,15 @@ main()
     for(auto i = myspace::manager.member_functions(); i.first != i.second;
         ++i.first)
     {
-        std::cout << myspace::manager.type_name(
-                         myspace::manager.member_function_return_type(*i.first))
-                  << " "
-                  << myspace::manager.type_name(
-                         myspace::manager.member_function_object_type(*i.first))
-                  << "::" << myspace::manager.member_function_name(*i.first)
+        std::cout << i.first->return_type().name() << " "
+                  << i.first->object_type().name() << "::" << i.first->name()
                   << '(';
-        for(auto j = myspace::manager.member_function_parameter_types(*i.first);
-            j.first != j.second;
-            ++j.first)
+        for(auto j = i.first->parameter_types(); j.first != j.second; ++j.first)
         {
-            std::cout << myspace::manager.type_name(*j.first) << ", ";
+            std::cout << j.first->name() << ", ";
         }
         std::cout << ")";
-        if(myspace::manager.member_function_is_const(*i.first))
+        if(i.first->is_const())
         {
             std::cout << " const";
         }
@@ -195,12 +181,32 @@ main()
     for(auto i = myspace::manager.member_variables(); i.first != i.second;
         ++i.first)
     {
-        std::cout << myspace::manager.type_name(
-                         myspace::manager.member_variable_type(*i.first))
-                  << ' '
-                  << myspace::manager.type_name(
-                         myspace::manager.member_variable_object_type(*i.first))
-                  << "::" << myspace::manager.member_variable_name(*i.first) << " offset=" << myspace::manager.member_variable_offset(*i.first) << '\n';
+        std::cout << i.first->type().name() << ' '
+                  << i.first->object_type().name() << "::" << i.first->name()
+                  << " offset=" << i.first->offset() << '\n';
     }
     std::cout << '\n';
+
+
+    auto constructor_range = myspace::manager.constructors();
+    std::vector<shadow::constructor_id> default_constructors;
+
+    std::copy_if(constructor_range.first,
+                 constructor_range.second,
+                 std::back_inserter(default_constructors),
+                 [](const auto& id) {
+                     auto arg_pair =
+                         myspace::manager.constructor_parameter_types(id);
+
+                     return std::distance(arg_pair.first, arg_pair.second) == 0;
+                 });
+
+    std::vector<shadow::object> default_constructed_objects;
+    default_constructed_objects.reserve(default_constructors.size());
+
+    std::transform(
+        default_constructors.begin(),
+        default_constructors.end(),
+        std::back_inserter(default_constructed_objects),
+        [](const auto& id) { return myspace::manager.construct_object(id); });
 }

@@ -4,6 +4,7 @@
 
 namespace shadow
 {
+class reflection_manager;
 template <class InfoType, class ProxyType>
 class info_iterator_
 {
@@ -20,24 +21,26 @@ public:
     info_iterator_() = default;
 
 
-    explicit info_iterator_(const InfoType* current) : current_(current)
+    explicit info_iterator_(const InfoType* current,
+                            const reflection_manager* man)
+        : current_(current), manager_(man)
     {
     }
 
 public:
     ProxyType operator*() const
     {
-        return ProxyType(*current_);
+        return ProxyType(*current_, *manager_);
     }
 
     ProxyType operator->() const
     {
-        return ProxyType(*current_);
+        return ProxyType(*current_, *manager_);
     }
 
     ProxyType operator[](difference_type n) const
     {
-        return ProxyType(*(current_ + n));
+        return ProxyType(*(current_ + n), *manager_);
     }
 
     info_iterator_& operator++()
@@ -142,6 +145,7 @@ public:
 
 private:
     InfoType* current_;
+    const reflection_manager* manager_;
 };
 
 
