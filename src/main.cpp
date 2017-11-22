@@ -153,7 +153,8 @@ main()
     {
         std::cout << myspace::manager.type_name(
                          myspace::manager.free_function_return_type(*i.first))
-                  << ' ';
+                  << ' ' << myspace::manager.free_function_name(*i.first)
+                  << '(';
 
         for(auto j = myspace::manager.free_function_parameter_types(*i.first);
             j.first != j.second;

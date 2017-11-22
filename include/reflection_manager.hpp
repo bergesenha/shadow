@@ -117,6 +117,8 @@ public:
     std::pair<type_id_iterator, type_id_iterator>
     constructor_parameter_types(const constructor_id& id) const;
 
+    std::string free_function_name(const free_function_id& id) const;
+
     type_id free_function_return_type(const free_function_id& id) const;
 
     std::pair<type_id_iterator, type_id_iterator>
@@ -247,6 +249,12 @@ reflection_manager::constructor_parameter_types(const constructor_id& id) const
     return std::make_pair(type_id_iterator(id.info_ptr_->parameter_types),
                           type_id_iterator(id.info_ptr_->parameter_types +
                                            id.info_ptr_->num_parameters));
+}
+
+inline std::string
+reflection_manager::free_function_name(const free_function_id& id) const
+{
+    return id.info_ptr_->name;
 }
 
 inline type_id
