@@ -125,10 +125,14 @@ SHADOW_INIT()
 int
 main()
 {
+    std::cout << "all registered types:\n";
     for(auto i = myspace::manager.types(); i.first != i.second; ++i.first)
     {
-        // std::cout << myspace::manager.type_name(*i.first) << '\n';
+        std::cout << i.first->name() << '\n';
     }
+    std::cout << "\n\n";
+
+    std::cout << "all registered constructors:\n";
     for(auto i = myspace::manager.constructors(); i.first != i.second;
         ++i.first)
     {
@@ -143,7 +147,7 @@ main()
     }
     std::cout << '\n';
 
-
+    std::cout << "all registered free functions:\n";
     for(auto i = myspace::manager.free_functions(); i.first != i.second;
         ++i.first)
     {
@@ -157,8 +161,9 @@ main()
 
         std::cout << '\n';
     }
-    std::cout << '\n';
+    std::cout << "\n\n";
 
+    std::cout << "all registered member functions:\n";
     for(auto i = myspace::manager.member_functions(); i.first != i.second;
         ++i.first)
     {
@@ -176,8 +181,9 @@ main()
         }
         std::cout << '\n';
     }
-    std::cout << '\n';
+    std::cout << "\n\n";
 
+    std::cout << "all registered member variables:\n";
     for(auto i = myspace::manager.member_variables(); i.first != i.second;
         ++i.first)
     {
@@ -185,7 +191,7 @@ main()
                   << i.first->object_type().name() << "::" << i.first->name()
                   << " offset=" << i.first->offset() << '\n';
     }
-    std::cout << '\n';
+    std::cout << "\n\n";
 
 
     auto constructor_range = myspace::manager.constructors();
