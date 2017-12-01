@@ -50,7 +50,7 @@ class info_type_aggregate
     friend struct offset_policy;
 
     template <class Derived>
-    friend struct equal_policy;
+    friend struct equal_by_name_policy;
 
 public:
     info_type_aggregate() = default;
@@ -113,7 +113,7 @@ struct name_policy
 };
 
 template <class Derived>
-struct equal_policy
+struct equal_by_name_policy
 {
     bool
     operator==(const Derived& other) const
@@ -124,7 +124,9 @@ struct equal_policy
     }
 };
 
-typedef info_type_aggregate<type_description, type_name_policy, equal_policy>
+typedef info_type_aggregate<type_description,
+                            type_name_policy,
+                            equal_by_name_policy>
     type_id;
 
 typedef info_iterator_<const type_description, type_id> type_id_iterator;
@@ -225,7 +227,7 @@ typedef info_type_aggregate<member_variable_info,
                             type_policy,
                             object_type_policy,
                             offset_policy,
-                            equal_policy>
+                            equal_by_name_policy>
     member_variable_id;
 
 
