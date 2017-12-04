@@ -72,7 +72,7 @@ public:
                        ConversionInfoArray& cv_arr,
                        FreeFunctionInfoArray& ff_arr,
                        MemberFunctionInfoArray& mf_arr,
-                       MemberVariableInfoArray& mv_arr)
+                       MemberVariableInfoArray& mv_arr) noexcept
         : type_info_view_(array_specializer<TypeInfoArray>::initialize(ti_arr)),
           constructor_info_view_(
               array_specializer<ConstructorInfoArray>::initialize(ctr_arr)),
