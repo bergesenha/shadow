@@ -16,3 +16,4 @@ Session.vim
 build_gcc_release/
 build_ubsan/
 build_asan/
+manifest
