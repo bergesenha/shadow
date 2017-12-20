@@ -17,6 +17,8 @@
 namespace shadow
 {
 
+// array_specializer: handles the case where when T is a pointer instead of an
+// array, indicating that the held static member is 'empty', ie. nullptr value.
 template <class T>
 struct array_specializer;
 
@@ -40,12 +42,16 @@ struct array_specializer<const T[N]>
     }
 };
 
+
+// reflection_manager: handles interaction with the registered reflection
+// information.
 class reflection_manager
 {
     template <class Derived>
     friend struct type_name_policy;
 
 public:
+    // member types
     typedef info_iterator_<const type_description, type_id> type_id_iterator;
     typedef info_iterator_<const constructor_info, constructor_id>
         constructor_id_iterator;
@@ -100,59 +106,109 @@ public:
 
 
 public:
+    // returns a range of iterators to type_id's representing all types
+    // registered
     std::pair<type_id_iterator, type_id_iterator> types() const;
+
+    // returns a range of iterators to constructor_id's representing all
+    // constructors registered
     std::pair<constructor_id_iterator, constructor_id_iterator>
     constructors() const;
+
+    // returns a range of iterators to conversion_id's representing all implicit
+    // conversions between types registered
     std::pair<conversion_id_iterator, conversion_id_iterator>
     conversions() const;
+
+    // returns a range of iterators to free_function_id's representing all
+    // registered free functions
     std::pair<free_function_id_iterator, free_function_id_iterator>
     free_functions() const;
+
+    // returns a range of iterators to member_function_id's representing all
+    // member functions of all types registered
     std::pair<member_function_id_iterator, member_function_id_iterator>
     member_functions() const;
+
+    // returns a range of iterators to member_variable_id's representing all
+    // member variables of all types registered
     std::pair<member_variable_id_iterator, member_variable_id_iterator>
     member_variables() const;
 
+    // returns a type_id representing the type of the given object obj
     type_id object_type(const object& obj) const;
 
+    // returns a string of the name of the type represented by the type_id id
     std::string type_name(const type_id& id) const;
+
+    // returns a type_id representing the base type (the type of id, with all
+    // qualifiers and attributes removed)
     type_id base_type(const type_id& id) const;
 
+    // returns a type_id representing the type of an object that would be
+    // constructed by the constructor id
     type_id constructor_type(const constructor_id& id) const;
 
+    // returns a range of iterators to type_id's representing the types of the
+    // parameters of the given constructor id
     std::pair<type_id_iterator, type_id_iterator>
     constructor_parameter_types(const constructor_id& id) const;
 
+    // returns an object holding an instance of a type that is constructed by
+    // the given constructor id, given the range to arguments (of type object)
     template <class Iterator>
     object construct_object(const constructor_id& id,
                             Iterator arg_first,
                             Iterator arg_last) const;
 
+    // returns an object holding an instance of a type that is constructed by
+    // the given constructor that takes no arguments
     object construct_object(const constructor_id& id) const;
 
+    // returns a string of the name of the free function represented by the
+    // given free_function_id id
     std::string free_function_name(const free_function_id& id) const;
 
+    // returns a type_id representing the return type of the given free function
+    // id
     type_id free_function_return_type(const free_function_id& id) const;
 
+    // returns a range to type_id's representing the types of parameters of the
+    // given free function id
     std::pair<type_id_iterator, type_id_iterator>
     free_function_parameter_types(const free_function_id& id) const;
 
+    // returns a string of the name of the given member function id
     std::string member_function_name(const member_function_id& id) const;
 
+    // returns a type_id representing the return type of the given member
+    // function id
     type_id member_function_return_type(const member_function_id& id) const;
 
+    // returns a type_id representing the type of the class that the given
+    // member function id is a member of
     type_id member_function_object_type(const member_function_id& id) const;
 
+    // returns a range of iterators to type_id's representing the parameter
+    // types of the given member function id
     std::pair<type_id_iterator, type_id_iterator>
     member_function_parameter_types(const member_function_id& id) const;
 
+    // returns true if the given member function is const
     bool member_function_is_const(const member_function_id& id) const;
 
+    // returns a string of the name of the given member variable
     std::string member_variable_name(const member_variable_id& id) const;
 
+    // returns a type_id representing the type of the given member variable id
     type_id member_variable_type(const member_variable_id& id) const;
 
+    // returns a type_id representing the type of the class that the given
+    // member variable id is a member of
     type_id member_variable_object_type(const member_variable_id& id) const;
 
+    // returns the offset of a member variable within its class, equivalent to
+    // offsetof
     std::size_t member_variable_offset(const member_variable_id& id) const;
 
 private:
@@ -171,7 +227,6 @@ private:
 
 namespace shadow
 {
-
 }
 
 
