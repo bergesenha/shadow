@@ -246,6 +246,8 @@ typedef info_type_aggregate<member_variable_info,
     member_variable_id;
 
 
+// object: class potentially holds a value of any type (that can be held by a
+// shadow::any) along with information about the type of the value held
 class object
 {
     friend class reflection_manager;
