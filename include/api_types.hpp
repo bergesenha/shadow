@@ -19,6 +19,7 @@ namespace shadow
 
 class reflection_manager;
 
+// policy aggregator for information/id types
 template <class InfoType, template <class> class... Policies>
 class info_type_aggregate
     : public Policies<info_type_aggregate<InfoType, Policies...>>...
@@ -76,6 +77,8 @@ protected:
 };
 
 
+// type_name_policy: implements the member function name, building a string from
+// a type's name and qualifiers and attributes
 template <class Derived>
 struct type_name_policy
 {
@@ -102,6 +105,10 @@ struct type_name_policy
     }
 };
 
+
+// name_policy: implements the member function name, building a string from the
+// pointer to char array of an information struct (typically instantiated at
+// compile time)
 template <class Derived>
 struct name_policy
 {
@@ -112,6 +119,9 @@ struct name_policy
     }
 };
 
+
+// equal_by_name_policy: implements operator== based on string matching of the
+// name
 template <class Derived>
 struct equal_by_name_policy
 {
@@ -124,6 +134,8 @@ struct equal_by_name_policy
     }
 };
 
+
+// type_id: aggregate information type representing a type
 typedef info_type_aggregate<type_description,
                             type_name_policy,
                             equal_by_name_policy>
@@ -131,6 +143,9 @@ typedef info_type_aggregate<type_description,
 
 typedef info_iterator_<const type_description, type_id> type_id_iterator;
 
+
+// return_type_policy: implements the member function return_type, returning a
+// type_id of the return type of a function-like invocation
 template <class Derived>
 struct return_type_policy
 {
